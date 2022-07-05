@@ -1,12 +1,15 @@
 # budgeting-app-frontend
 
 ## Dev requirements
-- Node v16.15.1 (if you have nvm, simply run `nvm use`)
-- npm v8.11.0 (probably doesn't matter)
+- Node v16.15.1 or higher (if you have nvm, simply run `nvm use`)
+- npm v8.11.0 or higher
 
-Q. Why do we need a specific node version?
+Don't have this specific version of node? Check out [nvm](https://github.com/coreybutler/nvm-windows#installation--upgrades). After installing, run the following:
 
-A. Because expo only works for specific node versions.
+```sh
+nvm install 16.15.1
+nvm use 16.15.1
+```
 
 ## Dev setup
 1. Clone this repo and cd into it.
