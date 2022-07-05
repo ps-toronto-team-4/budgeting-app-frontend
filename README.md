@@ -5,6 +5,7 @@
 - npm v8.11.0 (probably doesn't matter)
 
 Q. Why do we need a specific node version?
+
 A. Because expo only works for specific node versions.
 
 ## Dev setup
