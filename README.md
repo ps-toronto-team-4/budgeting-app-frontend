@@ -1,10 +1,26 @@
 # budgeting-app-frontend
 
 ## Dev requirements
-- Node v16.15.1 (if you have nvm, simply run `nvm use`)
-- npm v8.11.0
+- Node >=16.0.0 <17.0.0
+
+Don't have this specific version of node? Check out [nvm](https://github.com/coreybutler/nvm-windows#installation--upgrades). After installing, run the following if you are on Linux or wsl:
+
+```sh
+nvm use
+```
+
+Or if you are on Windows, you can run the following:
+
+```sh
+nvm install 16.15.1
+nvm use 16.15.1
+```
 
 ## Dev setup
-1. Clone this repo and cd into it.
-2. Install node_modules with `npm install`
-3. Start dev server with `npm start`
+
+```sh
+git clone
+cd budgeting-app-frontend
+npm install
+npm start
+```
