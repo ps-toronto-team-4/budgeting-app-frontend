@@ -17,9 +17,10 @@ nvm use
 ```
 
 ## Dev setup
-Clone this repo and cd into it. Run the following:
 
 ```sh
-Install node_modules with `npm install`
-Start dev server with `npm start`
+git clone
+cd budgeting-app-frontend
+npm install
+npm start
 ```
