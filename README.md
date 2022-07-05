@@ -12,6 +12,9 @@ nvm use 16.15.1
 ```
 
 ## Dev setup
-1. Clone this repo and cd into it.
-2. Install node_modules with `npm install`
-3. Start dev server with `npm start`
+Clone this repo and cd into it. Run the following:
+
+```sh
+Install node_modules with `npm install`
+Start dev server with `npm start`
+```
