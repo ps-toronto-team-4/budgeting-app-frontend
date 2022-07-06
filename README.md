@@ -1,7 +1,7 @@
 # budgeting-app-frontend
 
 ## Dev requirements
-- Node >=16.0.0 <17.0.0
+- Node >=16.0.0 <17.0.0 (expo only works for these versions)
 
 Don't have this specific version of node? Check out [nvm](https://github.com/coreybutler/nvm-windows#installation--upgrades). After installing, run the following if you are on Linux or wsl:
 
