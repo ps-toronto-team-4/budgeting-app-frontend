@@ -6,12 +6,6 @@
 Don't have this specific version of node? Check out [nvm](https://github.com/coreybutler/nvm-windows#installation--upgrades). After installing, run the following if you are on Linux or wsl:
 
 ```sh
-nvm use
-```
-
-Or if you are on Windows, you can run the following:
-
-```sh
 nvm install 16.15.1
 nvm use 16.15.1
 ```
