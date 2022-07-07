@@ -25,7 +25,7 @@ npm install
 npm start
 ```
 
-To make writing graphql easier, it is recommended you install the [Apollo GraphQL](https://marketplace.visualstudio.com/items?itemName=apollographql.vscode-apollo) VSCode extension. It will read the endpoints in the apollo.config.js file and provide intellisense when writing queries in .graphql files. 
+To make writing graphql easier, it is recommended you install the [Apollo GraphQL](https://marketplace.visualstudio.com/items?itemName=apollographql.vscode-apollo) VSCode extension. It will read the endpoints in the apollo.config.js file and provide intellisense when writing graphql queries. 
 
 ## Resources
 - [React Native - Getting Started](https://reactnative.dev/docs/getting-started)
