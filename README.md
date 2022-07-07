@@ -10,6 +10,12 @@ nvm install 16.15.1
 nvm use 16.15.1
 ```
 
+To make this node version your default, it is recommended you run:
+
+```sh
+nvm alias default 16.15.1
+```
+
 ## Dev setup
 
 ```sh
