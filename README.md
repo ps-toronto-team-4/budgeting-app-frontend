@@ -13,7 +13,7 @@ nvm use 16.15.1
 ## Dev setup
 
 ```sh
-git clone
+git clone https://github.com/ps-toronto-team-4/budgeting-app-frontend.git
 cd budgeting-app-frontend
 npm install
 npm start
