@@ -1,6 +1,12 @@
 import { AppRegistry } from 'react-native';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-import Root from './src/app/Root';
+import Root from './components/Root';
+import useCachedResources from './hooks/useCachedResources';
+import useColorScheme from './hooks/useColorScheme';
+import Navigation from './navigation';
+import HelloWorld from './components/HelloWorld';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 
 // Initialize Apollo Client
 const client = new ApolloClient({
@@ -11,9 +17,20 @@ const client = new ApolloClient({
 AppRegistry.registerComponent('MyApplication', () => App);
 
 export default function App() {
-  return (
-    <ApolloProvider client={client}>
-      <Root></Root>
-    </ApolloProvider>
-  );
+  const isLoadingComplete = useCachedResources();
+  const colorScheme = useColorScheme();
+
+  if (!isLoadingComplete) {
+    return null;
+  } else {
+    return (
+      <ApolloProvider client={client}>
+        <SafeAreaProvider>
+          <HelloWorld></HelloWorld>
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar />
+        </SafeAreaProvider>
+      </ApolloProvider>
+    );
+  }
 }
