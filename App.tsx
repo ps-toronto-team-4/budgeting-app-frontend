@@ -4,7 +4,6 @@ import Root from './components/Root';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
-import HelloWorld from './components/HelloWorld';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
@@ -26,7 +25,6 @@ export default function App() {
     return (
       <ApolloProvider client={client}>
         <SafeAreaProvider>
-          <HelloWorld></HelloWorld>
           <Navigation colorScheme={colorScheme} />
           <StatusBar />
         </SafeAreaProvider>

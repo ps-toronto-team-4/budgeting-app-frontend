@@ -2,6 +2,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import Colors from '../constants/Colors';
+import GraphqlTest from './GraphqlTest';
 import { MonoText } from './StyledText';
 import { Text, View } from './Themed';
 
@@ -37,6 +38,14 @@ export default function EditScreenInfo({ path }: { path: string }) {
             Tap here if your app doesn't automatically update after making changes
           </Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.testContainer}>
+        <Text
+          lightColor="rgba(0,0,0,0.8)"
+          darkColor="rgba(255,255,255,0.8)">
+          <GraphqlTest></GraphqlTest>
+        </Text>
       </View>
     </View>
   );
@@ -76,4 +85,9 @@ const styles = StyleSheet.create({
   helpLinkText: {
     textAlign: 'center',
   },
+  testContainer: {
+    marginTop: 20,
+    marginHorizontal: 20,
+    alignItems: 'center'
+  }
 });
