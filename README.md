@@ -35,3 +35,4 @@ To make writing graphql easier, it is recommended you install the [Apollo GraphQ
 - [Apollo Client - React Native Integration](https://www.apollographql.com/docs/react/integrations/react-native)
 - [GraphQL Language Reference](https://graphql.org/learn/)
 - [GraphQL Code Generator for React/Apollo](https://www.graphql-code-generator.com/docs/guides/react#apollo-and-urql)
+- [React Navigation](https://reactnavigation.org/docs/getting-started)
