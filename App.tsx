@@ -1,6 +1,5 @@
 import { AppRegistry } from 'react-native';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-import Root from './components/Root';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
