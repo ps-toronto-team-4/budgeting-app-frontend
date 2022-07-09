@@ -1,3 +1,4 @@
+import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -1321,3 +1322,6 @@ export type GetMuskQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetMuskQuery = { __typename?: 'Query', company?: { __typename?: 'Info', ceo?: string | null } | null };
+
+
+export const GetMuskDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getMusk"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"company"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ceo"}}]}}]}}]} as unknown as DocumentNode<GetMuskQuery, GetMuskQueryVariables>;
