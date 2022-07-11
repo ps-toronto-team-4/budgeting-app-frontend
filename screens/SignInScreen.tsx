@@ -1,17 +1,47 @@
-import { StyleSheet } from 'react-native';
+import React from "react"
+import { StyleSheet, SafeAreaView, TextInput, Button, Alert } from 'react-native';
 
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 
-export default function TabTwoScreen() {
+const LogInForm = () => {
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+
+  return(
+    <SafeAreaView>
+      <TextInput 
+        style = {styles.input}
+        placeholder = "Username"
+        onChangeText={username => setUsername(username)}
+        value = {username}
+        >
+      </TextInput>
+      
+      <TextInput 
+        style = {styles.input}
+        placeholder = "Password"
+        onChangeText={password => setPassword(password)}
+        value = {password}
+        >
+      </TextInput>
+      <Text style = {styles.fpassword}>Forgot Password?</Text>
+      <Button title = "Sign In" onPress={() => Alert.alert('Button pressed')}></Button>
+    </SafeAreaView>
+  );
+};
+
+export default function SignInScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
+      <Text style={styles.title}>Sign into your account</Text>
+      <LogInForm></LogInForm>
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -22,10 +52,33 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    width: 150,
+    textAlign: 'center',
+    marginBottom: 50,
   },
   separator: {
     marginVertical: 30,
     height: 1,
     width: '80%',
   },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderColor: '#ccc',
+    borderRadius: 15,
+  },
+  fpassword: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 50
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderColor: '#ccc',
+    borderRadius: 15,
+  }
 });
