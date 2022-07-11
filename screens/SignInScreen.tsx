@@ -11,6 +11,7 @@ const LogInForm = () => {
 
   return(
     <SafeAreaView>
+      <Text style={styles.title}>Sign into your account</Text>
       <TextInput 
         style = {styles.input}
         placeholder = "Username"
@@ -35,7 +36,6 @@ const LogInForm = () => {
 export default function SignInScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign into your account</Text>
       <LogInForm></LogInForm>
     </View>
   );
