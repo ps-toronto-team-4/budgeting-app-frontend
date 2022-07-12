@@ -1,4 +1,4 @@
-schema: http://api.spacex.land/graphql/
+schema: http://localhost:9090/graphql/
 documents: './components/**/*.graphql'
 generates:
   ./components/generated.ts:

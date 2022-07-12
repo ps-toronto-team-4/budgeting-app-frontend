@@ -8,7 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 
 // Initialize Apollo Client
 const client = new ApolloClient({
-  uri: 'http://api.spacex.land/graphql', // TODO: change this to our api endpoint
+  uri: 'http://localhost:9090/graphql', // TODO: change this to our api endpoint
   cache: new InMemoryCache()
 });
 
