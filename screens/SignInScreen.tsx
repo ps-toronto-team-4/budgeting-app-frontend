@@ -1,10 +1,11 @@
 import React from "react"
-import { StyleSheet, SafeAreaView, TextInput, Button, Alert, TouchableOpacity, Pressable,  } from 'react-native';
+import { StyleSheet, SafeAreaView, TextInput, Button, Alert, TouchableOpacity, Pressable, Modal  } from 'react-native';
 
-import ForgotPasswordScreen from '../screens/ForgotPasswordScreen'
 import Colors from '../constants/Colors';
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from "../types";
+import { useQuery } from '@apollo/client';
+import Graphql from "../components/Graphql";
 
 const LogInForm = (props:any) => {
   const [username, setUsername] = React.useState("");
@@ -13,26 +14,26 @@ const LogInForm = (props:any) => {
 
   return(
     <SafeAreaView>
-      
-      <TextInput 
-        style = {styles.input}
-        placeholder = "Username"
-        onChangeText={username => setUsername(username)}
-        value = {username}
-        >
-      </TextInput>
-      
-      <TextInput 
-        style = {styles.input}
-        placeholder = "Password"
-        onChangeText={password => setPassword(password)}
-        value = {password}
-        >
-      </TextInput>
+      <View style= {styles.textfields}>
+        <TextInput 
+          style = {styles.input}
+          placeholder = "Username"
+          onChangeText={username => setUsername(username)}
+          value = {username}
+          >
+        </TextInput>
+        
+        <TextInput 
+          style = {styles.input}
+          placeholder = "Password"
+          onChangeText={password => setPassword(password)}
+          value = {password}
+          secureTextEntry={true}
+          >
+        </TextInput>
+      </View>
 
-      
-
-      <Button title = "Sign In" onPress={() => Alert.alert('Button pressed')}></Button>
+      <Button title = "Sign In" onPress={() => checkInfo(username, password)}></Button>
     </SafeAreaView>
   );
 };
@@ -49,8 +50,22 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
             Forgot Password?
           </Text>
       </TouchableOpacity>
+
+      <View style={styles.testContainer}>
+        <Text
+          lightColor="rgba(0,0,0,0.8)"
+          darkColor="rgba(255,255,255,0.8)">
+          <Graphql></Graphql>
+        </Text>
+      </View>
     </View>
   );
+}
+
+
+
+function checkInfo(username: String, password: String){
+  
 }
 
 
@@ -66,7 +81,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width: 150,
     textAlign: 'center',
-    marginBottom: 50,
+    margin: 20,
   },
   separator: {
     marginVertical: 30,
@@ -81,6 +96,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderColor: '#ccc',
     borderRadius: 15,
+  },
+  textfields: {
+    marginBottom: 100,
   },
   fpassword: {
     fontWeight: 'bold',
@@ -112,4 +130,9 @@ const styles = StyleSheet.create({
   helpLinkText: {
     textAlign: 'center',
   },
+  testContainer: {
+    marginTop: 20,
+    marginHorizontal: 20,
+    alignItems: 'center'
+  }
 });

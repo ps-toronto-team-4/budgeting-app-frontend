@@ -40,7 +40,7 @@ function RootNavigator() {
     <Stack.Navigator>
       {/* <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} /> */}
       {/* <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} /> */}
-      <Stack.Screen name="SignIn" component={SignInScreen} options={{title: 'Tab Two',}}/>
+      <Stack.Screen name="SignIn" component={SignInScreen} options={{title: 'Sign In'}}/>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="ForgotPasswordModal" component={ForgotPasswordScreen} />
       </Stack.Group>

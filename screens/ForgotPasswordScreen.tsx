@@ -7,9 +7,12 @@ import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from '../types';
 
 export default function ForgotPasswordScreen() {
+
+  const contactemail = 'admin@admin.com'
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Get rekt.</Text>
+      <Text style={styles.contactemail} >Please contact {contactemail} for a reset.</Text>
     </View>
   );
 }
@@ -23,6 +26,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  contactemail: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    textAlign: 'center',
+    width: '80%',
   },
   separator: {
     marginVertical: 30,
