@@ -27,8 +27,9 @@ const linking: LinkingOptions<RootStackParamList> = {
           },
         },
       },
-      Modal: 'modal',
+      ForgotPasswordModal: 'fpassmodal',
       NotFound: '*',
+      SignIn: 'SignIn',
     },
   },
 };
