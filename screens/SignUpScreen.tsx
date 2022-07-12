@@ -30,6 +30,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     const [pwordConfirm, setPwordConfirm] = useState("")
     const [check, setCheck] = useState(false)
     const [pwordCheck, setPwordCheck] = useState(false)
+    const [emailCheck, setEmailCheck] = useState(false)
 
     // Create user graphql query
     const [createUser] = useMutation(CREATE_USER(fname, lname, username, email, phone, password), {
@@ -61,7 +62,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
 
     function PasswordRules() {
         let lengthCheck = password.length >= 8;
-        let upperCheck = /[A-Z]/.test(password);
+        let upperCheck = /[A-Za-z]/.test(password);
         let numberCheck = /\d/.test(password);
         let specialCheck = /[^A-Za-z0-9]/.test(password);
         if (upperCheck && lengthCheck && numberCheck && specialCheck) {
@@ -76,6 +77,17 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
                 {specialCheck? (<></>) : (<Text style={styles.reqs}> - At least one special character</Text>)}
             </View>
         )
+    }
+
+    function CheckEmail() {
+      let emailRegex = /[^\s/\\~`*'";:,|{}\[\]+=()#%$?]+@+[^\s/\\~`*'";:,|{}\[\]+=()#%$?]+[.]{1}[a-z]+/;
+      if (!emailCheck || emailRegex.test(email)) {
+        return (<></>);
+      } else {
+        return(
+          <Text style={styles.alert}>Invalid email address</Text>
+        )
+      }
     }
   
   return (
@@ -104,10 +116,12 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         <RequiredField input={username}/>
         <TextInput
             style={styles.input}
-            onChangeText={(email) => setEmail(email)}
+            onChangeText={(email) => {setEmail(email); setEmailCheck(false)}}
+            onBlur={() => setEmailCheck(true)}
             value={email}
             placeholder="Email*"
         />
+        <CheckEmail/>
         <RequiredField input={email}/>
         <TextInput
             style={styles.input}
