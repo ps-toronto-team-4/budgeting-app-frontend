@@ -17,12 +17,12 @@ const linking: LinkingOptions<RootStackParamList> = {
         screens: {
           SignIn: {
             screens: {
-              SignInScreen: 'Login',
+              SignInScreen: 'SignIn',
             },
           },
           SignUp: {
             screens: {
-              SignUpScreen: 'Register',
+              SignUpScreen: 'SignUp',
             },
           },
         },
