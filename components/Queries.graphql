@@ -1,5 +1,14 @@
-query getMusk {
-    company {
-        ceo
+query getPasswordHash ($username: String!, $password: String!) {
+    signIn(username: $username , password: $password){
+
+        __typename
+        ...on SignInSuccess{
+            passwordHash
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
     }
 }

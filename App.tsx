@@ -1,11 +1,10 @@
-import { ActivityIndicator, AppRegistry } from 'react-native';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { ActivityIndicator, AppRegistry, StyleSheet } from 'react-native';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
 
 // Initialize Apollo Client
 const client = new ApolloClient({
@@ -20,7 +19,7 @@ export default function App() {
   const colorScheme = useColorScheme();
 
   if (!isLoadingComplete) {
-    return (<ActivityIndicator size='large' style={styles.load}/>);
+    return (<ActivityIndicator size='large' style={styles.load} />);
   } else {
     return (
       <ApolloProvider client={client}>
