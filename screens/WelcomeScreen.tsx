@@ -1,4 +1,4 @@
-import { GestureResponderEvent, StyleSheet } from 'react-native';
+import { GestureResponderEvent, StyleSheet, Image } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
@@ -17,7 +17,9 @@ export default function WelcomeScreen({ navigation }: RootTabScreenProps<'Welcom
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to</Text>
       <Text style={styles.title}>[AppName]!</Text>
+      <Image style={styles.image} source={require('../assets/images/image_placeholder.png')}></Image>
       <Button text="Sign in" onPress={onPressSignIn}></Button>
+      <Text style={styles.registerCaption}>Don't have an account?</Text>
       <Button text="Create an account" onPress={onPressSignUp}></Button>
     </View>
   );
@@ -34,6 +36,16 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     fontFamily: 'Gill Sans MT'
+  },
+  image: {
+    height: 150,
+    width: 200,
+    marginVertical: 100,
+  },
+  registerCaption: {
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 5,
   },
   separator: {
     marginVertical: 30,
