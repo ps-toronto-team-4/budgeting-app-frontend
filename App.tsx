@@ -1,27 +1,16 @@
-import { AppRegistry } from 'react-native';
-import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
+import { ActivityIndicator, AppRegistry } from 'react-native';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { StyleSheet } from 'react-native';
 
 // Initialize Apollo Client
 const client = new ApolloClient({
-  //uri: 'http://localhost:9090/graphql', // TODO: change this to our api endpoint
-  cache: new InMemoryCache(),
-  link: new HttpLink({
-
-    uri: 'http://localhost:9090/graphql',
-
-    // fetchOptions: {
-
-    //   mode: 'no-cors'
-
-    // }
-
-}),
+  uri: 'https://backend.ps4.bornais.ca/graphiql?path=/graphql',
+  cache: new InMemoryCache()
 });
 
 AppRegistry.registerComponent('MyApplication', () => App);
@@ -31,7 +20,7 @@ export default function App() {
   const colorScheme = useColorScheme();
 
   if (!isLoadingComplete) {
-    return null;
+    return (<ActivityIndicator size='large' style={styles.load}/>);
   } else {
     return (
       <ApolloProvider client={client}>
@@ -43,3 +32,11 @@ export default function App() {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  load: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
+});
