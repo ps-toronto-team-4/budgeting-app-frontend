@@ -4,7 +4,6 @@ module.exports = {
             name: "api",
             url: "http://localhost:9090/graphql" // TODO: change this to our endpoint
         },
-        includes: ['./components/*.tsx', './components/*.graphql']
-            
+        includes: ["./components/**/*.tsx", "./components/**/*.graphql", "./components/**/*.gql"]
     }
 };

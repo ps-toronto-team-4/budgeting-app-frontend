@@ -1,4 +1,4 @@
-import { AppRegistry } from 'react-native';
+import { ActivityIndicator, AppRegistry, StyleSheet } from 'react-native';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
@@ -21,7 +21,7 @@ const client = new ApolloClient({
 
     // }
 
-}),
+  }),
 });
 
 AppRegistry.registerComponent('MyApplication', () => App);
@@ -31,7 +31,7 @@ export default function App() {
   const colorScheme = useColorScheme();
 
   if (!isLoadingComplete) {
-    return null;
+    return (<ActivityIndicator size='large' style={styles.load} />);
   } else {
     return (
       <ApolloProvider client={client}>
@@ -43,3 +43,11 @@ export default function App() {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  load: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
+});
