@@ -10,23 +10,12 @@ import * as Linking from 'expo-linking';
 import { RootStackParamList } from '../types';
 
 const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: [Linking.makeUrl('/')],
+  prefixes: [Linking.createURL('/')],
   config: {
     screens: {
-      Welcome: {
-        screens: {
-          SignIn: {
-            screens: {
-              SignInScreen: 'SignIn',
-            },
-          },
-          SignUp: {
-            screens: {
-              SignUpScreen: 'SignUp',
-            },
-          },
-        },
-      },
+      Welcome: '',
+      SignIn: 'login',
+      SignUp: 'register',
       ForgotPasswordModal: 'ForgotPassword',
       NotFound: '*',
       SignIn: 'Sign In',

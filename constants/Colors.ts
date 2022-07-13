@@ -8,6 +8,8 @@ export default {
     tint: tintColorLight,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
+    btnBackground: 'hsl(213,10%,18%)',
+    btnText: 'hsl(0,0%,100%)',
   },
   dark: {
     text: '#fff',
@@ -15,5 +17,7 @@ export default {
     tint: tintColorDark,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
+    btnBackground: 'hsl(0,50%,50%)',
+    btnText: 'hsl(0,0%,0%)', // TODO: test dark mode btn color scheme
   },
 };
