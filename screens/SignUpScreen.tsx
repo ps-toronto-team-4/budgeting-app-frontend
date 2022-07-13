@@ -1,6 +1,7 @@
 import { gql, useMutation } from '@apollo/client';
 import React, { useState } from 'react';
 import { Alert, Button, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 
@@ -31,6 +32,8 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     const [check, setCheck] = useState(false)
     const [pwordCheck, setPwordCheck] = useState(false)
     const [emailCheck, setEmailCheck] = useState(false)
+    const [phoneCheck, setPhoneCheck] = useState(false)
+    const [hidePword, setHidePword] = useState(true)
 
     // Create user graphql query
     const [createUser] = useMutation(CREATE_USER(fname, lname, username, email, phone, password), {
@@ -62,17 +65,17 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
 
     function PasswordRules() {
         let lengthCheck = password.length >= 8;
-        let upperCheck = /[A-Za-z]/.test(password);
+        let lettersCheck = /([A-Z].?[a-z])|([a-z].?[A-Z])/.test(password);
         let numberCheck = /\d/.test(password);
         let specialCheck = /[^A-Za-z0-9]/.test(password);
-        if (upperCheck && lengthCheck && numberCheck && specialCheck) {
+        if (lettersCheck && lengthCheck && numberCheck && specialCheck) {
             return (<></>);
         }
         return(
             <View>
                 <Text style={styles.reqs}>Password requirements:</Text>
                 {lengthCheck? (<></>) : (<Text style={styles.reqs}> - 8 characters minimum</Text>)}
-                {upperCheck? (<></>) : (<Text style={styles.reqs}> - Upper and lower case letters</Text>)}
+                {lettersCheck? (<></>) : (<Text style={styles.reqs}> - Upper and lower case letters</Text>)}
                 {numberCheck? (<></>) : (<Text style={styles.reqs}> - At least one number</Text>)}
                 {specialCheck? (<></>) : (<Text style={styles.reqs}> - At least one special character</Text>)}
             </View>
@@ -80,14 +83,31 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     }
 
     function CheckEmail() {
-      let emailRegex = /[^\s/\\~`*'";:,|{}\[\]+=()#%$?]+@+[^\s/\\~`*'";:,|{}\[\]+=()#%$?]+[.]{1}[a-z]+/;
-      if (!emailCheck || emailRegex.test(email)) {
+      let emailRegex = /^[^/\\*;:,{}\[\]()$?]+@+[^/\\~`*;:,|{}\[\]=()%$?]+[.]{1}[^/\\~`*;:,|{}\[\]=()%$?]+$/;
+      if (!emailCheck || !email || emailRegex.test(email)) {
         return (<></>);
       } else {
         return(
           <Text style={styles.alert}>Invalid email address</Text>
         )
       }
+    }
+
+    function CheckPhone() {
+      let phoneRegex = /^[0-9]{7,15}$/;
+      if (!phoneCheck || !phone || phoneRegex.test(phone)) {
+        return (<></>);
+      } else {
+        return(
+          <Text style={styles.alert}>Invalid phone number</Text>
+        )
+      }
+    }
+
+    function FormatPhone(newPhone: string) {
+      let phoneArray = newPhone.substring(1).replaceAll(/[^0-9]/g,"");
+      setPhone(phoneArray);
+      setPhoneCheck(false);
     }
   
   return (
@@ -116,7 +136,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         <RequiredField input={username}/>
         <TextInput
             style={styles.input}
-            onChangeText={(email) => {setEmail(email); setEmailCheck(false)}}
+            onChangeText={(email) => {setEmail(email.replaceAll(/\s+/g,"")); setEmailCheck(false)}}
             onBlur={() => setEmailCheck(true)}
             value={email}
             placeholder="Email*"
@@ -127,7 +147,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
             style={styles.input}
             onChangeText={(password) => setPassword(password)}
             value={password}
-            secureTextEntry={true}
+            secureTextEntry={hidePword}
             placeholder="Password*"
         />
         <RequiredField input={password}/>
@@ -137,7 +157,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
             onChangeText={(pword) => {setPwordConfirm(pword); setPwordCheck(false)}}
             onBlur={() => setPwordCheck(true)}
             value={pwordConfirm}
-            secureTextEntry={true}
+            secureTextEntry={hidePword}
             placeholder="Confirm Password*"
         />
         {(!pwordCheck || (pwordConfirm === password)) ? (
@@ -147,11 +167,13 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         )}
         <TextInput
             style={styles.input}
-            onChangeText={(phone) => setPhone(phone)}
-            value={phone}
+            onChangeText={(newPhone) => FormatPhone(newPhone)}
+            onBlur={() => setPhoneCheck(true)}
+            value={'+' + phone}
             keyboardType="phone-pad"
             placeholder="Phone Number"
         />
+        <CheckPhone/>
         <Button
             onPress={() => register()}
             title="Sign Up"
@@ -199,5 +221,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginHorizontal: 5,
     marginBottom: 1,
+  },
+  icon: {
+    marginHorizontal: 5
   }
 });
