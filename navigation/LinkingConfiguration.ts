@@ -13,20 +13,9 @@ const linking: LinkingOptions<RootStackParamList> = {
   prefixes: [Linking.createURL('/')],
   config: {
     screens: {
-      Welcome: {
-        screens: {
-          SignIn: {
-            screens: {
-              SignInScreen: 'Login',
-            },
-          },
-          SignUp: {
-            screens: {
-              SignUpScreen: 'Register',
-            },
-          },
-        },
-      },
+      Welcome: '',
+      SignIn: 'login',
+      SignUp: 'register',
       Modal: 'modal',
       NotFound: '*',
     },
