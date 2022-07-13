@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   image: {
     height: 150,
     width: 200,
-    marginVertical: 100,
+    marginVertical: 80
   },
   registerCaption: {
     fontWeight: 'bold',
