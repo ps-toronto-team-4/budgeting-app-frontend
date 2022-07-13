@@ -16,7 +16,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Welcome: '',
       SignIn: 'login',
       SignUp: 'register',
-      Modal: 'modal',
+      ForgotPasswordModal: 'ForgotPassword',
       NotFound: '*',
     },
   },
