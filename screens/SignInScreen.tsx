@@ -4,12 +4,13 @@ import { StyleSheet, SafeAreaView, TextInput, Button, Alert, TouchableOpacity, P
 import Colors from '../constants/Colors';
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from "../types";
-import { useQuery } from '@apollo/client';
-import Graphql from "../components/Graphql";
+import { useLazyQuery, useQuery } from '@apollo/client';
+//import Graphql from "../components/Graphql";
+import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
 
 const LogInForm = (props:any) => {
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  // setUsername: Function, setPassword: Function, username: string, password: string
+  const { username,password,setUsername,setPassword} = props
   
 
   return(
@@ -33,7 +34,7 @@ const LogInForm = (props:any) => {
         </TextInput>
       </View>
 
-      <Button title = "Sign In" onPress={() => checkInfo(username, password)}></Button>
+      
     </SafeAreaView>
   );
 };
@@ -41,23 +42,44 @@ const LogInForm = (props:any) => {
 
 
 export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'>) {
+  const [signInStatus, setSignInStatus] = React.useState(null);
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+  const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument,{
+    variables: {username,password}
+  });
+
+    const handleLogin = (username: String, password: String) =>{
+      console.log("username", username, "pass",password);
+      triggerLogin();
+      //graph ql query here
+      //checker
+      //setSignInStatus("verified")
+      //setSignInStatus("un-authenticated")
+    }
+
+    if(!loading && data?.signIn.__typename == "SignInSuccess"){
+      navigation.navigate('ForgotPasswordModal')
+    }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign into your account</Text>
-      <LogInForm></LogInForm>
+      <LogInForm
+       username={username}
+       password={password}
+       setUsername={setUsername}
+       setPassword={setPassword}></LogInForm>
       <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordModal')} style={styles.helpLink}>
           <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
             Forgot Password?
           </Text>
       </TouchableOpacity>
 
-      <View style={styles.testContainer}>
-        <Text
-          lightColor="rgba(0,0,0,0.8)"
-          darkColor="rgba(255,255,255,0.8)">
-          <Graphql></Graphql>
-        </Text>
-      </View>
+      <Button title = "Sign In" onPress={() => handleLogin(username,password)}></Button>
+
+      {!loading && <div>the status is :{data?.signIn.__typename == "SignInSuccess" ? "you have been signed in": " get rekted noob"}</div> }
     </View>
   );
 }
@@ -65,7 +87,7 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
 
 
 function checkInfo(username: String, password: String){
-  
+
 }
 
 

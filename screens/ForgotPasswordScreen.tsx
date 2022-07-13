@@ -6,7 +6,14 @@ import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from '../types';
 
+import Graphql from '../components/Graphql';
+import { useRoute } from '@react-navigation/native';
+
 export default function ForgotPasswordScreen() {
+
+  const route = useRoute();
+  // const { name, birthYear } = route.params;
+  const name = route.params;
 
   const contactemail = 'admin@admin.com'
 

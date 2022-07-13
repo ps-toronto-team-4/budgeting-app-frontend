@@ -19,12 +19,25 @@ import SignUpScreen from '../screens/SignUpScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
-export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
+
+declare global {
+  namespace ReactNavigation{
+    interface RootParamList {
+      ForgotPasswordModal: { name: string};
+    }
+
+
+  }
+}
+
+export default function Navigation( {colorScheme }: { colorScheme: ColorSchemeName }) {
+  
+  
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <RootNavigator />
+      <RootNavigator  />
     </NavigationContainer>
   );
 }
