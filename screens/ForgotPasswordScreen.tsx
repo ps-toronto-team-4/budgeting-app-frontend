@@ -13,9 +13,6 @@ import { RootTabScreenProps } from '../types';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ForgotPasswordScreen({ navigation }: RootTabScreenProps<'Welcome'>) {
-  const route = useRoute();
-  // const { name, birthYear } = route.params;
-  const name = route.params;
   const contactemail = 'admin@admin.com'
 
   return (
@@ -56,9 +53,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray'
   },
   title: {
+    fontWeight: 'bold',
     fontSize: 32,
     textAlign: 'center',
-    fontWeight: 'bold',
     width: '80%'
   },
   contactemail: {
@@ -88,5 +85,18 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
+  },
+  separator: {
+    marginVertical: 30,
+    height: 1,
+    width: '80%',
+  },
+  link: {
+    marginTop: 15,
+    paddingVertical: 15,
+  },
+  linkText: {
+    fontSize: 14,
+    color: '#2e78b7',
   }
 });

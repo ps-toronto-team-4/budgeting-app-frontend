@@ -5,23 +5,11 @@ import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
 
 // Initialize Apollo Client
 const client = new ApolloClient({
-  //uri: 'http://localhost:9090/graphql', // TODO: change this to our api endpoint
-  cache: new InMemoryCache(),
-  link: new HttpLink({
-
-    uri: 'http://localhost:9090/graphql',
-
-    // fetchOptions: {
-
-    //   mode: 'no-cors'
-
-    // }
-
-  }),
+  uri: 'https://backend.ps4.bornais.ca/graphiql?path=/graphql',
+  cache: new InMemoryCache()
 });
 
 AppRegistry.registerComponent('MyApplication', () => App);
