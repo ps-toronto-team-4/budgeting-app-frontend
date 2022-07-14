@@ -16,7 +16,7 @@ import useColorScheme from '../hooks/useColorScheme';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import SignInScreen from '../screens/SignInScreen';
-import SignUpScreen from '../screens/SignUpScreen';
+import SignUpScreen from '../screens/SignUpScreen/SignUpScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import HomeScreen from '../screens/HomeScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';

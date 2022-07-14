@@ -1,29 +1,15 @@
-import React, { useEffect } from "react"
-import { StyleSheet, SafeAreaView, TextInput, Alert, TouchableOpacity, Pressable, Modal  } from 'react-native';
+import React from "react"
+import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal } from 'react-native';
 import Button from "../components/Button";
-
+import TextInput from "../components/TextInput";
 import Colors from '../constants/Colors';
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useQuery } from '@apollo/client';
-//import Graphql from "../components/Graphql";
 import WelcomeScreen from "./WelcomeScreen";
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
 
 
-const LogInForm = (props:any) => {
-  // setUsername: Function, setPassword: Function, username: string, password: string
-  const { username,password,setUsername,setPassword} = props
-  
-
-  return(
-    <SafeAreaView>
-      
-
-      
-    </SafeAreaView>
-  );
-};
 
 
 
@@ -47,23 +33,14 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
     }
   });
 
+  const handleLogin = () => {
     
+    setUsernamePayload(username);
+    setPasswordPayload(password);
+    triggerLogin();
 
+  }
     
-const handleLogin = () => {
-  
-  setUsernamePayload(username);
-  setPasswordPayload(password);
-
-  triggerLogin();
-  
-
-}
-    
-    
-     
-    
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign into your account</Text>
@@ -86,12 +63,12 @@ const handleLogin = () => {
         </TextInput>
       </View>
       <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordModal')} style={styles.helpLink}>
-          <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
-            Forgot Password?
-          </Text>
+        <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
+          Forgot Password?
+        </Text>
       </TouchableOpacity>
 
-      <Button text="Sign In" onPress={() => handleLogin()}  />
+      <Button text="Sign In" onPress={() => handleLogin()} accessibilityLabel={"Sign In Button"}  />
       {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</Text> }
     </View>
   );
@@ -117,13 +94,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   input: {
-    height: 40,
     margin: 12,
-    borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderColor: '#ccc',
-    borderRadius: 15,
   },
   textfields: {
     marginBottom: 100,

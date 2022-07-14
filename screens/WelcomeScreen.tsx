@@ -22,9 +22,9 @@ export default function WelcomeScreen({ navigation }: RootTabScreenProps<'Welcom
       <Text style={Styles.title}>Welcome to</Text>
       <Text style={Styles.title}>[AppName]!</Text>
       <Image style={style.image} source={require('../assets/images/image_placeholder.png')}></Image>
-      <Button text="Sign in" onPress={onPressSignIn}></Button>
+      <Button text="Sign in" onPress={onPressSignIn} accessibilityLabel={'Sign In Page'}></Button>
       <Text style={style.registerCaption}>Don't have an account?</Text>
-      <Button text="Create an account" onPress={onPressSignUp}></Button>
+      <Button text="Create an account" onPress={onPressSignUp} accessibilityLabel={'Sign Up Page'}></Button>
     </View>
   );
 }
