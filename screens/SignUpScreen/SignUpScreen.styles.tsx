@@ -11,6 +11,29 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    phoneContainer: {
+        width: 250,
+        height: 50,
+        borderWidth: 1,
+        paddingHorizontal: 15,
+        borderColor: 'black',
+        borderRadius: 7,
+        marginTop: 7,
+        marginBottom: 14
+    },
+    textField: {
+        width: 70,
+        height: 50,
+        backgroundColor: 'invisible',
+        paddingHorizontal: 2,
+    },
+    phoneInput: {
+        fontSize: 14,
+        height: 50,
+    },
+    countryBtn: {
+        width: 55,
+    },
     title: {
         paddingTop: 20,
         fontSize: 32,

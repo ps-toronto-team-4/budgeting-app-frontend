@@ -1,6 +1,6 @@
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
@@ -8,6 +8,7 @@ import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
 import { styles, eyeIconSize } from './SignUpScreen.styles';
 import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
+import PhoneInput from 'react-native-phone-number-input';
 
 export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'>) {
 
@@ -82,21 +83,21 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     }
   }
 
-  function FormatPhone(newPhone: string) {
-    setPhone(newPhone.replaceAll(/[^0-9]/g, ""));
-    setPhoneCheck(false);
-  }
+  // function FormatPhone(newPhone: string) {
+  //   setPhone(newPhone.replaceAll(/[^0-9]/g, ""));
+  //   setPhoneCheck(false);
+  // }
 
-  function CheckPhone() {
-    let phoneRegex = /^[0-9]{7,15}$/;
-    if (!phoneCheck || !phone || phoneRegex.test(phone)) {
-      return (<></>);
-    } else {
-      return (
-        <Text style={styles.alert}>Invalid phone number</Text>
-      )
-    }
-  }
+  // function CheckPhone() {
+  //   let phoneRegex = /^[0-9]{7,15}$/;
+  //   if (!phoneCheck || !phone || phoneRegex.test(phone)) {
+  //     return (<></>);
+  //   } else {
+  //     return (
+  //       <Text style={styles.alert}>Invalid phone number</Text>
+  //     )
+  //   }
+  // }
 
   return (
     <View style={styles.container}>
@@ -169,15 +170,17 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
             (<Text style={styles.alert}>password fields need to match</Text>)
           )
         }
-        <TextInput
-          style={styles.formField}
-          onChangeText={(newPhone) => FormatPhone(newPhone)}
-          onBlur={() => setPhoneCheck(true)}
+        <PhoneInput
+          containerStyle={styles.phoneContainer}
+          textContainerStyle={styles.textField}
+          countryPickerButtonStyle={styles.countryBtn}
+          textInputStyle={styles.phoneInput}
+          defaultCode='CA'
+          onChangeText={(newPhone) => setPhone(newPhone)}
           value={phone}
-          keyboardType="phone-pad"
-          placeholder="Phone Number (optional)"
+          placeholder="Phone Number"
         />
-        <CheckPhone />
+        {/* <CheckPhone /> */}
         <Button
           onPress={() => register()}
           text='Sign Up'
