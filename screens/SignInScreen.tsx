@@ -1,16 +1,12 @@
 import React from "react"
-import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal } from 'react-native';
+import { StyleSheet, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import Colors from '../constants/Colors';
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useQuery } from '@apollo/client';
-import WelcomeScreen from "./WelcomeScreen";
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
-
-
-
 
 
 export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'>) {
@@ -22,7 +18,6 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
   const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument,{
     variables: {username:usernamePayload,password:passwordPayload},
     onCompleted: (data) => {
-      console.log(usernamePayload);
       if(data?.signIn.__typename === "SignInSuccess"){
         navigation.replace('Home');
       }
@@ -69,7 +64,9 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
       </TouchableOpacity>
 
       <Button text="Sign In" onPress={() => handleLogin()} accessibilityLabel={"Sign In Button"}  />
-      {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</Text> }
+
+      {/* Uncomment below code when sign in status is unknown! */}
+      {/* {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</Text> } */}
     </View>
   );
 }
