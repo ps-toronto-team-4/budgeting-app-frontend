@@ -203,7 +203,8 @@ const styles = StyleSheet.create({
   title: {
     paddingTop: 20,
     fontSize: 32,
-    fontFamily: 'Gill Sans MT',
+    // Not a system font on Android
+    // fontFamily: 'Gill Sans MT', 
     marginHorizontal: 25,
     marginVertical: 10,
     textAlign: 'center',
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   reqs: {
-    color: '#gray',
+    color: 'gray',
     fontSize: 14,
     marginHorizontal: 5,
     marginBottom: 1,
