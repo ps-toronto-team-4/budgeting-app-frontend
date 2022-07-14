@@ -1,27 +1,13 @@
 import { gql, useMutation } from '@apollo/client';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
 import { styles, eyeIconSize } from './SignUpScreen.styles';
-
-const CREATE_USER = (fname: string, lname: string, username: string, email: string, phone: string, password: string) => gql`
-  mutation CREATE_USER {
-    createUser(
-      firstName: "${fname}",
-      lastName: "${lname}",
-      username: "${username}",
-      email: "${email}",
-      phoneNumber: "${phone}",
-      password:"${password}"
-    ){
-      hashAuth
-    }
-  }
-`;
+import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
 
 export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'>) {
 
@@ -34,23 +20,23 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
   const [pwordConfirm, setPwordConfirm] = useState("")
   const [check, setCheck] = useState(false)
   const [pwordCheck, setPwordCheck] = useState(false)
+  const [pwordRules, setPwordRules] = useState(false)
   const [emailCheck, setEmailCheck] = useState(false)
   const [phoneCheck, setPhoneCheck] = useState(false)
   const [hidePword, setHidePword] = useState(true)
 
   // Create user graphql query
-  const [createUser] = useMutation(CREATE_USER(fname, lname, username, email, phone, password), {
-    onCompleted: (data => {
-      data = data.createUser;
-      navigation.navigate("SignIn");
-    }),
+  const [createUser, { loading, error, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
+    variables: { fname, lname, username, email, phone, password },
     onError: (error => {
-      Alert.alert("Something went wrong")
-      console.log(error.message);
-    })
+      Alert.alert(error.message);
+    }),
+    onCompleted: (() =>
+      navigation.navigate("SignIn")
+    )
   })
 
-  const register = () => {
+  const register = async () => {
     setCheck(true);
     if (password && fname && username && email) {
       createUser();
@@ -96,6 +82,11 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     }
   }
 
+  function FormatPhone(newPhone: string) {
+    setPhone(newPhone.replaceAll(/[^0-9]/g, ""));
+    setPhoneCheck(false);
+  }
+
   function CheckPhone() {
     let phoneRegex = /^[0-9]{7,15}$/;
     if (!phoneCheck || !phone || phoneRegex.test(phone)) {
@@ -107,15 +98,17 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     }
   }
 
-  function FormatPhone(newPhone: string) {
-    let phoneArray = newPhone.substring(1).replaceAll(/[^0-9]/g, "");
-    setPhone(phoneArray);
-    setPhoneCheck(false);
-  }
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create a New Account</Text>
+      {!loading ? (
+        data?.signUp.__typename === "CreateUserSuccess" ? (
+          <Text>Account created succesfully! Logging you in...</Text>
+        ) : (
+          <Text>{data?.signUp.errorMessage}</Text>
+        )) : (
+        <ActivityIndicator size='large' />
+      )}
       <ScrollView style={styles.separator}>
         <TextInput
           style={styles.formField}
@@ -128,8 +121,9 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           style={styles.formField}
           onChangeText={(lname) => setLname(lname)}
           value={lname}
-          placeholder="Last Name"
+          placeholder="Last Name*"
         />
+        <RequiredField input={lname} />
         <TextInput
           style={styles.formField}
           onChangeText={(username) => setUsername(username)}
@@ -151,13 +145,15 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
             style={styles.pwordinput}
             onChangeText={(password) => setPassword(password)}
             value={password}
+            onFocus={() => setPwordRules(true)}
+            onBlur={() => setPwordRules(false)}
             secureTextEntry={hidePword}
             placeholder="Password*"
           />
           <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={eyeIconSize} onPress={() => setHidePword(!hidePword)} />
         </View>
         <RequiredField input={password} />
-        <PasswordRules />
+        {pwordRules ? (<PasswordRules />) : (<></>)}
         <TextInput
           style={styles.formField}
           onChangeText={(pword) => { setPwordConfirm(pword); setPwordCheck(false) }}
@@ -166,27 +162,28 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           secureTextEntry={hidePword}
           placeholder="Confirm Password*"
         />
-        {(!pwordCheck || (pwordConfirm === password)) ? (
-          <RequiredField input={pwordConfirm} />
-        ) : (
-          (<Text style={styles.alert}>password fields need to match</Text>)
-        )}
+        {
+          (!pwordCheck || (pwordConfirm === password)) ? (
+            <RequiredField input={pwordConfirm} />
+          ) : (
+            (<Text style={styles.alert}>password fields need to match</Text>)
+          )
+        }
         <TextInput
           style={styles.formField}
           onChangeText={(newPhone) => FormatPhone(newPhone)}
           onBlur={() => setPhoneCheck(true)}
-          value={'+' + phone}
+          value={phone}
           keyboardType="phone-pad"
-          placeholder="Phone Number"
+          placeholder="Phone Number (optional)"
         />
         <CheckPhone />
         <Button
           onPress={() => register()}
-          text="Sign Up"
-        // Uncomment accessibility label when Button changes are merged.
-        // accessibilityLabel="Sign Up Button"
+          text='Sign Up'
+          accessibilityLabel='Sign Up Button'
         />
-      </ScrollView>
-    </View>
+      </ScrollView >
+    </View >
   );
 }
