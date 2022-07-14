@@ -8,7 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 
 // Initialize Apollo Client
 const client = new ApolloClient({
-  uri: 'http://localhost:9090/graphql',
+  uri: 'https://backend.ps4.bornais.ca/graphql',
   cache: new InMemoryCache()
 });
 
