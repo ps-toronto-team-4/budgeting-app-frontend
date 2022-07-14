@@ -24,8 +24,8 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
   const [hidePword, setHidePword] = useState(true)
 
   // Create user graphql query
-  const [createUser, {loading, error, data}] = useMutation<CreateUserMutation>(CreateUserDocument, {
-    variables: {fname, lname, username, email, phone, password},
+  const [createUser, { loading, error, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
+    variables: { fname, lname, username, email, phone, password },
     onError: (error => {
       Alert.alert(error.message);
     }),
@@ -34,11 +34,12 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     )
   })
 
-  const register = async() => {
+  const register = async () => {
     setCheck(true);
     if (password && fname && username && email) {
       createUser();
-    }}
+    }
+  }
 
   function RequiredField({ input }: { input: string }) {
     return (
@@ -104,7 +105,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         ) : (
           <Text>{data?.signUp.errorMessage}</Text>
         )) : (
-        <ActivityIndicator size='large'/>
+        <ActivityIndicator size='large' />
       )}
       <ScrollView style={styles.separator}>
         <TextInput
@@ -120,7 +121,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           value={lname}
           placeholder="Last Name*"
         />
-        <RequiredField input={lname}/>
+        <RequiredField input={lname} />
         <TextInput
           style={styles.input}
           onChangeText={(username) => setUsername(username)}
@@ -135,21 +136,21 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           value={email}
           placeholder="Email*"
         />
-        <CheckEmail/>
-        <RequiredField input={email}/>
+        <CheckEmail />
+        <RequiredField input={email} />
         <View style={styles.pwordfield}>
           <TextInput
-              onChangeText={(password) => setPassword(password)}
-              value={password}
-              onFocus={() => setPwordRules(true)}
-              onBlur={() => setPwordRules(false)}
-              secureTextEntry={hidePword}
-              placeholder="Password*"
+            onChangeText={(password) => setPassword(password)}
+            value={password}
+            onFocus={() => setPwordRules(true)}
+            onBlur={() => setPwordRules(false)}
+            secureTextEntry={hidePword}
+            placeholder="Password*"
           />
-          <FontAwesome style={styles.icon} name={hidePword? ("eye") : ("eye-slash")} size={15} onPress={() => setHidePword(!hidePword)}/>
+          <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={15} onPress={() => setHidePword(!hidePword)} />
         </View>
-        <RequiredField input={password}/>
-        {pwordRules? (<PasswordRules/>) : (<></>)}
+        <RequiredField input={password} />
+        {pwordRules ? (<PasswordRules />) : (<></>)}
         <TextInput
           style={styles.input}
           onChangeText={(pword) => { setPwordConfirm(pword); setPwordCheck(false) }}
@@ -233,4 +234,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   }
-})
+});
