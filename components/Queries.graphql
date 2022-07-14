@@ -12,3 +12,24 @@ query getPasswordHash ($username: String!, $password: String!) {
         }
     }
 }
+
+mutation createUser($fname: String!, $lname: String!, $username: String!, $email: String!, $password: String!, $phone: String) {
+    signUp(
+      firstName: $fname,
+      lastName: $lname,
+      username: $username,
+      email: $email,
+      phoneNumber: $phone,
+      password: $password
+    ){
+      __typename
+        ...on CreateUserSuccess{
+            passwordHash
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+  }
