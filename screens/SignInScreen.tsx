@@ -80,7 +80,7 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
 
       <Button text="Sign In" onPress={() => handleLogin(username,password)}></Button>
 
-      {!loading && <div>the status is :{data?.signIn.__typename == "SignInSuccess" ? "you have been signed in": " get rekted noob"}</div> }
+      {!loading && <div>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</div> }
     </View>
   );
 }
