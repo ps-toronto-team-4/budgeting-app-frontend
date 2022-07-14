@@ -141,17 +141,19 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           value={email}
           placeholder="Email*"
         />
-        <CheckEmail />
-        <RequiredField input={email} />
-        <TextInput
-          style={styles.input}
-          onChangeText={(password) => setPassword(password)}
-          value={password}
-          secureTextEntry={hidePword}
-          placeholder="Password*"
-        />
-        <RequiredField input={password} />
-        <PasswordRules />
+        <CheckEmail/>
+        <RequiredField input={email}/>
+        <View style={styles.pwordfield}>
+          <TextInput
+              onChangeText={(password) => setPassword(password)}
+              value={password}
+              secureTextEntry={hidePword}
+              placeholder="Password*"
+          />
+          <FontAwesome style={styles.icon} name={hidePword? ("eye") : ("eye-slash")} size={15} onPress={() => setHidePword(!hidePword)}/>
+        </View>
+        <RequiredField input={password}/>
+        <PasswordRules/>
         <TextInput
           style={styles.input}
           onChangeText={(pword) => { setPwordConfirm(pword); setPwordCheck(false) }}
@@ -223,6 +225,16 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   icon: {
-    marginHorizontal: 5
+    marginHorizontal: 5,
+  },
+  pwordfield: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 40,
+    margin: 5,
+    borderWidth: 1,
+    padding: 10,
   }
 });
