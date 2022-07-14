@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, SafeAreaView, TextInput, Alert, TouchableOpacity, Pressable, Modal  } from 'react-native';
+import { StyleSheet, SafeAreaView, TextInput, Alert, TouchableOpacity, Pressable, Modal, ActivityIndicator  } from 'react-native';
 import Button from "../components/Button";
 
 import Colors from '../constants/Colors';
@@ -67,6 +67,14 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign into your account</Text>
+      {!loading ? (
+        data?.signIn.__typename === "SignInSuccess" ? (
+          <Text>Sign in successful</Text>
+        ) : (
+          <Text>{data?.signIn.errorMessage}</Text>
+        )) : (
+        <ActivityIndicator size='large'/>
+      )}
       <LogInForm
        username={username}
        password={password}
@@ -77,10 +85,7 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
             Forgot Password?
           </Text>
       </TouchableOpacity>
-
-      <Button text="Sign In" onPress={() => handleLogin(username,password)}></Button>
-
-      {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</Text> }
+      <Button text="Sign In" onPress={() => handleLogin(username,password)} accessibilityLabel="Sign In Button"/>
     </View>
   );
 }
