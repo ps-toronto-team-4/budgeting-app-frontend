@@ -35,6 +35,8 @@ export type CategorySuccess = {
   category: Category;
 };
 
+export type CreateExpensePayload = ExpenseSuccess | FailurePayload;
+
 export type CreateUserPayload = CreateUserSuccess | FailurePayload;
 
 export type CreateUserSuccess = {
@@ -45,12 +47,37 @@ export type CreateUserSuccess = {
 
 export type DeleteCategoryPayload = DeleteSuccess | FailurePayload;
 
+export type DeleteMerchantPayload = DeleteSuccess | FailurePayload;
+
 export type DeleteSuccess = {
   __typename?: 'DeleteSuccess';
   successMessage?: Maybe<Scalars['String']>;
 };
 
+export type DeleteUserFailed = {
+  __typename?: 'DeleteUserFailed';
+  errorMessage?: Maybe<Scalars['String']>;
+  exceptionName?: Maybe<Scalars['String']>;
+};
+
 export type DeleteUserPayload = DeleteSuccess | FailurePayload;
+
+/**
+ * #
+ * # EXPENSE RELATED
+ * #
+ */
+export type Expense = {
+  __typename?: 'Expense';
+  amount?: Maybe<Scalars['Float']>;
+  description?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+};
+
+export type ExpenseSuccess = {
+  __typename?: 'ExpenseSuccess';
+  expense: Expense;
+};
 
 export type FailurePayload = {
   __typename?: 'FailurePayload';
@@ -58,10 +85,35 @@ export type FailurePayload = {
   exceptionName?: Maybe<Scalars['String']>;
 };
 
+export type Merchant = {
+  __typename?: 'Merchant';
+  defaultCategory?: Maybe<Category>;
+  description?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+};
+
+export type MerchantPayload = FailurePayload | MerchantSuccess;
+
+export type MerchantSuccess = {
+  __typename?: 'MerchantSuccess';
+  merchant: Merchant;
+};
+
+export type MerchantsPayload = FailurePayload | MerchantsSuccess;
+
+export type MerchantsSuccess = {
+  __typename?: 'MerchantsSuccess';
+  merchants: Array<Maybe<Merchant>>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createCategory: CategoryPayload;
+  createExpense: CreateExpensePayload;
+  createMerchant: MerchantPayload;
   deleteCategory: DeleteCategoryPayload;
+  deleteMerchant: DeleteMerchantPayload;
   deleteUser: DeleteUserPayload;
   signUp: CreateUserPayload;
 };
@@ -75,7 +127,29 @@ export type MutationCreateCategoryArgs = {
 };
 
 
+export type MutationCreateExpenseArgs = {
+  amount: Scalars['Float'];
+  description?: InputMaybe<Scalars['String']>;
+  passwordHash: Scalars['String'];
+  title: Scalars['String'];
+};
+
+
+export type MutationCreateMerchantArgs = {
+  defaultCategoryId?: InputMaybe<Scalars['Int']>;
+  description?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  passwordHash: Scalars['String'];
+};
+
+
 export type MutationDeleteCategoryArgs = {
+  id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type MutationDeleteMerchantArgs = {
   id: Scalars['Int'];
   passwordHash: Scalars['String'];
 };
@@ -99,7 +173,10 @@ export type Query = {
   __typename?: 'Query';
   categories: CategoriesPayload;
   category: CategoryPayload;
+  expense: CreateExpensePayload;
   greeting: Scalars['String'];
+  merchant?: Maybe<MerchantPayload>;
+  merchants?: Maybe<MerchantsPayload>;
   /** # Helper for testing. */
   signIn: SignInPayload;
   user?: Maybe<User>;
@@ -113,6 +190,23 @@ export type QueryCategoriesArgs = {
 
 export type QueryCategoryArgs = {
   id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type QueryExpenseArgs = {
+  id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type QueryMerchantArgs = {
+  id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type QueryMerchantsArgs = {
   passwordHash: Scalars['String'];
 };
 
@@ -151,5 +245,18 @@ export type GetPasswordHashQueryVariables = Exact<{
 
 export type GetPasswordHashQuery = { __typename?: 'Query', signIn: { __typename: 'FailurePayload', exceptionName?: string | null, errorMessage?: string | null } | { __typename: 'SignInSuccess', passwordHash: string } };
 
+export type CreateUserMutationVariables = Exact<{
+  fname: Scalars['String'];
+  lname: Scalars['String'];
+  username: Scalars['String'];
+  email: Scalars['String'];
+  password: Scalars['String'];
+  phone?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', signUp: { __typename: 'CreateUserSuccess', passwordHash: string } | { __typename: 'FailurePayload', exceptionName?: string | null, errorMessage?: string | null } };
+
 
 export const GetPasswordHashDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPasswordHash"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"signIn"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SignInSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"passwordHash"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"FailurePayload"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"exceptionName"}},{"kind":"Field","name":{"kind":"Name","value":"errorMessage"}}]}}]}}]}}]} as unknown as DocumentNode<GetPasswordHashQuery, GetPasswordHashQueryVariables>;
+export const CreateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fname"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"lname"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"phone"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"signUp"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"firstName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fname"}}},{"kind":"Argument","name":{"kind":"Name","value":"lastName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"lname"}}},{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}},{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"phoneNumber"},"value":{"kind":"Variable","name":{"kind":"Name","value":"phone"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CreateUserSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"passwordHash"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"FailurePayload"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"exceptionName"}},{"kind":"Field","name":{"kind":"Name","value":"errorMessage"}}]}}]}}]}}]} as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>;
