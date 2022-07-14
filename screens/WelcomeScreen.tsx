@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: 'bold',
-    fontFamily: 'Gill Sans MT'
   },
   image: {
     height: 150,
