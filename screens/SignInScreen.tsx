@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal, ActivityIndicator  } from 'react-native';
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
@@ -7,7 +7,7 @@ import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");
@@ -19,7 +19,7 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
     variables: {username:usernamePayload,password:passwordPayload},
     onCompleted: (data) => {
       if(data?.signIn.__typename === "SignInSuccess"){
-        navigation.replace('Home');
+        setData();       
       }
     },
     onError:(data) => {
@@ -27,6 +27,33 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
 
     }
   });
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = () => {
+    try{
+      AsyncStorage.getItem('passwordHash')
+        .then(value =>{
+          if(value != null){
+            navigation.navigate('Home');
+          }
+        })
+    } catch (error){
+      console.log(error);
+    }
+  }
+
+  const setData = async () => {
+    try{
+      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash: "undefined");
+      navigation.replace('Home'); 
+      
+    } catch (error){
+      data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage: "undefined error";
+    }
+  }
 
   const handleLogin = () => {
     
@@ -39,6 +66,14 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign into your account</Text>
+      {!loading ? (
+        data?.signIn.__typename === "SignInSuccess" ? (
+          <Text>Sign in successful</Text>
+        ) : (
+          <Text>{data?.signIn.errorMessage}</Text>
+        )) : (
+        <ActivityIndicator size='large'/>
+      )}
       <View style= {styles.textfields}>
         <TextInput 
           style = {styles.input}

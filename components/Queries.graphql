@@ -11,6 +11,51 @@ query getPasswordHash ($username: String!, $password: String!) {
             errorMessage
         }
     }
+
+
+}
+
+query getCategory($passwordHash: String!, $id: Int!){
+    category(passwordHash: $passwordHash, id: $id ){
+        __typename
+        ...on CategorySuccess{
+            category {
+                id
+                name
+                colourHex
+                description
+            }
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query getGreetings{
+    greeting
+}
+
+
+query getCategories($passwordHash: String!){
+    categories(passwordHash: $passwordHash){
+        __typename
+        ...on CategoriesSuccess{
+            categories {
+                id
+                name
+                colourHex
+                description
+            }
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
 }
 
 mutation createUser($fname: String!, $lname: String!, $username: String!, $email: String!, $password: String!, $phone: String) {
