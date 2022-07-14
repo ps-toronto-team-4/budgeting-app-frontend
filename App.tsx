@@ -1,5 +1,5 @@
-import { AppRegistry } from 'react-native';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { ActivityIndicator, AppRegistry, StyleSheet } from 'react-native';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
@@ -8,7 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 
 // Initialize Apollo Client
 const client = new ApolloClient({
-  uri: 'http://api.spacex.land/graphql', // TODO: change this to our api endpoint
+  uri: 'http://localhost:9090/graphql',
   cache: new InMemoryCache()
 });
 
@@ -19,7 +19,7 @@ export default function App() {
   const colorScheme = useColorScheme();
 
   if (!isLoadingComplete) {
-    return null;
+    return (<ActivityIndicator size='large' style={styles.load} />);
   } else {
     return (
       <ApolloProvider client={client}>
@@ -31,3 +31,11 @@ export default function App() {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  load: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
+});
