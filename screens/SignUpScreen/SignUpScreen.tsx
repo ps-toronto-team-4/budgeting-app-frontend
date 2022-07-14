@@ -2,11 +2,11 @@ import { gql, useMutation } from '@apollo/client';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
-import TextInput from '../components/TextInput';
-import layout from '../constants/Layout';
-import Button from '../components/Button';
+import { Text, View } from '../../components/Themed';
+import { RootTabScreenProps } from '../../types';
+import TextInput from '../../components/TextInput';
+import Button from '../../components/Button';
+import { styles, eyeIconSize } from './SignUpScreen.styles';
 
 const CREATE_USER = (fname: string, lname: string, username: string, email: string, phone: string, password: string) => gql`
   mutation CREATE_USER {
@@ -154,7 +154,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
             secureTextEntry={hidePword}
             placeholder="Password*"
           />
-          <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={layout.signUpScreen.eyeIconSize} onPress={() => setHidePword(!hidePword)} />
+          <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={eyeIconSize} onPress={() => setHidePword(!hidePword)} />
         </View>
         <RequiredField input={password} />
         <PasswordRules />
@@ -183,56 +183,10 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         <Button
           onPress={() => register()}
           text="Sign Up"
-        // Uncomment accessibiliyt label when Button changes are merged.
+        // Uncomment accessibility label when Button changes are merged.
         // accessibilityLabel="Sign Up Button"
         />
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    paddingTop: 20,
-    fontSize: 32,
-    // Not a system font on Android
-    // fontFamily: 'Gill Sans MT', 
-    marginHorizontal: 25,
-    marginVertical: 10,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 20,
-    height: 1,
-  },
-  alert: {
-    color: 'red',
-    marginHorizontal: 5,
-    marginBottom: 8,
-  },
-  reqs: {
-    color: 'gray',
-    fontSize: 14,
-    marginHorizontal: 5,
-    marginBottom: 1,
-  },
-  formField: {
-    marginVertical: 7,
-  },
-  icon: {
-    position: 'absolute',
-    right: layout.signUpScreen.eyeIconMarginRight,
-    top: '50%',
-    transform: [{ translateY: -(layout.signUpScreen.eyeIconSize) / 2 }],
-  },
-  pwordinput: {
-    paddingRight: 20 + layout.signUpScreen.eyeIconMarginRight,
-  }
-});
