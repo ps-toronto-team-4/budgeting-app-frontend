@@ -1,11 +1,12 @@
 import { gql, useMutation } from '@apollo/client';
 import React, { useState } from 'react';
-import { Alert, Button, ScrollView, StyleSheet } from 'react-native';
+import { Alert, ScrollView, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import TextInput from '../components/TextInput';
 import layout from '../constants/Layout';
+import Button from '../components/Button';
 
 const CREATE_USER = (fname: string, lname: string, username: string, email: string, phone: string, password: string) => gql`
   mutation CREATE_USER {
@@ -181,9 +182,9 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         <CheckPhone />
         <Button
           onPress={() => register()}
-          title="Sign Up"
-          color="#0b5394"
-          accessibilityLabel="Sign Up Button"
+          text="Sign Up"
+        // Uncomment accessibiliyt label when Button changes are merged.
+        // accessibilityLabel="Sign Up Button"
         />
       </ScrollView>
     </View>
