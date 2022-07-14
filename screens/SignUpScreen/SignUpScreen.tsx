@@ -1,11 +1,13 @@
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, TextInput } from 'react-native';
-import { CreateUserDocument, CreateUserMutation } from "../components/generated";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
-import Button from '../components/Button';
+import { Text, View } from '../../components/Themed';
+import { RootTabScreenProps } from '../../types';
+import TextInput from '../../components/TextInput';
+import Button from '../../components/Button';
+import { styles, eyeIconSize } from './SignUpScreen.styles';
+import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
 
 export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'>) {
 
@@ -109,28 +111,28 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
       )}
       <ScrollView style={styles.separator}>
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(fname) => setFname(fname)}
           value={fname}
           placeholder="First Name*"
         />
         <RequiredField input={fname} />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(lname) => setLname(lname)}
           value={lname}
           placeholder="Last Name*"
         />
         <RequiredField input={lname} />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(username) => setUsername(username)}
           value={username}
           placeholder="Username*"
         />
         <RequiredField input={username} />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(email) => { setEmail(email.replaceAll(/\s+/g, "")); setEmailCheck(false) }}
           onBlur={() => setEmailCheck(true)}
           value={email}
@@ -138,8 +140,9 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         />
         <CheckEmail />
         <RequiredField input={email} />
-        <View style={styles.pwordfield}>
+        <View style={styles.formField}>
           <TextInput
+            style={styles.pwordinput}
             onChangeText={(password) => setPassword(password)}
             value={password}
             onFocus={() => setPwordRules(true)}
@@ -147,25 +150,27 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
             secureTextEntry={hidePword}
             placeholder="Password*"
           />
-          <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={15} onPress={() => setHidePword(!hidePword)} />
+          <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={eyeIconSize} onPress={() => setHidePword(!hidePword)} />
         </View>
         <RequiredField input={password} />
         {pwordRules ? (<PasswordRules />) : (<></>)}
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(pword) => { setPwordConfirm(pword); setPwordCheck(false) }}
           onBlur={() => setPwordCheck(true)}
           value={pwordConfirm}
           secureTextEntry={hidePword}
           placeholder="Confirm Password*"
         />
-        {(!pwordCheck || (pwordConfirm === password)) ? (
-          <RequiredField input={pwordConfirm} />
-        ) : (
-          (<Text style={styles.alert}>password fields need to match</Text>)
-        )}
+        {
+          (!pwordCheck || (pwordConfirm === password)) ? (
+            <RequiredField input={pwordConfirm} />
+          ) : (
+            (<Text style={styles.alert}>password fields need to match</Text>)
+          )
+        }
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(newPhone) => FormatPhone(newPhone)}
           onBlur={() => setPhoneCheck(true)}
           value={phone}
@@ -178,60 +183,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           text='Sign Up'
           accessibilityLabel='Sign Up Button'
         />
-      </ScrollView>
-    </View>
+      </ScrollView >
+    </View >
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    height: 40,
-    margin: 5,
-    borderWidth: 1,
-    padding: 10
-  },
-  title: {
-    paddingTop: 20,
-    fontSize: 32,
-    // Not a system font on Android
-    // fontFamily: 'Gill Sans MT', 
-    marginHorizontal: 25,
-    marginVertical: 10,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 20,
-    height: 1,
-  },
-  alert: {
-    color: 'red',
-    marginHorizontal: 5,
-    marginBottom: 8,
-  },
-  reqs: {
-    color: 'gray',
-    fontSize: 14,
-    marginHorizontal: 5,
-    marginBottom: 1,
-  },
-  icon: {
-    marginHorizontal: 5,
-  },
-  pwordfield: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 40,
-    margin: 5,
-    borderWidth: 1,
-    padding: 10,
-  }
-});
