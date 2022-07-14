@@ -79,7 +79,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
         </Text>
       </TouchableOpacity>
 
-      <Button text="Sign In" onPress={() => handleLogin(username, password)}></Button>
+      <Button text="Sign In" onPress={() => handleLogin(username, password)} accessibilityLabel='Sign In Button'></Button>
 
       {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in" : "Failed sign in"}</Text>}
     </View>
