@@ -61,7 +61,7 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
     }
 
     if(!loading && data?.signIn.__typename == "SignInSuccess"){
-      navigation.navigate('ForgotPasswordModal')
+      navigation.navigate('Home')
     }
 
   return (

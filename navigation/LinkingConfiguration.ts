@@ -18,6 +18,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       SignUp: 'register',
       ForgotPasswordModal: 'ForgotPassword',
       NotFound: '*',
+      Home: 'Home',
     },
   },
 };
