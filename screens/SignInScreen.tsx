@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal, ActivityIndicator  } from 'react-native';
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import Colors from '../constants/Colors';
