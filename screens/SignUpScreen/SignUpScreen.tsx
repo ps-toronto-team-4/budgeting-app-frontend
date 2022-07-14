@@ -1,24 +1,13 @@
 import { gql, useMutation } from '@apollo/client';
 import React, { useState } from 'react';
-import { Alert, Button, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
-
-const CREATE_USER = (fname: string, lname: string, username: string, email: string, phone: string, password: string) => gql`
-  mutation CREATE_USER {
-    createUser(
-      firstName: "${fname}",
-      lastName: "${lname}",
-      username: "${username}",
-      email: "${email}",
-      phoneNumber: "${phone}",
-      password:"${password}"
-    ){
-      hashAuth
-    }
-  }
-`;
+import { Text, View } from '../../components/Themed';
+import { RootTabScreenProps } from '../../types';
+import TextInput from '../../components/TextInput';
+import Button from '../../components/Button';
+import { styles, eyeIconSize } from './SignUpScreen.styles';
+import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
 
 export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'>) {
 
@@ -31,23 +20,23 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
   const [pwordConfirm, setPwordConfirm] = useState("")
   const [check, setCheck] = useState(false)
   const [pwordCheck, setPwordCheck] = useState(false)
+  const [pwordRules, setPwordRules] = useState(false)
   const [emailCheck, setEmailCheck] = useState(false)
   const [phoneCheck, setPhoneCheck] = useState(false)
   const [hidePword, setHidePword] = useState(true)
 
   // Create user graphql query
-  const [createUser] = useMutation(CREATE_USER(fname, lname, username, email, phone, password), {
-    onCompleted: (data => {
-      data = data.createUser;
-      navigation.navigate("SignIn");
-    }),
+  const [createUser, { loading, error, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
+    variables: { fname, lname, username, email, phone, password },
     onError: (error => {
-      Alert.alert("Something went wrong")
-      console.log(error.message);
-    })
+      Alert.alert(error.message);
+    }),
+    onCompleted: (() =>
+      navigation.navigate("SignIn")
+    )
   })
 
-  const register = () => {
+  const register = async () => {
     setCheck(true);
     if (password && fname && username && email) {
       createUser();
@@ -93,6 +82,11 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     }
   }
 
+  function FormatPhone(newPhone: string) {
+    setPhone(newPhone.replaceAll(/[^0-9]/g, ""));
+    setPhoneCheck(false);
+  }
+
   function CheckPhone() {
     let phoneRegex = /^[0-9]{7,15}$/;
     if (!phoneCheck || !phone || phoneRegex.test(phone)) {
@@ -104,138 +98,92 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     }
   }
 
-  function FormatPhone(newPhone: string) {
-    let phoneArray = newPhone.substring(1).replaceAll(/[^0-9]/g, "");
-    setPhone(phoneArray);
-    setPhoneCheck(false);
-  }
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create a New Account</Text>
+      {!loading ? (
+        data?.signUp.__typename === "CreateUserSuccess" ? (
+          <Text>Account created succesfully! Logging you in...</Text>
+        ) : (
+          <Text>{data?.signUp.errorMessage}</Text>
+        )) : (
+        <ActivityIndicator size='large' />
+      )}
       <ScrollView style={styles.separator}>
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(fname) => setFname(fname)}
           value={fname}
           placeholder="First Name*"
         />
         <RequiredField input={fname} />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(lname) => setLname(lname)}
           value={lname}
-          placeholder="Last Name"
+          placeholder="Last Name*"
         />
+        <RequiredField input={lname} />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(username) => setUsername(username)}
           value={username}
           placeholder="Username*"
         />
         <RequiredField input={username} />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(email) => { setEmail(email.replaceAll(/\s+/g, "")); setEmailCheck(false) }}
           onBlur={() => setEmailCheck(true)}
           value={email}
           placeholder="Email*"
         />
-        <CheckEmail/>
-        <RequiredField input={email}/>
-        <View style={styles.pwordfield}>
+        <CheckEmail />
+        <RequiredField input={email} />
+        <View style={styles.formField}>
           <TextInput
-              onChangeText={(password) => setPassword(password)}
-              value={password}
-              secureTextEntry={hidePword}
-              placeholder="Password*"
+            style={styles.pwordinput}
+            onChangeText={(password) => setPassword(password)}
+            value={password}
+            onFocus={() => setPwordRules(true)}
+            onBlur={() => setPwordRules(false)}
+            secureTextEntry={hidePword}
+            placeholder="Password*"
           />
-          <FontAwesome style={styles.icon} name={hidePword? ("eye") : ("eye-slash")} size={15} onPress={() => setHidePword(!hidePword)}/>
+          <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={eyeIconSize} onPress={() => setHidePword(!hidePword)} />
         </View>
-        <RequiredField input={password}/>
-        <PasswordRules/>
+        <RequiredField input={password} />
+        {pwordRules ? (<PasswordRules />) : (<></>)}
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(pword) => { setPwordConfirm(pword); setPwordCheck(false) }}
           onBlur={() => setPwordCheck(true)}
           value={pwordConfirm}
           secureTextEntry={hidePword}
           placeholder="Confirm Password*"
         />
-        {(!pwordCheck || (pwordConfirm === password)) ? (
-          <RequiredField input={pwordConfirm} />
-        ) : (
-          (<Text style={styles.alert}>password fields need to match</Text>)
-        )}
+        {
+          (!pwordCheck || (pwordConfirm === password)) ? (
+            <RequiredField input={pwordConfirm} />
+          ) : (
+            (<Text style={styles.alert}>password fields need to match</Text>)
+          )
+        }
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(newPhone) => FormatPhone(newPhone)}
           onBlur={() => setPhoneCheck(true)}
-          value={'+' + phone}
+          value={phone}
           keyboardType="phone-pad"
-          placeholder="Phone Number"
+          placeholder="Phone Number (optional)"
         />
         <CheckPhone />
         <Button
           onPress={() => register()}
-          title="Sign Up"
-          color="#0b5394"
-          accessibilityLabel="Sign Up Button"
+          text='Sign Up'
+          accessibilityLabel='Sign Up Button'
         />
-      </ScrollView>
-    </View>
+      </ScrollView >
+    </View >
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    height: 40,
-    margin: 5,
-    borderWidth: 1,
-    padding: 10,
-  },
-  title: {
-    paddingTop: 20,
-    fontSize: 32,
-    // Not a system font on Android
-    // fontFamily: 'Gill Sans MT', 
-    marginHorizontal: 25,
-    marginVertical: 10,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 20,
-    height: 1,
-  },
-  alert: {
-    color: 'red',
-    marginHorizontal: 5,
-    marginBottom: 8,
-  },
-  reqs: {
-    color: 'gray',
-    fontSize: 14,
-    marginHorizontal: 5,
-    marginBottom: 1,
-  },
-  icon: {
-    marginHorizontal: 5,
-  },
-  pwordfield: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 40,
-    margin: 5,
-    borderWidth: 1,
-    padding: 10,
-  }
-});
