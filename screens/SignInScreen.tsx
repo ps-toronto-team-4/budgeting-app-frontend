@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { StyleSheet, SafeAreaView, TextInput, Alert, TouchableOpacity, Pressable, Modal  } from 'react-native';
 import Button from "../components/Button";
 
@@ -7,7 +7,9 @@ import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useQuery } from '@apollo/client';
 //import Graphql from "../components/Graphql";
+import WelcomeScreen from "./WelcomeScreen";
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
+
 
 const LogInForm = (props:any) => {
   // setUsername: Function, setPassword: Function, username: string, password: string
@@ -16,24 +18,7 @@ const LogInForm = (props:any) => {
 
   return(
     <SafeAreaView>
-      <View style= {styles.textfields}>
-        <TextInput 
-          style = {styles.input}
-          placeholder = "Username"
-          onChangeText={username => setUsername(username)}
-          value = {username}
-          >
-        </TextInput>
-        
-        <TextInput 
-          style = {styles.input}
-          placeholder = "Password"
-          onChangeText={password => setPassword(password)}
-          value = {password}
-          secureTextEntry={true}
-          >
-        </TextInput>
-      </View>
+      
 
       
     </SafeAreaView>
@@ -43,54 +28,74 @@ const LogInForm = (props:any) => {
 
 
 export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'>) {
-  const [signInStatus, setSignInStatus] = React.useState(null);
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-
+  const [usernamePayload, setUsernamePayload] = React.useState("");
+  const [passwordPayload, setPasswordPayload] = React.useState("");
+  
   const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument,{
-    variables: {username,password}
+    variables: {username:usernamePayload,password:passwordPayload},
+    onCompleted: (data) => {
+      console.log(usernamePayload);
+      if(data?.signIn.__typename === "SignInSuccess"){
+        navigation.replace('Home');
+      }
+    },
+    onError:(data) => {
+      console.log(data);
+
+    }
   });
 
-    const handleLogin = (username: String, password: String) =>{
-      console.log("username", username, "pass",password);
-      triggerLogin();
-      //graph ql query here
-      //checker
-      //setSignInStatus("verified")
-      //setSignInStatus("un-authenticated")
-    }
+    
 
-    if(!loading && data?.signIn.__typename == "SignInSuccess"){
-      navigation.navigate('Home')
-    }
+    
+const handleLogin = () => {
+  
+  setUsernamePayload(username);
+  setPasswordPayload(password);
+
+  triggerLogin();
+  
+
+}
+    
+    
+     
+    
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign into your account</Text>
-      <LogInForm
-       username={username}
-       password={password}
-       setUsername={setUsername}
-       setPassword={setPassword}></LogInForm>
+      <View style= {styles.textfields}>
+        <TextInput 
+          style = {styles.input}
+          placeholder = "Username"
+          onChangeText={(username) => setUsername(username)}
+          value = {username}
+          >
+        </TextInput>
+        
+        <TextInput 
+          style = {styles.input}
+          placeholder = "Password"
+          onChangeText={(password) => setPassword(password)}
+          value = {password}
+          secureTextEntry={true}
+          >
+        </TextInput>
+      </View>
       <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordModal')} style={styles.helpLink}>
           <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
             Forgot Password?
           </Text>
       </TouchableOpacity>
 
-      <Button text="Sign In" onPress={() => handleLogin(username,password)}></Button>
-
+      <Button text="Sign In" onPress={() => handleLogin()}  />
       {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</Text> }
     </View>
   );
 }
-
-
-
-function checkInfo(username: String, password: String){
-
-}
-
 
 
 const styles = StyleSheet.create({

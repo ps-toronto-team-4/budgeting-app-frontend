@@ -3,8 +3,12 @@ import { GestureResponderEvent, StyleSheet, Image } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import Button from '../components/Button';
+import React from 'react';
+import Styles from '../constants/Styles';
+
 
 export default function WelcomeScreen({ navigation }: RootTabScreenProps<'Welcome'>) {
+
   function onPressSignIn(_: GestureResponderEvent) {
     navigation.navigate('SignIn');
   }
@@ -14,28 +18,18 @@ export default function WelcomeScreen({ navigation }: RootTabScreenProps<'Welcom
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to</Text>
-      <Text style={styles.title}>[AppName]!</Text>
-      <Image style={styles.image} source={require('../assets/images/image_placeholder.png')}></Image>
+    <View style={Styles.container}>
+      <Text style={Styles.title}>Welcome to</Text>
+      <Text style={Styles.title}>[AppName]!</Text>
+      <Image style={style.image} source={require('../assets/images/image_placeholder.png')}></Image>
       <Button text="Sign in" onPress={onPressSignIn}></Button>
-      <Text style={styles.registerCaption}>Don't have an account?</Text>
+      <Text style={style.registerCaption}>Don't have an account?</Text>
       <Button text="Create an account" onPress={onPressSignUp}></Button>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-  },
+const style = StyleSheet.create({
   image: {
     height: 150,
     width: 200,
@@ -46,9 +40,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 5,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  }
 });
