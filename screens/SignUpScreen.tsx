@@ -1,9 +1,11 @@
 import { gql, useMutation } from '@apollo/client';
 import React, { useState } from 'react';
-import { Alert, Button, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { Alert, Button, ScrollView, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
+import TextInput from '../components/TextInput';
+import layout from '../constants/Layout';
 
 const CREATE_USER = (fname: string, lname: string, username: string, email: string, phone: string, password: string) => gql`
   mutation CREATE_USER {
@@ -115,47 +117,48 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
       <Text style={styles.title}>Create a New Account</Text>
       <ScrollView style={styles.separator}>
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(fname) => setFname(fname)}
           value={fname}
           placeholder="First Name*"
         />
         <RequiredField input={fname} />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(lname) => setLname(lname)}
           value={lname}
           placeholder="Last Name"
         />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(username) => setUsername(username)}
           value={username}
           placeholder="Username*"
         />
         <RequiredField input={username} />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(email) => { setEmail(email.replaceAll(/\s+/g, "")); setEmailCheck(false) }}
           onBlur={() => setEmailCheck(true)}
           value={email}
           placeholder="Email*"
         />
-        <CheckEmail/>
-        <RequiredField input={email}/>
-        <View style={styles.pwordfield}>
+        <CheckEmail />
+        <RequiredField input={email} />
+        <View style={styles.formField}>
           <TextInput
-              onChangeText={(password) => setPassword(password)}
-              value={password}
-              secureTextEntry={hidePword}
-              placeholder="Password*"
+            style={styles.pwordinput}
+            onChangeText={(password) => setPassword(password)}
+            value={password}
+            secureTextEntry={hidePword}
+            placeholder="Password*"
           />
-          <FontAwesome style={styles.icon} name={hidePword? ("eye") : ("eye-slash")} size={15} onPress={() => setHidePword(!hidePword)}/>
+          <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={layout.signUpScreen.eyeIconSize} onPress={() => setHidePword(!hidePword)} />
         </View>
-        <RequiredField input={password}/>
-        <PasswordRules/>
+        <RequiredField input={password} />
+        <PasswordRules />
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(pword) => { setPwordConfirm(pword); setPwordCheck(false) }}
           onBlur={() => setPwordCheck(true)}
           value={pwordConfirm}
@@ -168,7 +171,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           (<Text style={styles.alert}>password fields need to match</Text>)
         )}
         <TextInput
-          style={styles.input}
+          style={styles.formField}
           onChangeText={(newPhone) => FormatPhone(newPhone)}
           onBlur={() => setPhoneCheck(true)}
           value={'+' + phone}
@@ -193,12 +196,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  input: {
-    height: 40,
-    margin: 5,
-    borderWidth: 1,
-    padding: 10,
   },
   title: {
     paddingTop: 20,
@@ -225,17 +222,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     marginBottom: 1,
   },
-  icon: {
-    marginHorizontal: 5,
+  formField: {
+    marginVertical: 7,
   },
-  pwordfield: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 40,
-    margin: 5,
-    borderWidth: 1,
-    padding: 10,
+  icon: {
+    position: 'absolute',
+    right: layout.signUpScreen.eyeIconMarginRight,
+    top: '50%',
+    transform: [{ translateY: -(layout.signUpScreen.eyeIconSize) / 2 }],
+  },
+  pwordinput: {
+    paddingRight: 20 + layout.signUpScreen.eyeIconMarginRight,
   }
 });

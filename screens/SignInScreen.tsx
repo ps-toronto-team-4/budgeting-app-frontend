@@ -1,6 +1,7 @@
 import React from "react"
-import { StyleSheet, SafeAreaView, TextInput, Alert, TouchableOpacity, Pressable, Modal  } from 'react-native';
+import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal } from 'react-native';
 import Button from "../components/Button";
+import TextInput from "../components/TextInput";
 
 import Colors from '../constants/Colors';
 import { Text, View } from '../components/Themed';
@@ -9,85 +10,85 @@ import { useLazyQuery, useQuery } from '@apollo/client';
 //import Graphql from "../components/Graphql";
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
 
-const LogInForm = (props:any) => {
+const LogInForm = (props: any) => {
   // setUsername: Function, setPassword: Function, username: string, password: string
-  const { username,password,setUsername,setPassword} = props
-  
+  const { username, password, setUsername, setPassword } = props
 
-  return(
+
+  return (
     <SafeAreaView>
-      <View style= {styles.textfields}>
-        <TextInput 
-          style = {styles.input}
-          placeholder = "Username"
+      <View style={styles.textfields}>
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
           onChangeText={username => setUsername(username)}
-          value = {username}
-          >
+          value={username}
+        >
         </TextInput>
-        
-        <TextInput 
-          style = {styles.input}
-          placeholder = "Password"
+
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
           onChangeText={password => setPassword(password)}
-          value = {password}
+          value={password}
           secureTextEntry={true}
-          >
+        >
         </TextInput>
       </View>
 
-      
+
     </SafeAreaView>
   );
 };
 
 
 
-export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'>) {
+export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
   const [signInStatus, setSignInStatus] = React.useState(null);
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument,{
-    variables: {username,password}
+  const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument, {
+    variables: { username, password }
   });
 
-    const handleLogin = (username: String, password: String) =>{
-      console.log("username", username, "pass",password);
-      triggerLogin();
-      //graph ql query here
-      //checker
-      //setSignInStatus("verified")
-      //setSignInStatus("un-authenticated")
-    }
+  const handleLogin = (username: String, password: String) => {
+    console.log("username", username, "pass", password);
+    triggerLogin();
+    //graph ql query here
+    //checker
+    //setSignInStatus("verified")
+    //setSignInStatus("un-authenticated")
+  }
 
-    if(!loading && data?.signIn.__typename == "SignInSuccess"){
-      navigation.navigate('ForgotPasswordModal')
-    }
+  if (!loading && data?.signIn.__typename == "SignInSuccess") {
+    navigation.navigate('ForgotPasswordModal')
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign into your account</Text>
       <LogInForm
-       username={username}
-       password={password}
-       setUsername={setUsername}
-       setPassword={setPassword}></LogInForm>
+        username={username}
+        password={password}
+        setUsername={setUsername}
+        setPassword={setPassword}></LogInForm>
       <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordModal')} style={styles.helpLink}>
-          <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
-            Forgot Password?
-          </Text>
+        <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
+          Forgot Password?
+        </Text>
       </TouchableOpacity>
 
-      <Button text="Sign In" onPress={() => handleLogin(username,password)}></Button>
+      <Button text="Sign In" onPress={() => handleLogin(username, password)}></Button>
 
-      {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</Text> }
+      {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in" : "Failed sign in"}</Text>}
     </View>
   );
 }
 
 
 
-function checkInfo(username: String, password: String){
+function checkInfo(username: String, password: String) {
 
 }
 
@@ -112,13 +113,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   input: {
-    height: 40,
     margin: 12,
-    borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderColor: '#ccc',
-    borderRadius: 15,
   },
   textfields: {
     marginBottom: 100,

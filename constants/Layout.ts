@@ -9,4 +9,8 @@ export default {
     height,
   },
   isSmallDevice: width < 375,
+  signUpScreen: {
+    eyeIconSize: 15,
+    eyeIconMarginRight: 13,
+  }
 };
