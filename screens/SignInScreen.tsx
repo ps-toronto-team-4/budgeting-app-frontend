@@ -1,5 +1,6 @@
 import React from "react"
-import { StyleSheet, SafeAreaView, TextInput, Button, Alert, TouchableOpacity, Pressable, Modal  } from 'react-native';
+import { StyleSheet, SafeAreaView, TextInput, Alert, TouchableOpacity, Pressable, Modal  } from 'react-native';
+import Button from "../components/Button";
 
 import Colors from '../constants/Colors';
 import { Text, View } from '../components/Themed';
@@ -77,9 +78,9 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
           </Text>
       </TouchableOpacity>
 
-      <Button title = "Sign In" onPress={() => handleLogin(username,password)}></Button>
+      <Button text="Sign In" onPress={() => handleLogin(username,password)}></Button>
 
-      {!loading && <div>the status is :{data?.signIn.__typename == "SignInSuccess" ? "you have been signed in": " get rekted noob"}</div> }
+      {!loading && <div>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</div> }
     </View>
   );
 }
