@@ -17,6 +17,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       SignIn: 'login',
       SignUp: 'register',
       ForgotPasswordModal: 'ForgotPassword',
+      ViewExpenses: 'view-expenses',
       NotFound: '*',
     },
   },
