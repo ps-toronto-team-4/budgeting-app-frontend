@@ -29,22 +29,6 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
     }
   });
 
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const getData = () => {
-    try{
-      AsyncStorage.getItem('passwordHash')
-        .then(value =>{
-          if(value != null){
-            navigation.navigate('Home');
-          }
-        })
-    } catch (error){
-      console.log(error);
-    }
-  }
 
   const setData = async () => {
     try{
