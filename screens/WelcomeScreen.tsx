@@ -1,10 +1,10 @@
 import { GestureResponderEvent, StyleSheet, Image } from 'react-native';
 
 import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
 import Button from '../components/Button';
+import { RootStackScreenProps } from '../types';
 
-export default function WelcomeScreen({ navigation }: RootTabScreenProps<'Welcome'>) {
+export default function WelcomeScreen({ navigation }: RootStackScreenProps<'Welcome'>) {
   function onPressSignIn(_: GestureResponderEvent) {
     navigation.navigate('SignIn');
   }
@@ -18,9 +18,9 @@ export default function WelcomeScreen({ navigation }: RootTabScreenProps<'Welcom
       <Text style={styles.title}>Welcome to</Text>
       <Text style={styles.title}>[AppName]!</Text>
       <Image style={styles.image} source={require('../assets/images/image_placeholder.png')}></Image>
-      <Button text="Sign in" onPress={onPressSignIn}></Button>
+      <Button text="Sign in" onPress={onPressSignIn} accessibilityLabel="Sign in button"></Button>
       <Text style={styles.registerCaption}>Don't have an account?</Text>
-      <Button text="Create an account" onPress={onPressSignUp}></Button>
+      <Button text="Create an account" onPress={onPressSignUp} accessibilityLabel="Sign up button"></Button>
     </View>
   );
 }
