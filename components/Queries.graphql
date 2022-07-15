@@ -12,3 +12,29 @@ query getPasswordHash ($username: String!, $password: String!) {
         }
     }
 }
+
+query getExpenses ($passwordHash: String!) {
+  expenses(passwordHash: $passwordHash) {
+    ... on ExpensesSuccess {
+      expenses {
+        amount
+        id
+        title
+        description
+        category {
+          colourHex
+          name
+        }
+        merchant {
+          name
+          description
+          
+        }
+      }
+    }
+    ... on FailurePayload{
+      errorMessage
+      exceptionName
+    }
+  }
+}
