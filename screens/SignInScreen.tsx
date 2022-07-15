@@ -8,6 +8,7 @@ import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Styles from "../constants/Styles";
 
 export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");
@@ -64,8 +65,8 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
   }
     
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign into your account</Text>
+    <View style={Styles.container}>
+      <Text style={Styles.title}>Sign into your account</Text>
       {!loading ? (
         data?.signIn.__typename === "SignInSuccess" ? (
           <Text>Sign in successful</Text>
@@ -108,23 +109,6 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    width: 150,
-    textAlign: 'center',
-    margin: 20,
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
   input: {
     margin: 12,
   },
