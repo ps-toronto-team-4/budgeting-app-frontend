@@ -20,7 +20,7 @@ export type RootStackParamList = {
   SignUp: undefined;
   ExpenseDetails: undefined;
   ForgotPasswordModal: undefined;
-  ViewExpenses: undefined;
+  Expenses: undefined;
   NotFound: undefined;
 };
 

@@ -13,6 +13,7 @@ import {
   FlatList,
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { RootTabScreenProps } from "../types";
 const todoList = [
   { id: '1', text: 'Learn JavaScript' },
   { id: '2', text: 'Learn React' },
@@ -110,7 +111,7 @@ const ListItem = ({ id, title, amount, description, category }:
   </Swipeable>)
 };
 
-export default function ExpensesScreen() {
+export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
   const [userHash, setUserHash] = useState('$2a$06$W0DqcQ.eGA.eGA.eGA.eG.9QuFuYui/jdsCyGWdU8lh5AM2tUV0o2');
   const { loading, error, data } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash: userHash }
