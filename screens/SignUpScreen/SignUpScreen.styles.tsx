@@ -11,6 +11,9 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    codeText: {
+        marginRight: 5
+    },
     phoneContainer: {
         width: 250,
         height: 50,
@@ -18,8 +21,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 15,
         borderColor: 'black',
         borderRadius: 7,
-        marginTop: 7,
-        marginBottom: 14
+        marginVertical:7
     },
     textField: {
         height: 50,
@@ -40,7 +42,8 @@ export const styles = StyleSheet.create({
         // Not a system font on Android
         // fontFamily: 'Gill Sans MT',
         marginHorizontal: 25,
-        marginVertical: 10,
+        marginTop: '10%',
+        marginBottom: '5%',
         textAlign: 'center',
         fontWeight: 'bold',
     },
@@ -53,6 +56,7 @@ export const styles = StyleSheet.create({
         marginHorizontal: 5,
         marginBottom: 8,
         maxWidth: 250,
+        textAlign: 'center'
     },
     reqs: {
         color: 'gray',

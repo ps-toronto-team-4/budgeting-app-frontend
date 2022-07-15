@@ -33,9 +33,11 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     onError: (error => {
       Alert.alert(error.message);
     }),
-    onCompleted: (() =>
-      navigation.navigate("SignIn")
-    )
+    onCompleted: ((data) => {
+      if (data.signUp.__typename === "CreateUserSuccess") {
+        navigation.navigate("SignIn")
+      }
+    })
   })
 
   const register = async () => {
@@ -85,20 +87,18 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
   }
 
   function FormatPhone(newPhone: string) {
-    console.log('before: ' + newPhone);
-    setPhone(phone + newPhone.replaceAll(/[^0-9]/g, ""));
-    console.log('after: '+ phone)
+    setPhone(newPhone.replaceAll(/[^0-9]/g, "").substring(0,15));
     setPhoneCheck(false);
   }
 
   function CheckPhone() {
-    let phoneRegex = /^[0-9]{7,15}$/;
-    if (!phoneCheck || !phone || phoneRegex.test(phone)) {
-      return (<></>);
+
+    if (phoneCheck && phone && phone.length < 6) {
+      return (<Text style={styles.alert}>Invalid phone number</Text>);
+    } else if (phone.length === 15) {
+      return (<Text style={styles.alert}>Maximum length reached</Text>)
     } else {
-      return (
-        <Text style={styles.alert}>Invalid phone number</Text>
-      )
+      return (<></>)
     }
   }
 
@@ -123,7 +123,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         data?.signUp.__typename === "CreateUserSuccess" ? (
           <Text>Account created succesfully! Logging you in...</Text>
         ) : (
-          <Text>{data?.signUp.errorMessage}</Text>
+          <Text style={styles.alert}>{data?.signUp.errorMessage}</Text>
         )) : (
         <ActivityIndicator size='large' />
       )}
@@ -193,11 +193,10 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           containerStyle={styles.phoneContainer}
           textContainerStyle={styles.textField}
           countryPickerButtonStyle={styles.countryBtn}
-          textInputStyle={styles.phoneInput}
+          codeTextStyle={styles.codeText}
           disableArrowIcon={true}
           defaultCode='CA'
-          value={phone}
-          textInputProps={{onChangeText: (phone) => FormatPhone(phone)}}
+          textInputProps={{onChangeText: (phone) => {FormatPhone(phone); setPhoneCheck(false)}, onBlur: () => setPhoneCheck(true), value: phone, style: styles.phoneInput}}
           placeholder="Phone Number (optional)"
         />
         <CheckPhone />
