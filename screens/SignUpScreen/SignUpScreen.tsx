@@ -21,13 +21,14 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
   const [pwordConfirm, setPwordConfirm] = useState("")
   const [check, setCheck] = useState(false)
   const [pwordCheck, setPwordCheck] = useState(false)
+  const [userCheck, setUserCheck] = useState(false)
   const [pwordRules, setPwordRules] = useState(false)
   const [emailCheck, setEmailCheck] = useState(false)
   const [phoneCheck, setPhoneCheck] = useState(false)
   const [hidePword, setHidePword] = useState(true)
 
   // Create user graphql query
-  const [createUser, { loading, error, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
+  const [createUser, { loading, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
     variables: { fname, lname, username, email, phone, password },
     onError: (error => {
       Alert.alert(error.message);
@@ -49,7 +50,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
       (!check || input) ? (
         <></>
       ) : (
-        <Text style={styles.alert}>this field is required</Text>
+        <Text style={styles.alert}>This field is required</Text>
       ))
   }
 
@@ -83,21 +84,37 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
     }
   }
 
-  // function FormatPhone(newPhone: string) {
-  //   setPhone(newPhone.replaceAll(/[^0-9]/g, ""));
-  //   setPhoneCheck(false);
-  // }
+  function FormatPhone(newPhone: string) {
+    console.log('before: ' + newPhone);
+    setPhone(phone + newPhone.replaceAll(/[^0-9]/g, ""));
+    console.log('after: '+ phone)
+    setPhoneCheck(false);
+  }
 
-  // function CheckPhone() {
-  //   let phoneRegex = /^[0-9]{7,15}$/;
-  //   if (!phoneCheck || !phone || phoneRegex.test(phone)) {
-  //     return (<></>);
-  //   } else {
-  //     return (
-  //       <Text style={styles.alert}>Invalid phone number</Text>
-  //     )
-  //   }
-  // }
+  function CheckPhone() {
+    let phoneRegex = /^[0-9]{7,15}$/;
+    if (!phoneCheck || !phone || phoneRegex.test(phone)) {
+      return (<></>);
+    } else {
+      return (
+        <Text style={styles.alert}>Invalid phone number</Text>
+      )
+    }
+  }
+
+  function UsernameRules() {
+    let minCheck = username.length < 4;
+    let maxCheck = username.length >= 16;
+    let formatCheck = /^[A-Za-z0-9_.]*$/.test(username);
+    if (username && userCheck && minCheck) {
+      return (<Text style={styles.alert}>Username must have at least 4 characters</Text>)
+    } else if (maxCheck) {
+      return (<Text style={styles.alert}>Maximum length reached</Text>)
+    } else if (!formatCheck) {
+      return (<Text style={styles.alert}>Username can only include letters, numbers, underscore (_) and dot (.)</Text>)
+    } else {
+      return (<></>);
+  }}
 
   return (
     <View style={styles.container}>
@@ -127,11 +144,13 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
         <RequiredField input={lname} />
         <TextInput
           style={styles.formField}
-          onChangeText={(username) => setUsername(username)}
+          onChangeText={(user) => {setUsername(user.substring(0,16)); setUserCheck(false)}}
+          onBlur={() => setUserCheck(true)}
           value={username}
           placeholder="Username*"
         />
         <RequiredField input={username} />
+        <UsernameRules/>
         <TextInput
           style={styles.formField}
           onChangeText={(email) => { setEmail(email.replaceAll(/\s+/g, "")); setEmailCheck(false) }}
@@ -167,7 +186,7 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           (!pwordCheck || (pwordConfirm === password)) ? (
             <RequiredField input={pwordConfirm} />
           ) : (
-            (<Text style={styles.alert}>password fields need to match</Text>)
+            (<Text style={styles.alert}>Password fields need to match</Text>)
           )
         }
         <PhoneInput
@@ -175,12 +194,13 @@ export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'
           textContainerStyle={styles.textField}
           countryPickerButtonStyle={styles.countryBtn}
           textInputStyle={styles.phoneInput}
+          disableArrowIcon={true}
           defaultCode='CA'
-          onChangeText={(newPhone) => setPhone(newPhone)}
           value={phone}
-          placeholder="Phone Number"
+          textInputProps={{onChangeText: (phone) => FormatPhone(phone)}}
+          placeholder="Phone Number (optional)"
         />
-        {/* <CheckPhone /> */}
+        <CheckPhone />
         <Button
           onPress={() => register()}
           text='Sign Up'

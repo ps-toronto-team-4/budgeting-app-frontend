@@ -22,7 +22,6 @@ export const styles = StyleSheet.create({
         marginBottom: 14
     },
     textField: {
-        width: 70,
         height: 50,
         backgroundColor: 'invisible',
         paddingHorizontal: 2,
@@ -30,9 +29,10 @@ export const styles = StyleSheet.create({
     phoneInput: {
         fontSize: 14,
         height: 50,
+        width: 170,
     },
     countryBtn: {
-        width: 55,
+        width: 30,
     },
     title: {
         paddingTop: 20,
@@ -52,6 +52,7 @@ export const styles = StyleSheet.create({
         color: 'red',
         marginHorizontal: 5,
         marginBottom: 8,
+        maxWidth: 250,
     },
     reqs: {
         color: 'gray',
