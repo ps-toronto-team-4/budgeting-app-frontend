@@ -14,7 +14,7 @@ export default function ForgotPasswordScreen({ navigation }: RootTabScreenProps<
   const contactemail = 'admin@admin.com'
 
   return (
-    <View style={styles.forgotcontainer}>
+    <View style={[Styles.container, styles.graybackground]}>
       <Modal
         animationType="slide"
         transparent={true}
@@ -44,10 +44,7 @@ export default function ForgotPasswordScreen({ navigation }: RootTabScreenProps<
 }
 
 const styles = StyleSheet.create({
-  forgotcontainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+  graybackground: {
     backgroundColor: 'gray',
   },
   contactemail: {

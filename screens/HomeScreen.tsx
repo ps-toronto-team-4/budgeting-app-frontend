@@ -20,15 +20,6 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     getData();
   }, []);
 
-
-  const storeData = async () => {
-    try{
-      await AsyncStorage 
-    } catch (e){
-
-    }
-  }
-
   const getData = async() => {
     try{
       const value = await AsyncStorage.getItem('passwordHash')
