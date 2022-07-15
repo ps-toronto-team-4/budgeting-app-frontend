@@ -110,10 +110,7 @@ const ListItem = ({ id, title, amount, description, category }:
   </Swipeable>)
 };
 
-
-
-
-export default function ViewExpenses() {
+export default function ExpensesScreen() {
   const [userHash, setUserHash] = useState('$2a$06$W0DqcQ.eGA.eGA.eGA.eG.9QuFuYui/jdsCyGWdU8lh5AM2tUV0o2');
   const { loading, error, data } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash: userHash }
@@ -143,8 +140,6 @@ export default function ViewExpenses() {
     </>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
