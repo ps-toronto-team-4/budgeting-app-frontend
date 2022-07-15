@@ -18,6 +18,7 @@ import NotFoundScreen from '../screens/NotFoundScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen/SignUpScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
+import HomeScreen from '../screens/HomeScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -52,6 +53,7 @@ function RootNavigator() {
       <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
+      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="ForgotPasswordModal" component={ForgotPasswordScreen} options={{ headerShown: false, title: 'Oops!' }} />
       </Stack.Group>

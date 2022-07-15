@@ -1,117 +1,114 @@
-import React from "react"
-import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal } from 'react-native';
+import React, { useEffect } from "react"
+import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal, ActivityIndicator  } from 'react-native';
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
-
 import Colors from '../constants/Colors';
 import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useQuery } from '@apollo/client';
-//import Graphql from "../components/Graphql";
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Styles from "../constants/Styles";
 
-const LogInForm = (props: any) => {
-  // setUsername: Function, setPassword: Function, username: string, password: string
-  const { username, password, setUsername, setPassword } = props
-
-
-  return (
-    <SafeAreaView>
-      <View style={styles.textfields}>
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          onChangeText={username => setUsername(username)}
-          value={username}
-        >
-        </TextInput>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          onChangeText={password => setPassword(password)}
-          value={password}
-          secureTextEntry={true}
-        >
-        </TextInput>
-      </View>
-
-
-    </SafeAreaView>
-  );
-};
-
-
-
-export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
-  const [signInStatus, setSignInStatus] = React.useState(null);
+export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [usernamePayload, setUsernamePayload] = React.useState("");
+  const [passwordPayload, setPasswordPayload] = React.useState("");
+  
+  const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument,{
+    variables: {username:usernamePayload,password:passwordPayload},
+    onCompleted: (data) => {
+      if(data?.signIn.__typename === "SignInSuccess"){
+        setData();       
+      }
+    },
+    onError:(data) => {
+      console.log(data);
 
-  const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument, {
-    variables: { username, password }
+    }
   });
 
-  const handleLogin = (username: String, password: String) => {
-    console.log("username", username, "pass", password);
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = () => {
+    try{
+      AsyncStorage.getItem('passwordHash')
+        .then(value =>{
+          if(value != null){
+            navigation.navigate('Home');
+          }
+        })
+    } catch (error){
+      console.log(error);
+    }
+  }
+
+  const setData = async () => {
+    try{
+      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash: "undefined");
+      navigation.replace('Home'); 
+      
+    } catch (error){
+      data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage: "undefined error";
+    }
+  }
+
+  const handleLogin = () => {
+    
+    setUsernamePayload(username);
+    setPasswordPayload(password);
     triggerLogin();
-    //graph ql query here
-    //checker
-    //setSignInStatus("verified")
-    //setSignInStatus("un-authenticated")
-  }
 
-  if (!loading && data?.signIn.__typename == "SignInSuccess") {
-    navigation.navigate('ForgotPasswordModal')
   }
-
+    
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign into your account</Text>
-      <LogInForm
-        username={username}
-        password={password}
-        setUsername={setUsername}
-        setPassword={setPassword}></LogInForm>
+    <View style={Styles.container}>
+      <Text style={Styles.title}>Sign into your account</Text>
+      {!loading ? (
+        data?.signIn.__typename === "SignInSuccess" ? (
+          <Text>Sign in successful</Text>
+        ) : (
+          <Text>{data?.signIn.errorMessage}</Text>
+        )) : (
+        <ActivityIndicator size='large'/>
+      )}
+      <View style= {styles.textfields}>
+        <TextInput 
+          style = {styles.input}
+          placeholder = "Username"
+          onChangeText={(username) => setUsername(username)}
+          value = {username}
+          >
+        </TextInput>
+        
+        <TextInput 
+          style = {styles.input}
+          placeholder = "Password"
+          onChangeText={(password) => setPassword(password)}
+          value = {password}
+          secureTextEntry={true}
+          >
+        </TextInput>
+      </View>
       <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordModal')} style={styles.helpLink}>
         <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
           Forgot Password?
         </Text>
       </TouchableOpacity>
 
-      <Button text="Sign In" onPress={() => handleLogin(username, password)} accessibilityLabel='Sign In Button'></Button>
+      <Button text="Sign In" onPress={() => handleLogin()} accessibilityLabel={"Sign In Button"}  />
 
-      {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in" : "Failed sign in"}</Text>}
+      {/* Uncomment below code when sign in status is unknown! */}
+      {/* {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</Text> } */}
     </View>
   );
 }
 
 
-
-function checkInfo(username: String, password: String) {
-
-}
-
-
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    width: 150,
-    textAlign: 'center',
-    margin: 20,
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
   input: {
     margin: 12,
   },
