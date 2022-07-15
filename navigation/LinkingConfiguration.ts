@@ -26,7 +26,6 @@ const linking: LinkingOptions<RootStackParamList> = {
       ExpenseDetails: 'expense-details',
       ForgotPasswordModal: 'ForgotPassword',
       NotFound: '*',
-      Home: 'Home',
     },
   },
 };

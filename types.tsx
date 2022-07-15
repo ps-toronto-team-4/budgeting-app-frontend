@@ -20,9 +20,8 @@ export type RootStackParamList = {
   SignUp: undefined;
   ExpenseDetails: undefined;
   ForgotPasswordModal: undefined;
-  ViewExpenses: undefined;
+  Expenses: undefined;
   NotFound: undefined;
-  Home: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -31,17 +30,10 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> = Nati
 >;
 
 export type RootTabParamList = {
-<<<<<<< HEAD
   Expenses: undefined;
   Budget: undefined;
   Reports: undefined;
   Profile: undefined;
-=======
-  Welcome: undefined;
-  SignIn: undefined;
-  SignUp: undefined;
-  Home: undefined;
->>>>>>> fa9e8f62b678810b345665130ab06f570d43272f
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
