@@ -18,8 +18,13 @@ import NotFoundScreen from '../screens/NotFoundScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen/SignUpScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
+import HomeScreen from '../screens/HomeScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+import ExpensesScreen from '../screens/ExpensesScreen';
+import BudgetScreen from '../screens/BudgetScreen';
+import ReportsScreen from '../screens/ReportsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -49,13 +54,28 @@ function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
+      <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
+      <Stack.Screen name="ExpenseDetails" component={ExpensesScreen} options={{ headerShown: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
+      <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="ForgotPasswordModal" component={ForgotPasswordScreen} options={{ headerShown: false, title: 'Oops!' }} />
       </Stack.Group>
     </Stack.Navigator >
+  );
+}
+
+const Tab = createBottomTabNavigator<RootTabParamList>();
+
+function Root() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Expenses" component={ExpensesScreen} options={{ headerShown: false }} />
+      <Tab.Screen name="Budget" component={BudgetScreen} options={{ headerShown: false }} />
+      <Tab.Screen name="Reports" component={ReportsScreen} options={{ headerShown: false }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}></Tab.Screen>
+    </Tab.Navigator>
   );
 }
 

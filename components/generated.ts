@@ -35,8 +35,6 @@ export type CategorySuccess = {
   category: Category;
 };
 
-export type CreateExpensePayload = ExpenseSuccess | FailurePayload;
-
 export type CreateUserPayload = CreateUserSuccess | FailurePayload;
 
 export type CreateUserSuccess = {
@@ -49,34 +47,38 @@ export type DeleteCategoryPayload = DeleteSuccess | FailurePayload;
 
 export type DeleteMerchantPayload = DeleteSuccess | FailurePayload;
 
+export type DeletePayload = DeleteSuccess | FailurePayload;
+
 export type DeleteSuccess = {
   __typename?: 'DeleteSuccess';
   successMessage?: Maybe<Scalars['String']>;
 };
 
-export type DeleteUserFailed = {
-  __typename?: 'DeleteUserFailed';
-  errorMessage?: Maybe<Scalars['String']>;
-  exceptionName?: Maybe<Scalars['String']>;
-};
-
 export type DeleteUserPayload = DeleteSuccess | FailurePayload;
 
-/**
- * #
- * # EXPENSE RELATED
- * #
- */
 export type Expense = {
   __typename?: 'Expense';
   amount?: Maybe<Scalars['Float']>;
+  category?: Maybe<Category>;
   description?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['Int']>;
+  merchant?: Maybe<Merchant>;
   title?: Maybe<Scalars['String']>;
+  user?: Maybe<User>;
 };
+
+export type ExpensePayload = ExpenseSuccess | FailurePayload;
 
 export type ExpenseSuccess = {
   __typename?: 'ExpenseSuccess';
   expense: Expense;
+};
+
+export type ExpensesPayload = ExpensesSuccess | FailurePayload;
+
+export type ExpensesSuccess = {
+  __typename?: 'ExpensesSuccess';
+  expenses: Array<Maybe<Expense>>;
 };
 
 export type FailurePayload = {
@@ -110,12 +112,16 @@ export type MerchantsSuccess = {
 export type Mutation = {
   __typename?: 'Mutation';
   createCategory: CategoryPayload;
-  createExpense: CreateExpensePayload;
+  createExpense: ExpensePayload;
   createMerchant: MerchantPayload;
   deleteCategory: DeleteCategoryPayload;
+  deleteExpense: DeletePayload;
   deleteMerchant: DeleteMerchantPayload;
   deleteUser: DeleteUserPayload;
   signUp: CreateUserPayload;
+  updateCategory: CategoryPayload;
+  updateExpense: ExpensePayload;
+  updateMerchant: MerchantPayload;
 };
 
 
@@ -129,7 +135,10 @@ export type MutationCreateCategoryArgs = {
 
 export type MutationCreateExpenseArgs = {
   amount: Scalars['Float'];
+  categoryId?: InputMaybe<Scalars['Int']>;
   description?: InputMaybe<Scalars['String']>;
+  epochDate: Scalars['Int'];
+  merchantId?: InputMaybe<Scalars['Int']>;
   passwordHash: Scalars['String'];
   title: Scalars['String'];
 };
@@ -144,6 +153,12 @@ export type MutationCreateMerchantArgs = {
 
 
 export type MutationDeleteCategoryArgs = {
+  id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type MutationDeleteExpenseArgs = {
   id: Scalars['Int'];
   passwordHash: Scalars['String'];
 };
@@ -169,11 +184,42 @@ export type MutationSignUpArgs = {
   username: Scalars['String'];
 };
 
+
+export type MutationUpdateCategoryArgs = {
+  colourHex: Scalars['String'];
+  description?: InputMaybe<Scalars['String']>;
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type MutationUpdateExpenseArgs = {
+  amount: Scalars['Float'];
+  categoryId?: InputMaybe<Scalars['Int']>;
+  description?: InputMaybe<Scalars['String']>;
+  epochDate: Scalars['Int'];
+  id: Scalars['Int'];
+  merchantId?: InputMaybe<Scalars['Int']>;
+  passwordHash: Scalars['String'];
+  title: Scalars['String'];
+};
+
+
+export type MutationUpdateMerchantArgs = {
+  defaultCategoryId?: InputMaybe<Scalars['Int']>;
+  description?: InputMaybe<Scalars['String']>;
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  passwordHash: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   categories: CategoriesPayload;
   category: CategoryPayload;
-  expense: CreateExpensePayload;
+  expense: ExpensePayload;
+  expenses: ExpensesPayload;
   greeting: Scalars['String'];
   merchant?: Maybe<MerchantPayload>;
   merchants?: Maybe<MerchantsPayload>;
@@ -196,6 +242,11 @@ export type QueryCategoryArgs = {
 
 export type QueryExpenseArgs = {
   id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type QueryExpensesArgs = {
   passwordHash: Scalars['String'];
 };
 
@@ -257,6 +308,14 @@ export type CreateUserMutationVariables = Exact<{
 
 export type CreateUserMutation = { __typename?: 'Mutation', signUp: { __typename: 'CreateUserSuccess', passwordHash: string } | { __typename: 'FailurePayload', exceptionName?: string | null, errorMessage?: string | null } };
 
+export type GetExpensesQueryVariables = Exact<{
+  passwordHash: Scalars['String'];
+}>;
+
+
+export type GetExpensesQuery = { __typename?: 'Query', expenses: { __typename?: 'ExpensesSuccess', expenses: Array<{ __typename?: 'Expense', amount?: number | null, id?: number | null, title?: string | null, description?: string | null, category?: { __typename?: 'Category', colourHex?: string | null, name?: string | null } | null, merchant?: { __typename?: 'Merchant', name?: string | null, description?: string | null } | null } | null> } | { __typename?: 'FailurePayload', errorMessage?: string | null, exceptionName?: string | null } };
+
 
 export const GetPasswordHashDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPasswordHash"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"signIn"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SignInSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"passwordHash"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"FailurePayload"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"exceptionName"}},{"kind":"Field","name":{"kind":"Name","value":"errorMessage"}}]}}]}}]}}]} as unknown as DocumentNode<GetPasswordHashQuery, GetPasswordHashQueryVariables>;
 export const CreateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fname"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"lname"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"phone"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"signUp"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"firstName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fname"}}},{"kind":"Argument","name":{"kind":"Name","value":"lastName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"lname"}}},{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}},{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"phoneNumber"},"value":{"kind":"Variable","name":{"kind":"Name","value":"phone"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CreateUserSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"passwordHash"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"FailurePayload"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"exceptionName"}},{"kind":"Field","name":{"kind":"Name","value":"errorMessage"}}]}}]}}]}}]} as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>;
+export const GetExpensesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getExpenses"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"passwordHash"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"expenses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"passwordHash"},"value":{"kind":"Variable","name":{"kind":"Name","value":"passwordHash"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ExpensesSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"expenses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"category"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"colourHex"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"merchant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"FailurePayload"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"errorMessage"}},{"kind":"Field","name":{"kind":"Name","value":"exceptionName"}}]}}]}}]}}]} as unknown as DocumentNode<GetExpensesQuery, GetExpensesQueryVariables>;

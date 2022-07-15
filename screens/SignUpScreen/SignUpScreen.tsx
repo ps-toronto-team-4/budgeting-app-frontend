@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '../../components/Themed';
-import { RootTabScreenProps } from '../../types';
+import { RootStackScreenProps, RootTabScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
 import { styles, eyeIconSize } from './SignUpScreen.styles';
 import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
 import PhoneInput from 'react-native-phone-number-input';
 
-export default function SignUpScreen({ navigation }: RootTabScreenProps<'SignUp'>) {
+export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignUp'>) {
 
   const [username, setUsername] = useState("")
   const [fname, setFname] = useState("")

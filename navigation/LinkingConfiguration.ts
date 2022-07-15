@@ -16,8 +16,17 @@ const linking: LinkingOptions<RootStackParamList> = {
       Welcome: '',
       SignIn: 'login',
       SignUp: 'register',
+      Root: {
+        screens: {
+          Expenses: 'expenses-list',
+          Reports: 'reports',
+          Budget: 'budget',
+        }
+      },
+      ExpenseDetails: 'expense-details',
       ForgotPasswordModal: 'ForgotPassword',
       NotFound: '*',
+      Home: 'Home',
     },
   },
 };
