@@ -6,9 +6,11 @@ import { Text, View } from '../../components/Themed';
 import { RootStackScreenProps, RootTabScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
+import Styles from "../../constants/Styles";
 import { styles, eyeIconSize } from './SignUpScreen.styles';
 import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
 import PhoneInput from 'react-native-phone-number-input';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignUp'>) {
 
@@ -33,14 +35,17 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
     onError: (error => {
       Alert.alert(error.message);
     }),
-    onCompleted: ((data) => {
+    onCompleted: ((data) => async () => {
       if (data.signUp.__typename === "CreateUserSuccess") {
-        navigation.navigate("SignIn")
-      }
-    })
-  })
+        try {
+          await AsyncStorage.setItem('passwordHash', data.signUp.passwordHash);
+          navigation.replace('Root');
+        } catch (error) {
+          console.log(error);
+          Alert.alert("Something went wrong");
+    }}})})
 
-  const register = async () => {
+  const register = () => {
     setCheck(true);
     if (password && fname && username && email) {
       createUser();
@@ -117,8 +122,8 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   }}
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create a New Account</Text>
+    <View style={Styles.container}>
+      <Text style={Styles.title}>Create a New Account</Text>
       {!loading ? (
         data?.signUp.__typename === "CreateUserSuccess" ? (
           <Text>Account created succesfully! Logging you in...</Text>
@@ -127,7 +132,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
         )) : (
         <ActivityIndicator size='large' />
       )}
-      <ScrollView style={styles.separator}>
+      <ScrollView >
         <TextInput
           style={styles.formField}
           onChangeText={(fname) => setFname(fname)}

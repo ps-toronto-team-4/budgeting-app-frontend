@@ -5,12 +5,6 @@ export const eyeIconMarginRight = 13;
 
 
 export const styles = StyleSheet.create({
-    container: {
-        display: 'flex',
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     codeText: {
         marginRight: 5
     },
@@ -35,21 +29,6 @@ export const styles = StyleSheet.create({
     },
     countryBtn: {
         width: 30,
-    },
-    title: {
-        paddingTop: 20,
-        fontSize: 32,
-        // Not a system font on Android
-        // fontFamily: 'Gill Sans MT',
-        marginHorizontal: 25,
-        marginTop: '10%',
-        marginBottom: '5%',
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-    separator: {
-        marginVertical: 20,
-        height: 1,
     },
     alert: {
         color: 'red',
