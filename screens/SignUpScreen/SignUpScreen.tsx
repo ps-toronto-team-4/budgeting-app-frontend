@@ -32,7 +32,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
       Alert.alert(error.message);
     }),
     onCompleted: (() =>
-      navigation.navigate("SignIn")
+      navigation.navigate("Root")
     )
   })
 
