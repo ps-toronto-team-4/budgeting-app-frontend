@@ -23,7 +23,7 @@ type AdaptiveNumInputProps = TextInputProps & {
     initialValue: string,
 };
 
-export default function AdaptiveNumInput(props: AdaptiveNumInputProps) {
+export default function AdaptiveTextInput(props: AdaptiveNumInputProps) {
     const { style, ...otherProps } = props;
     const [ value, setValue ] = useState(props.initialValue.toString());
     const [ fontLoaded ] = useFonts({B612Mono_700Bold});
