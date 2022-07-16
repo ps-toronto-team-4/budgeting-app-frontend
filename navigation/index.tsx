@@ -56,7 +56,9 @@ function RootNavigator() {
       <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
-      <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{
+        title: 'Expense Details', headerTitleAlign: "center", headerShadowVisible: false, headerTitleStyle: {fontWeight: "bold"} 
+      }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>

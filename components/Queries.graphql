@@ -108,8 +108,8 @@ query getExpense($passwordHash: String!, $expenseId: Int!) {
                     name
                 }
                 description
+                date
             }
-            # TODO: need the date as well
         }
 
         ...on FailurePayload {
