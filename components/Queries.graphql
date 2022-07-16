@@ -94,3 +94,27 @@ query getExpenses($passwordHash: String!) {
         }
     }
 }
+
+query getExpense($passwordHash: String!, $expenseId: Int!) {
+    expense(passwordHash: $passwordHash, id: $expenseId) {
+        ...on ExpenseSuccess {
+            expense {
+                amount
+                category {
+                    name
+                    colourHex
+                }
+                merchant {
+                    name
+                }
+                description
+            }
+            # TODO: need the date as well
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}

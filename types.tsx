@@ -18,7 +18,7 @@ export type RootStackParamList = {
   Welcome: undefined;
   SignIn: undefined;
   SignUp: undefined;
-  ExpenseDetails: undefined;
+  ExpenseDetails: { expenseId: number };
   ForgotPasswordModal: undefined;
   Expenses: undefined;
   NotFound: undefined;
