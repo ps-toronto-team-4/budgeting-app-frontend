@@ -9,7 +9,7 @@ import {
     B612Mono_700Bold_Italic
 } from '@expo-google-fonts/b612-mono';
 
-type AdaptiveNumInputProps = TextInputProps & {
+type AdaptiveTextInputProps = TextInputProps & {
     /**
      * For default fontSize, charWidth = 9.5 is best. If initializing with custom fontSize
      * style, you gotta figure out the right charWidth yourself. Good luck.
@@ -17,9 +17,9 @@ type AdaptiveNumInputProps = TextInputProps & {
     charWidth: number,
 };
 
-export default function AdaptiveTextInput(props: AdaptiveNumInputProps) {
+export default function AdaptiveTextInput(props: AdaptiveTextInputProps) {
     const { style, onChangeText, ...otherProps } = props;
-    const [ textLength, setTextLength ] = useState(4);
+    const [ textLength, setTextLength ] = useState(otherProps.defaultValue?.length || otherProps.value?.length || 0);
     const [ fontLoaded ] = useFonts({B612Mono_700Bold});
 
     function handleChange(text: string) {
@@ -40,6 +40,6 @@ export default function AdaptiveTextInput(props: AdaptiveNumInputProps) {
 
 const styles = StyleSheet.create({
     input: {
-        fontFamily: 'B612Mono_700Bold',
+        fontFamily: 'B612Mono_700Bold', // Must be a monospaced font
     }
 });
