@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
+    "@expo-google-fonts/b612-mono": "^0.2.2",
     "@expo/ngrok": "^4.1.0",
     "@expo/vector-icons": "^13.0.0",
     "@graphql-codegen/cli": "^2.7.0",
