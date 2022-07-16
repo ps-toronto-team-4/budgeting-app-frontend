@@ -6,11 +6,11 @@ import { StyleSheet, View, Text, TextInput } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
+import AdaptiveTextInput from "../components/AdaptiveTextInput";
 
 export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'Budget'>) {
-    const [ passwordHash, setpasswordHash ] = useState("");
-    const [ amount, setAmount ] = useState(0);
-    const [ focused, setFocused ] = useState(false);
+    const [ passwordHash, setpasswordHash ] = useState('');
+    const [ amount, setAmount ] = useState('0.00');
 
     useEffect(() => {
         getData();
@@ -27,12 +27,14 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
         }
     }
 
-    function handleFocus() {
-        setFocused(true);
+    function handleAmountBlur() {
+        if (amount === '') {
+            setAmount('0.00');
+        }
     }
 
-    function handleBlue() {
-        setFocused(false);
+    function handleAmountChange(text: string) {
+        setAmount(text);
     }
 
     return (
@@ -40,14 +42,12 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
             <View style={styles.amountInputContainer}>
                 <View style={styles.dollarSignAndAmountInput}>
                     <Text style={styles.dollarSign}>$</Text>
-                    <TextInput style={styles.amountInput}></TextInput>
+                    <AdaptiveTextInput keyboardType="numeric" style={{fontSize: 50}} charWidth={30} value={amount} onChangeText={handleAmountChange} onBlur={handleAmountBlur}></AdaptiveTextInput>
                 </View>
             </View>
         </View>
     );
 }
-
-
 
 const styles = StyleSheet.create({
     screen: {
@@ -63,11 +63,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-end',
     },
-    dollarSign: {},
+    dollarSign: {
+        fontSize: 20,
+        marginRight: 5,
+        paddingBottom: 15,
+    },
     amountInput: {
-        // fontSize: 50,
+        fontSize: 50,
+        height:200,
         width: 100,
-        borderWidth: 1,
-        borderColor: 'green',
+        padding: 0,
     },
 });

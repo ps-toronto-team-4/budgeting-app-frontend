@@ -18,14 +18,8 @@ type AdaptiveTextInputProps = TextInputProps & {
 };
 
 export default function AdaptiveTextInput(props: AdaptiveTextInputProps) {
-    const { style, onChangeText, ...otherProps } = props;
-    const [ textLength, setTextLength ] = useState(otherProps.defaultValue?.length || otherProps.value?.length || 0);
+    const { style, value, ...otherProps } = props;
     const [ fontLoaded ] = useFonts({B612Mono_700Bold});
-
-    function handleChange(text: string) {
-        setTextLength(text.length);
-        onChangeText && onChangeText(text);
-    }
 
     if (!fontLoaded) {
         return <View></View>
@@ -33,7 +27,7 @@ export default function AdaptiveTextInput(props: AdaptiveTextInputProps) {
 
     return (
         <>
-            <TextInput style={[style, styles.input, {width: textLength * props.charWidth + props.charWidth}]} onChangeText={handleChange} {...otherProps}></TextInput>
+            <TextInput style={[style, styles.input, {width: (value?.length || 0) * props.charWidth + props.charWidth}]} value={value} {...otherProps}></TextInput>
         </>
     );
 }
