@@ -38,7 +38,7 @@ export default function AdaptiveTextInput(props: AdaptiveNumInputProps) {
 
     return (
         <>
-            <TextInput keyboardType='numeric' value={value} style={[style, styles.input, {width: value.length * props.charWidth + props.charWidth}]} {...otherProps} onChangeText={handleChange}></TextInput>
+            <TextInput value={value} style={[style, styles.input, {width: value.length * props.charWidth + props.charWidth}]} {...otherProps} onChangeText={handleChange}></TextInput>
         </>
     );
 }
