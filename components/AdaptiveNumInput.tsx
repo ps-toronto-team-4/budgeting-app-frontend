@@ -14,12 +14,18 @@ type AdaptiveNumInputProps = TextInputProps & {
      * For default fontSize, charWidth = 9.5 is best. If initializing with custom fontSize
      * style, you gotta figure out the right charWidth yourself. Good luck.
      */
-    charWidth: number
+    charWidth: number,
+
+    /**
+     * For default fontSize, charWidth = 9.5 is best. If initializing with custom fontSize
+     * style, you gotta figure out the right charWidth yourself. Good luck.
+     */
+    initialValue: string,
 };
 
 export default function AdaptiveNumInput(props: AdaptiveNumInputProps) {
     const { style, ...otherProps } = props;
-    const [ value, setValue ] = useState('0.00');
+    const [ value, setValue ] = useState(props.initialValue.toString());
     const [ fontLoaded ] = useFonts({B612Mono_700Bold});
 
     function handleChange(text: string) {
