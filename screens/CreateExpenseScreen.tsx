@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
 
-import { StyleSheet, View, Text, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TextInput, GestureResponderEvent } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
@@ -12,8 +12,8 @@ import { transform } from "@babel/core";
 import Button from "../components/Button";
 
 export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'Budget'>) {
-    const [ passwordHash, setpasswordHash ] = useState('');
-    const [ amount, setAmount ] = useState('0.00');
+    const [passwordHash, setpasswordHash] = useState('');
+    const [amount, setAmount] = useState('0.00');
 
     useEffect(() => {
         getData();
@@ -40,37 +40,57 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
         setAmount(text);
     }
 
+    function handleRowTouchStart(e: GestureResponderEvent) {
+        console.log(e.target);
+    }
+
     return (
         <View style={styles.screen}>
             <View style={styles.amountInputContainer}>
                 <View style={styles.dollarSignAndAmountInput}>
                     <Text style={styles.dollarSign}>$</Text>
-                    <AdaptiveTextInput keyboardType="numeric" style={{fontSize: 50}} charWidth={30} value={amount} onChangeText={handleAmountChange} onBlur={handleAmountBlur}></AdaptiveTextInput>
+                    <AdaptiveTextInput keyboardType="numeric" style={{ fontSize: 50 }} charWidth={30} value={amount} onChangeText={handleAmountChange} onBlur={handleAmountBlur}></AdaptiveTextInput>
                 </View>
             </View>
-            <View style={styles.categoryContainer}>
-                <Text style={styles.categoryLabel}>Category:</Text>
-                <TextInput style={styles.categoryInput} placeholder="Select Category"></TextInput>
-                <AntDesign name="down" size={20} color="black" />
+            <View style={styles.row} onTouchStart={handleRowTouchStart}>
+                <View style={styles.fieldContainer}>
+                    <View style={styles.fieldLabelAndInputContainer}>
+                        <Text style={styles.fieldLabel}>Category:</Text>
+                        <TextInput style={styles.fieldInput} placeholder="Select Category"></TextInput>
+                    </View>
+                    <AntDesign name="down" size={20} color="black" />
+                </View>
             </View>
-            <View style={styles.categoryContainer}>
-                <Text style={styles.categoryLabel}>Merchant:</Text>
-                <TextInput style={styles.categoryInput} placeholder="Select Merchant"></TextInput>
-                <AntDesign name="down" size={20} color="black" />
+            <View style={styles.row} onTouchStart={handleRowTouchStart}>
+                <View style={styles.fieldContainer}>
+                    <View style={styles.fieldLabelAndInputContainer}>
+                        <Text style={styles.fieldLabel}>Merchant:</Text>
+                        <TextInput style={styles.fieldInput} placeholder="Select Merchant"></TextInput>
+                    </View>
+                    <AntDesign name="down" size={20} color="black" />
+                </View>
             </View>
-            <View style={styles.categoryContainer}>
-                <Text style={styles.categoryLabel}>Date:</Text>
-                <TextInput style={styles.categoryInput} placeholder="Select Date"></TextInput>
+            <View style={styles.row} onTouchStart={handleRowTouchStart}>
+                <View style={styles.fieldContainer}>
+                    <View style={styles.fieldLabelAndInputContainer}>
+                        <Text style={styles.fieldLabel}>Date:</Text>
+                        <TextInput style={styles.fieldInput} placeholder="Select Date"></TextInput>
+                    </View>
+                </View>
             </View>
-            <View style={styles.categoryContainer}>
-                <Text style={styles.categoryLabel}>Recurrence:</Text>
-                <TextInput style={styles.categoryInput} placeholder="One time"></TextInput>
-                <AntDesign name="down" size={20} color="black" />
+            <View style={styles.row} onTouchStart={handleRowTouchStart}>
+                <View style={styles.fieldContainer}>
+                    <View style={styles.fieldLabelAndInputContainer}>
+                        <Text style={styles.fieldLabel}>Recurrence:</Text>
+                        <TextInput style={styles.fieldInput} placeholder="One time"></TextInput>
+                    </View>
+                    <AntDesign name="down" size={20} color="black" />
+                </View>
             </View>
             <View style={styles.detailsContainer}>
                 <View style={styles.detailsIconAndLabel}>
                     <Feather style={styles.detailsIcon} name="bar-chart" size={24} color="black" />
-                    <Text style={styles.detailsLabel}>Details:</Text>
+                    <Text style={styles.fieldLabel}>Details:</Text>
                 </View>
                 <TextInput style={styles.detailsInput} placeholder="Enter Details"></TextInput>
             </View>
@@ -102,26 +122,35 @@ const styles = StyleSheet.create({
     },
     amountInput: {
         fontSize: 50,
-        height:200,
+        height: 200,
         width: 100,
         padding: 0,
     },
-    categoryContainer: {
-        flexDirection: 'row',
-        paddingHorizontal: 30,
-        justifyContent: 'space-between',
-        // backgroundColor: 'red',
+    row: {
         alignItems: 'center',
-        paddingVertical: 10,
         borderTopWidth: 1,
         borderTopColor: 'rgba(0,0,0,0.3)',
+        paddingVertical: 10,
+        paddingHorizontal: 30,
     },
-    categoryLabel: {
+    fieldContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 320,
+    },
+    fieldLabelAndInputContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: 280,
+    },
+    fieldLabel: {
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 15,
     },
-    categoryInput: {
-        fontSize: 20,
+    fieldInput: {
+        fontSize: 15,
+        width: 180
     },
     detailsContainer: {
         flexDirection: 'row',
@@ -138,17 +167,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingHorizontal: 0,
         marginHorizontal: 0,
+        alignItems: 'center',
     },
     detailsIcon: {
-        transform: [{rotateZ: '90deg'}, {rotateY: '180deg'}],
+        transform: [{ rotateZ: '90deg' }, { rotateY: '180deg' }],
         marginRight: 5,
     },
-    detailsLabel: {
-        fontWeight: 'bold',
-        fontSize: 20,
-    },
     detailsInput: {
-        fontSize: 20,
+        fontSize: 15,
     },
     buttonContainer: {
         flex: 1,
