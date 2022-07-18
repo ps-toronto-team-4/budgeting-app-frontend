@@ -1,7 +1,8 @@
 import { useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
 import { ColorValue } from "react-native"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import React from 'react';
 import {
@@ -11,14 +12,23 @@ import {
   Text,
   StatusBar,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RootTabScreenProps } from "../types";
-const todoList = [
-  { id: '1', text: 'Learn JavaScript' },
-  { id: '2', text: 'Learn React' },
-  { id: '3', text: 'Learn TypeScript' },
-];
+
+
+//TODO
+// - order dates
+// - Have special names for today and yesterday
+
+const jumpToSpecificItem = (id: number | null | undefined) => {
+  if (id === undefined || id == null) {
+    alert("Transaction could not be found!")
+  }
+
+}
+
 const Separator = () => <View style={styles.itemSeparator} />;
 const LeftSwipeActions = (selectedColor: String) => {
   return (
@@ -112,11 +122,19 @@ const ListItem = ({ id, title, amount, description, category }:
 };
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
-  const [passwordHash, setPasswordHash] = useState('$2a$06$W0DqcQ.eGA.eGA.eGA.eG.9QuFuYui/jdsCyGWdU8lh5AM2tUV0o2');
+  const [passwordHash, setPasswordHash] = useState('');
   const { loading, error, data } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
   });
-  console.log(data);
+  useEffect(() => {
+    getUserDate();
+  }, []);
+  const getUserDate = async () => {
+    const retrivedUserHash = await AsyncStorage.getItem('passwordHash');
+    if (retrivedUserHash != null) {
+      setPasswordHash(retrivedUserHash);
+    }
+  }
   const dailyGrouping = splitTransationsOnDate(data)
   return (
     <>
@@ -125,48 +143,25 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         <Text style={{ textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
           Expenses
         </Text>
+        <ScrollView>
+          {dailyGrouping && dailyGrouping.map((gItem, index) => {
+            return (<View key={index}>
+              <Text>{gItem.key}</Text>
+              <FlatList
+                data={gItem.item}
+                keyExtractor={(ele) => {
+                  if (ele == null) {
+                    return ''
+                  }
+                  return String(ele.id)
+                }}
+                renderItem={({ item }) => <ListItem {...item} />}
+                ItemSeparatorComponent={() => <Separator />}
+              />
 
-        <Text>All</Text>
-        <View style={{ flex: 1 }}>
-          {!loading && data?.expenses.__typename == 'ExpensesSuccess' &&
-            <FlatList
-              style={{ flex: 1 }}
-              data={data?.expenses.expenses}
-              keyExtractor={(item) => {
-                if (item == null) {
-                  return ''
-                }
-                return String(item.id)
-              }}
-              renderItem={({ item }) => <ListItem {...item} />}
-              ItemSeparatorComponent={() => <Separator />}
-            />
-          }
-        </View>
-        <Text>Dates</Text>
-        <View>
-          {dailyGrouping &&
-            dailyGrouping.map((gItem, index) => {
-
-              return (<View>
-                <Text>{gItem.key}</Text>{gItem.item.map((dailyItem, dailyIndex) => {
-                  console.log("calvin", dailyItem)
-                  return (
-                    <FlatList
-                      data={gItem.item}
-                      keyExtractor={(ele) => {
-                        if (ele == null) {
-                          return ''
-                        }
-                        return String(ele.id)
-                      }}
-                      renderItem={({ item }) => <ListItem {...item} />}
-                      ItemSeparatorComponent={() => <Separator />}
-                    />
-                  )
-                })}</View>)
-            })}
-        </View>
+            </View>)
+          })}
+        </ScrollView>
       </SafeAreaView>
     </>
   );
