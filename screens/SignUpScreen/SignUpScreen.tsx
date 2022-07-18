@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '../../components/Themed';
@@ -21,6 +21,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [pwordConfirm, setPwordConfirm] = useState("")
+
   const [check, setCheck] = useState(false)
   const [pwordCheck, setPwordCheck] = useState(false)
   const [userCheck, setUserCheck] = useState(false)
@@ -28,6 +29,16 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   const [emailCheck, setEmailCheck] = useState(false)
   const [phoneCheck, setPhoneCheck] = useState(false)
   const [hidePword, setHidePword] = useState(true)
+ 
+  const [lengthCheck, setLengthCheck] = useState(true)
+  const [lettersCheck, setLettersCheck] = useState(true)
+  const [numberCheck, setNumberCheck] = useState(true)
+  const [specialCheck, setSpecialCheck] = useState(true)
+  const [minCheck, setMinCheck] = useState(true)
+  const [maxCheck, setMaxCheck] = useState(true)
+  const [formatCheck, setFormatCheck] = useState(true)
+  const [emailRegex, setEmailRegex] = useState(true)
+  const [minPhone, setMinPhone] = useState(true)
 
   // Create user graphql query
   const [createUser, { loading, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
@@ -35,22 +46,48 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
     onError: (error => {
       Alert.alert(error.message);
     }),
-    onCompleted: ((data) => async () => {
-      if (data.signUp.__typename === "CreateUserSuccess") {
-        try {
-          console.log("right before async storage")
-          await AsyncStorage.setItem('passwordHash', data.signUp.passwordHash);
-          console.log("right after async storage")
-          navigation.replace('Root');
-        } catch (error) {
-          console.log(error);
-          Alert.alert("Something went wrong");
-    }}})})
+    onCompleted: (() => setData())
+  })
 
   const register = () => {
     setCheck(true);
-    if (password && fname && username && email) {
-      createUser();
+    if (password && pwordConfirm && (pwordConfirm === password) && fname && lname && email && username) {
+      if (lengthCheck && lettersCheck && numberCheck && specialCheck && minCheck && formatCheck && emailRegex && minPhone) {
+        createUser();
+      }
+    }
+  }
+
+  useEffect(() => {
+    setLengthCheck(password.length >= 8);
+    setLettersCheck(/([A-Z].?[a-z])|([a-z].?[A-Z])/.test(password));
+    setNumberCheck(/\d/.test(password));
+    setSpecialCheck(/[^A-Za-z0-9]/.test(password));
+  }, [password]);
+
+  useEffect(() => {
+    setMinCheck(username.length >= 4);
+    setMaxCheck(username.length === 16);
+    setFormatCheck(/^[A-Za-z0-9_.]*$/.test(username));
+  }, [username]);
+
+  useEffect(() => {
+    setEmailRegex(/^[^/\\*;:,{}\[\]()$?]+@+[^/\\~`*;:,|{}\[\]=()%$?]+[.]{1}[^/\\~`*;:,|{}\[\]=()%$?]+$/.test(email));
+  }, [email])
+
+  useEffect(() => {
+    setMinPhone(phone.length === 0 || phone.length >= 6);
+  }, [phone]);
+
+  const setData = async () => {
+    if (data?.signUp.__typename === "CreateUserSuccess") {
+      try {
+        await AsyncStorage.setItem('passwordHash', data.signUp.passwordHash);
+        navigation.replace('Root');
+      } catch (error) {
+        console.log(error);
+        Alert.alert("Something went wrong");
+      }
     }
   }
 
@@ -64,10 +101,6 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   }
 
   function PasswordRules() {
-    let lengthCheck = password.length >= 8;
-    let lettersCheck = /([A-Z].?[a-z])|([a-z].?[A-Z])/.test(password);
-    let numberCheck = /\d/.test(password);
-    let specialCheck = /[^A-Za-z0-9]/.test(password);
     if (lettersCheck && lengthCheck && numberCheck && specialCheck) {
       return (<></>);
     }
@@ -83,13 +116,10 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   }
 
   function CheckEmail() {
-    let emailRegex = /^[^/\\*;:,{}\[\]()$?]+@+[^/\\~`*;:,|{}\[\]=()%$?]+[.]{1}[^/\\~`*;:,|{}\[\]=()%$?]+$/;
-    if (!emailCheck || !email || emailRegex.test(email)) {
+    if (!emailCheck || !email || emailRegex) {
       return (<></>);
     } else {
-      return (
-        <Text style={styles.alert}>Invalid email address</Text>
-      )
+      return (<Text style={styles.alert}>Invalid email address</Text>)
     }
   }
 
@@ -99,8 +129,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   }
 
   function CheckPhone() {
-
-    if (phoneCheck && phone && phone.length < 6) {
+    if (phoneCheck && phone && !minPhone) {
       return (<Text style={styles.alert}>Invalid phone number</Text>);
     } else if (phone.length === 15) {
       return (<Text style={styles.alert}>Maximum length reached</Text>)
@@ -110,10 +139,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   }
 
   function UsernameRules() {
-    let minCheck = username.length < 4;
-    let maxCheck = username.length >= 16;
-    let formatCheck = /^[A-Za-z0-9_.]*$/.test(username);
-    if (username && userCheck && minCheck) {
+    if (username && userCheck && !minCheck) {
       return (<Text style={styles.alert}>Username must have at least 4 characters</Text>)
     } else if (maxCheck) {
       return (<Text style={styles.alert}>Maximum length reached</Text>)
@@ -128,7 +154,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
       <Text style={Styles.title}>Create a New Account</Text>
       {!loading ? (
         data?.signUp.__typename === "CreateUserSuccess" ? (
-          <Text>Account created succesfully! Logging you in...</Text>
+          <Text>Account created successfully! Logging you in...</Text>
         ) : (
           <Text style={styles.alert}>{data?.signUp.errorMessage}</Text>
         )) : (
