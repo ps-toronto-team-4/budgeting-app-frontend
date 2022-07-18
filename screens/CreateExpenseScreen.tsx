@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
-import { GetCategoriesDocument, GetCategoriesQuery, Merchant } from "../components/generated";
+import { Category, GetCategoriesDocument, GetCategoriesQuery, Merchant } from "../components/generated";
 
 import { StyleSheet, View, Text, TextInput, GestureResponderEvent, ScrollView, FlatList, TouchableOpacity, TouchableHighlight } from 'react-native';
 import { RootTabScreenProps } from "../types";
@@ -11,28 +11,32 @@ import { AntDesign, Feather } from '@expo/vector-icons';
 import Button from "../components/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
 
-const MerchantItem = ({ name }: { name: string }) => (
-    <View style={styles.row}>
+const DropdownItem = ({ name, callback }: { name: string, callback: (name: string) => void }) => (
+    <TouchableHighlight
+        style={styles.row}
+        underlayColor="rgba(0,0,0,0.1)"
+        onPress={() => callback(name)}>
         <View style={[styles.fieldContainer, { paddingLeft: 70 }]}>
             <Text style={styles.listItem}>{name}</Text>
         </View>
-    </View>
+    </TouchableHighlight>
 );
 
-const CategoryItem = ({ colourHex }: { colourHex: string }) => (
-    <View style={styles.row}>
-        <View style={[styles.fieldContainer, { paddingLeft: 70 }]}>
-            <Text style={styles.listItem}>{colourHex}</Text>
-        </View>
-    </View>
-);
-
-const DropdownRow = ({ label }: { label: string }) => {
+const DropdownRow = ({ label, data, callback }: { label: string, data: string[], callback: (name: string) => void }) => {
     const [expanded, setExpanded] = useState(false);
     const inputRef = useRef<TextInput>(null);
+    const [value, setValue] = useState('');
+
+    const collapse = () => {
+        if (expanded) {
+            setExpanded(false);
+            inputRef.current?.blur();
+        }
+    };
 
     const handleRowPress = () => {
         if (!expanded) {
+            setValue('');
             setExpanded(true);
             inputRef.current?.focus();
         }
@@ -42,12 +46,20 @@ const DropdownRow = ({ label }: { label: string }) => {
         // propogate press event to merchant row because propagation
         // is prevented by the icon for some reason.
         handleRowPress();
-
-        if (expanded) {
-            setExpanded(false);
-            inputRef.current?.blur();
-        }
+        collapse();
     };
+
+    function renderDropdownItem({ item }: { item: { name: string, callback: (name: string) => void } }) {
+        return (
+            <DropdownItem name={item.name} callback={item.callback}></DropdownItem>
+        );
+    }
+
+    function handleSelect(name: string) {
+        setValue(name);
+        collapse();
+        callback(name);
+    }
 
     return (
         <>
@@ -61,8 +73,10 @@ const DropdownRow = ({ label }: { label: string }) => {
                         <TextInput
                             style={styles.fieldInput}
                             editable={expanded}
-                            placeholder="Select Merchant"
-                            ref={inputRef}>
+                            placeholder={"Select " + label}
+                            ref={inputRef}
+                            value={value}
+                            onChangeText={setValue}>
                         </TextInput>
                     </View>
                     <AntDesign
@@ -73,11 +87,10 @@ const DropdownRow = ({ label }: { label: string }) => {
                 </View>
             </TouchableHighlight>
             {
-                (expanded && !loading && data?.merchants?.__typename === 'MerchantsSuccess') ?
+                (expanded) ?
                     <FlatList
-                        data={data.merchants.merchants}
-                        renderItem={renderMerchantItem}
-                        keyExtractor={merchant => merchant.id.toString()}>
+                        data={data.filter(name => name.toLowerCase().startsWith(value.toLowerCase())).map(name => { return { name: name, callback: handleSelect } })}
+                        renderItem={renderDropdownItem}>
                     </FlatList>
                     :
                     <View></View>
@@ -88,21 +101,19 @@ const DropdownRow = ({ label }: { label: string }) => {
 
 export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'Budget'>) {
     const [passwordHash, setpasswordHash] = useState('');
-    const { loading: merchantDataLoading, error: merchantDataError, data: merchantData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+    const { loading: merchantDataLoading, data: merchantData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: {
             passwordHash: passwordHash
         }
     });
-    const { loading: categoryDataLoading, error: categoryDataError, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+    const { loading: categoryDataLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
         variables: {
             passwordHash: passwordHash
         }
     });
     const [amount, setAmount] = useState('0.00');
-    const [merchantsExpanded, setMerchantsExpanded] = useState(false);
-    const [categoriesExpanded, setCategoriesExpanded] = useState(false);
-    const merchantInputRef = useRef<TextInput>(null);
-    const categoryInputRef = useRef<TextInput>(null);
+    const [merchant, setMerchant] = useState('');
+    const [category, setCategory] = useState('');
 
     useEffect(() => {
         getData();
@@ -129,30 +140,6 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
         setAmount(text);
     }
 
-    function renderMerchantItem({ item }: { item: Merchant }) {
-        return (
-            <MerchantItem name={item.name}></MerchantItem>
-        );
-    }
-
-    function handleMerchantRowPress() {
-        if (!merchantsExpanded) {
-            setMerchantsExpanded(true);
-            merchantInputRef.current?.focus();
-        }
-    }
-
-    function handleMerchantArrowPress() {
-        // propogate press event to merchant row because propagation
-        // is prevented by the arrow for some reason.
-        handleMerchantRowPress();
-
-        if (merchantListVisible) {
-            collapseMerchants();
-            merchantInputRef.current?.blur();
-        }
-    }
-
     return (
         <View style={styles.screen}>
             <View style={styles.amountInputContainer}>
@@ -161,66 +148,26 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     <AdaptiveTextInput keyboardType="numeric" style={{ fontSize: 50 }} charWidth={30} value={amount} onChangeText={handleAmountChange} onBlur={handleAmountBlur}></AdaptiveTextInput>
                 </View>
             </View>
-            <TouchableHighlight
-                underlayColor="rgba(0,0,0,0.1)"
-                style={merchantListVisible ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
-                onPress={handleMerchantRowPress}>
-                <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
-                        <Text style={styles.fieldLabel}>Merchant:</Text>
-                        <TextInput style={styles.fieldInput} editable={merchantListVisible} placeholder="Select Merchant" ref={merchantInputRef}></TextInput>
-                    </View>
-                    <AntDesign
-                        name={merchantListVisible ? 'up' : 'down'}
-                        size={20}
-                        color="black"
-                        onPress={handleMerchantArrowPress} />
-                </View>
-            </TouchableHighlight>
-            {
-                (merchantListVisible && !merchantDataLoading && data?.merchants?.__typename === 'MerchantsSuccess') ?
-                    <FlatList
-                        data={data.merchants.merchants}
-                        renderItem={renderMerchantItem}
-                        keyExtractor={merchant => merchant.id.toString()}>
-                    </FlatList>
-                    :
-                    <View></View>
-            }
-            <TouchableHighlight style={styles.row}>
-                <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
-                        <Text style={styles.fieldLabel}>Category:</Text>
-                        <TextInput style={styles.fieldInput} placeholder="Select Category"></TextInput>
-                    </View>
-                    <AntDesign name="down" size={20} color="black" />
-                </View>
-            </TouchableHighlight>
-            {
-                (merchantListVisible && !merchantDataLoading && data?.merchants?.__typename === 'MerchantsSuccess') ?
-                    <FlatList
-                        data={data.merchants.merchants}
-                        renderItem={renderMerchantItem}
-                        keyExtractor={merchant => merchant.id.toString()}>
-                    </FlatList>
-                    :
-                    <View></View>
-            }
+            <DropdownRow
+                label="Merchants"
+                data={
+                    merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                        merchantData.merchants.merchants.map(x => x.name) : []
+                }
+                callback={(name) => { setMerchant(name); console.log(name); }} />
+            <DropdownRow
+                label="Categories"
+                data={
+                    categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                        categoryData.categories.categories.map(x => x?.name || 'jermie pls') : []
+                }
+                callback={(name) => { setCategory(name); console.log(name); }} />
             <View style={styles.row}>
                 <View style={styles.fieldContainer}>
                     <View style={styles.fieldLabelAndInputContainer}>
                         <Text style={styles.fieldLabel}>Date:</Text>
                         <TextInput style={styles.fieldInput} placeholder="Select Date"></TextInput>
                     </View>
-                </View>
-            </View>
-            <View style={styles.row}>
-                <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
-                        <Text style={styles.fieldLabel}>Recurrence:</Text>
-                        <TextInput style={styles.fieldInput} placeholder="One time"></TextInput>
-                    </View>
-                    <AntDesign name="down" size={20} color="black" />
                 </View>
             </View>
             <View style={styles.detailsContainer}>
