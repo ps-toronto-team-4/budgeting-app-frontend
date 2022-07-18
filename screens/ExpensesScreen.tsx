@@ -112,11 +112,12 @@ const ListItem = ({ id, title, amount, description, category }:
 };
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
-  const [userHash, setUserHash] = useState('$2a$06$W0DqcQ.eGA.eGA.eGA.eG.9QuFuYui/jdsCyGWdU8lh5AM2tUV0o2');
+  const [passwordHash, setPasswordHash] = useState('$2a$06$W0DqcQ.eGA.eGA.eGA.eG.9QuFuYui/jdsCyGWdU8lh5AM2tUV0o2');
   const { loading, error, data } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
-    variables: { passwordHash: userHash }
+    variables: { passwordHash }
   });
   console.log(data);
+  const dailyGrouping = splitTransationsOnDate(data)
   return (
     <>
       <StatusBar />
@@ -124,22 +125,86 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         <Text style={{ textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
           Expenses
         </Text>
-        {!loading && data?.expenses.__typename == 'ExpensesSuccess' &&
-          <FlatList
-            data={data?.expenses.expenses}
-            keyExtractor={(item) => {
-              if (item == null) {
-                return ''
-              }
-              return String(item.id)
-            }}
-            renderItem={({ item }) => <ListItem {...item} />}
-            ItemSeparatorComponent={() => <Separator />}
-          />
-        }
+
+        <Text>All</Text>
+        <View style={{ flex: 1 }}>
+          {!loading && data?.expenses.__typename == 'ExpensesSuccess' &&
+            <FlatList
+              style={{ flex: 1 }}
+              data={data?.expenses.expenses}
+              keyExtractor={(item) => {
+                if (item == null) {
+                  return ''
+                }
+                return String(item.id)
+              }}
+              renderItem={({ item }) => <ListItem {...item} />}
+              ItemSeparatorComponent={() => <Separator />}
+            />
+          }
+        </View>
+        <Text>Dates</Text>
+        <View>
+          {dailyGrouping &&
+            dailyGrouping.map((gItem, index) => {
+
+              return (<View>
+                <Text>{gItem.key}</Text>{gItem.item.map((dailyItem, dailyIndex) => {
+                  console.log("calvin", dailyItem)
+                  return (
+                    <FlatList
+                      data={gItem.item}
+                      keyExtractor={(ele) => {
+                        if (ele == null) {
+                          return ''
+                        }
+                        return String(ele.id)
+                      }}
+                      renderItem={({ item }) => <ListItem {...item} />}
+                      ItemSeparatorComponent={() => <Separator />}
+                    />
+                  )
+                })}</View>)
+            })}
+        </View>
       </SafeAreaView>
     </>
   );
+}
+
+const splitTransationsOnDate = (data: GetExpensesQuery | undefined) => {
+  if (data === undefined || data?.expenses.__typename == 'FailurePayload') {
+    return undefined
+  }
+
+  var dailyGrouping: { [key: string]: Array<any> } = {}
+
+  if (data.expenses.__typename == 'ExpensesSuccess') {
+    data.expenses.expenses.forEach(item => {
+      if (item?.date == undefined) {
+        return
+      }
+      const date = item?.date.split(' ')[0]
+      if (!(date in dailyGrouping)) {
+        dailyGrouping[date] = []
+      }
+      dailyGrouping[date].push(item)
+    })
+  }
+  const orderDays: Array<{ key: string, item: Array<any> }> = Object.keys(dailyGrouping).map(key => {
+    return {
+      key: key,
+      item: dailyGrouping[key]
+    }
+  }).sort((a, b) => {
+    if (a.key < b.key) {
+      return 1
+    } else if (a.key > b.key) {
+      return -1
+    }
+    return 0
+  })
+  return orderDays
 }
 
 const styles = StyleSheet.create({
@@ -148,7 +213,7 @@ const styles = StyleSheet.create({
   },
   itemSeparator: {
     flex: 1,
-    height: 1,
-    backgroundColor: '#444',
+    flexBasis: 2,
+    backgroundColor: '#c9c9c9',
   },
 });

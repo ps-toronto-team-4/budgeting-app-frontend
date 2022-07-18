@@ -87,6 +87,7 @@ query getExpenses ($passwordHash: String!) {
         id
         title
         description
+        date
         category {
           colourHex
           name
