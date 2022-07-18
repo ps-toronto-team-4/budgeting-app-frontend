@@ -124,7 +124,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   }
 
   function FormatPhone(newPhone: string) {
-    setPhone(newPhone.replaceAll(/[^0-9]/g, "").substring(0,15));
+    setPhone(newPhone.replace(/[^0-9]/g, "").substring(0,15));
     setPhoneCheck(false);
   }
 
@@ -186,7 +186,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
         <UsernameRules/>
         <TextInput
           style={styles.formField}
-          onChangeText={(email) => { setEmail(email.replaceAll(/\s+/g, "")); setEmailCheck(false) }}
+          onChangeText={(email) => { setEmail(email.replace(/\s+/g, "")); setEmailCheck(false) }}
           onBlur={() => setEmailCheck(true)}
           value={email}
           placeholder="Email*"
