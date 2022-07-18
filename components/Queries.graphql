@@ -104,3 +104,18 @@ query getExpenses ($passwordHash: String!) {
     }
   }
 }
+
+mutation createExpense($passwordHash: String!, $title: String!, $amount: Float!, $epochDate: Int!) {
+    createExpense(passwordHash: $passwordHash, title: $title, amount: $amount, epochDate: $epochDate) {
+        ...on ExpenseSuccess {
+            expense {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}

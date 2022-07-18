@@ -16,12 +16,21 @@ import {
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RootTabScreenProps } from "../types";
+<<<<<<< HEAD
 
 
 //TODO
 // - order dates
 // - Have special names for today and yesterday
 
+=======
+import AddButton from "../components/AddButton";
+const todoList = [
+  { id: '1', text: 'Learn JavaScript' },
+  { id: '2', text: 'Learn React' },
+  { id: '3', text: 'Learn TypeScript' },
+];
+>>>>>>> origin/P13-Hark-Add-Expense-Screen
 const Separator = () => <View style={styles.itemSeparator} />;
 const LeftSwipeActions = (selectedColor: String) => {
   return (
@@ -100,6 +109,10 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
 
   }
   const dailyGrouping = splitTransationsOnDate(data)
+  function handleAddExpense() {
+    navigation.navigate('CreateExpense');
+  }
+
   return (
     <>
       <StatusBar />
@@ -127,6 +140,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
           })}
         </ScrollView>
       </SafeAreaView>
+      <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>
     </>
   );
 }
@@ -204,5 +218,10 @@ const styles = StyleSheet.create({
   expenseItemWrapper: {
     flex: 1,
     flexDirection: "row",
-  }
+  },
+  addExpenseBtn: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+  },
 });

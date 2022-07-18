@@ -21,6 +21,7 @@ export type RootStackParamList = {
   ExpenseDetails: undefined;
   ForgotPasswordModal: undefined;
   Expenses: undefined;
+  CreateExpense: undefined;
   NotFound: undefined;
 };
 
