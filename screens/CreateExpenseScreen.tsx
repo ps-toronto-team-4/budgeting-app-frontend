@@ -1,19 +1,108 @@
 import { useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
-import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
+import { useState, useEffect, useRef } from "react";
+import { GetCategoriesDocument, GetCategoriesQuery, Merchant } from "../components/generated";
 
-import { StyleSheet, View, Text, TextInput, GestureResponderEvent } from 'react-native';
+import { StyleSheet, View, Text, TextInput, GestureResponderEvent, ScrollView, FlatList, TouchableOpacity, TouchableHighlight } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
 import AdaptiveTextInput from "../components/AdaptiveTextInput";
 import { AntDesign, Feather } from '@expo/vector-icons';
-import { transform } from "@babel/core";
 import Button from "../components/Button";
+import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
+
+const MerchantItem = ({ name }: { name: string }) => (
+    <View style={styles.row}>
+        <View style={[styles.fieldContainer, { paddingLeft: 70 }]}>
+            <Text style={styles.listItem}>{name}</Text>
+        </View>
+    </View>
+);
+
+const CategoryItem = ({ colourHex }: { colourHex: string }) => (
+    <View style={styles.row}>
+        <View style={[styles.fieldContainer, { paddingLeft: 70 }]}>
+            <Text style={styles.listItem}>{colourHex}</Text>
+        </View>
+    </View>
+);
+
+const DropdownRow = ({ label }: { label: string }) => {
+    const [expanded, setExpanded] = useState(false);
+    const inputRef = useRef<TextInput>(null);
+
+    const handleRowPress = () => {
+        if (!expanded) {
+            setExpanded(true);
+            inputRef.current?.focus();
+        }
+    };
+
+    const handleIconPress = () => {
+        // propogate press event to merchant row because propagation
+        // is prevented by the icon for some reason.
+        handleRowPress();
+
+        if (expanded) {
+            setExpanded(false);
+            inputRef.current?.blur();
+        }
+    };
+
+    return (
+        <>
+            <TouchableHighlight
+                underlayColor="rgba(0,0,0,0.1)"
+                style={expanded ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
+                onPress={handleRowPress}>
+                <View style={styles.fieldContainer}>
+                    <View style={styles.fieldLabelAndInputContainer}>
+                        <Text style={styles.fieldLabel}>{label}:</Text>
+                        <TextInput
+                            style={styles.fieldInput}
+                            editable={expanded}
+                            placeholder="Select Merchant"
+                            ref={inputRef}>
+                        </TextInput>
+                    </View>
+                    <AntDesign
+                        name={expanded ? 'up' : 'down'}
+                        size={20}
+                        color="black"
+                        onPress={handleIconPress} />
+                </View>
+            </TouchableHighlight>
+            {
+                (expanded && !loading && data?.merchants?.__typename === 'MerchantsSuccess') ?
+                    <FlatList
+                        data={data.merchants.merchants}
+                        renderItem={renderMerchantItem}
+                        keyExtractor={merchant => merchant.id.toString()}>
+                    </FlatList>
+                    :
+                    <View></View>
+            }
+        </>
+    );
+};
 
 export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'Budget'>) {
     const [passwordHash, setpasswordHash] = useState('');
+    const { loading: merchantDataLoading, error: merchantDataError, data: merchantData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+        variables: {
+            passwordHash: passwordHash
+        }
+    });
+    const { loading: categoryDataLoading, error: categoryDataError, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+        variables: {
+            passwordHash: passwordHash
+        }
+    });
     const [amount, setAmount] = useState('0.00');
+    const [merchantListVisible, setMerchantListVisible] = useState(false);
+    const [categoryListVisible, setCategoryListVisible] = useState(false);
+    const merchantInputRef = useRef<TextInput>(null);
+    const categoryInputRef = useRef<TextInput>(null);
 
     useEffect(() => {
         getData();
@@ -40,8 +129,40 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
         setAmount(text);
     }
 
-    function handleRowTouchStart(e: GestureResponderEvent) {
-        console.log(e.target);
+    function renderMerchantItem({ item }: { item: Merchant }) {
+        return (
+            <MerchantItem name={item.name}></MerchantItem>
+        );
+    }
+
+    function expandMerchants() {
+        setMerchantListVisible(true);
+    }
+
+    function collapseMerchants() {
+        setMerchantListVisible(false);
+    }
+
+    function toggleMerchants() {
+        setMerchantListVisible(!merchantListVisible);
+    }
+
+    function handleMerchantRowPress() {
+        if (!merchantListVisible) {
+            expandMerchants();
+            merchantInputRef.current?.focus();
+        }
+    }
+
+    function handleMerchantArrowPress() {
+        // propogate press event to merchant row because propagation
+        // is prevented by the arrow for some reason.
+        handleMerchantRowPress();
+
+        if (merchantListVisible) {
+            collapseMerchants();
+            merchantInputRef.current?.blur();
+        }
     }
 
     return (
@@ -52,7 +173,33 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     <AdaptiveTextInput keyboardType="numeric" style={{ fontSize: 50 }} charWidth={30} value={amount} onChangeText={handleAmountChange} onBlur={handleAmountBlur}></AdaptiveTextInput>
                 </View>
             </View>
-            <View style={styles.row} onTouchStart={handleRowTouchStart}>
+            <TouchableHighlight
+                underlayColor="rgba(0,0,0,0.1)"
+                style={merchantListVisible ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
+                onPress={handleMerchantRowPress}>
+                <View style={styles.fieldContainer}>
+                    <View style={styles.fieldLabelAndInputContainer}>
+                        <Text style={styles.fieldLabel}>Merchant:</Text>
+                        <TextInput style={styles.fieldInput} editable={merchantListVisible} placeholder="Select Merchant" ref={merchantInputRef}></TextInput>
+                    </View>
+                    <AntDesign
+                        name={merchantListVisible ? 'up' : 'down'}
+                        size={20}
+                        color="black"
+                        onPress={handleMerchantArrowPress} />
+                </View>
+            </TouchableHighlight>
+            {
+                (merchantListVisible && !merchantDataLoading && data?.merchants?.__typename === 'MerchantsSuccess') ?
+                    <FlatList
+                        data={data.merchants.merchants}
+                        renderItem={renderMerchantItem}
+                        keyExtractor={merchant => merchant.id.toString()}>
+                    </FlatList>
+                    :
+                    <View></View>
+            }
+            <TouchableHighlight style={styles.row}>
                 <View style={styles.fieldContainer}>
                     <View style={styles.fieldLabelAndInputContainer}>
                         <Text style={styles.fieldLabel}>Category:</Text>
@@ -60,17 +207,18 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     </View>
                     <AntDesign name="down" size={20} color="black" />
                 </View>
-            </View>
-            <View style={styles.row} onTouchStart={handleRowTouchStart}>
-                <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
-                        <Text style={styles.fieldLabel}>Merchant:</Text>
-                        <TextInput style={styles.fieldInput} placeholder="Select Merchant"></TextInput>
-                    </View>
-                    <AntDesign name="down" size={20} color="black" />
-                </View>
-            </View>
-            <View style={styles.row} onTouchStart={handleRowTouchStart}>
+            </TouchableHighlight>
+            {
+                (merchantListVisible && !merchantDataLoading && data?.merchants?.__typename === 'MerchantsSuccess') ?
+                    <FlatList
+                        data={data.merchants.merchants}
+                        renderItem={renderMerchantItem}
+                        keyExtractor={merchant => merchant.id.toString()}>
+                    </FlatList>
+                    :
+                    <View></View>
+            }
+            <View style={styles.row}>
                 <View style={styles.fieldContainer}>
                     <View style={styles.fieldLabelAndInputContainer}>
                         <Text style={styles.fieldLabel}>Date:</Text>
@@ -78,7 +226,7 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     </View>
                 </View>
             </View>
-            <View style={styles.row} onTouchStart={handleRowTouchStart}>
+            <View style={styles.row}>
                 <View style={styles.fieldContainer}>
                     <View style={styles.fieldLabelAndInputContainer}>
                         <Text style={styles.fieldLabel}>Recurrence:</Text>
@@ -97,7 +245,7 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
             <View style={styles.buttonContainer}>
                 <Button text="Save Expense" accessibilityLabel="Button to Save Expense"></Button>
             </View>
-        </View>
+        </View >
     );
 }
 
@@ -181,5 +329,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start',
         paddingTop: 60,
+    },
+    listItem: {
+        fontSize: 15,
     },
 });
