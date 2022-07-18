@@ -100,13 +100,11 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
       console.error("Can't retrive password hash")
     }
   }
-  console.log(data)
   const navigateCallBack = (id: number | null | undefined) => {
     if (id === undefined || id == null) {
       alert("Transaction could not be found!")
     } else {
-      // navigation.navigate('ExpenseDetails', { expenseId: clickedExpenseId })
-      navigation.navigate('ExpenseDetails');
+      navigation.navigate('ExpenseDetails', { expenseId: id })
     }
 
   }
@@ -115,7 +113,6 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     navigation.navigate('CreateExpense');
   }
 
-  console.log(dailyGrouping)
 
   return (
     <>
