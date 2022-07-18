@@ -22,94 +22,50 @@ import { RootTabScreenProps } from "../types";
 // - order dates
 // - Have special names for today and yesterday
 
-const jumpToSpecificItem = (id: number | null | undefined) => {
-  if (id === undefined || id == null) {
-    alert("Transaction could not be found!")
-  }
-
-}
-
 const Separator = () => <View style={styles.itemSeparator} />;
 const LeftSwipeActions = (selectedColor: String) => {
   return (
     <View
       style={{ flex: 1, backgroundColor: selectedColor as ColorValue, justifyContent: 'center' }}
     >
-      <Text
-        style={{
-          color: '#40394a',
-          paddingHorizontal: 10,
-          fontWeight: '100',
-          fontSize: 30,
-          paddingVertical: 20,
-        }}
-      >
+      <Text style={styles.seeDetailsText}>
         {`See details >>>`}
       </Text>
     </View>
   );
 };
-const rightSwipeActions = () => {
+const rightSwipeActions = ({ id }: { id: number | null | undefined }) => {
   return (
-    <View
-      style={{
-        backgroundColor: '#fc0303',
-        justifyContent: 'center',
-        alignItems: 'flex-end',
-      }}
-    >
-      <Text
-        style={{
-          color: '#1b1a17',
-          paddingHorizontal: 10,
-          fontWeight: '600',
-          paddingVertical: 20,
-        }}
-      >
+    <View style={styles.deleteContainer}>
+      <Text style={styles.deleteText}>
         Delete
       </Text>
     </View>
   );
 };
-const swipeFromLeftOpen = () => {
+const swipeFromLeftOpen = ({ id, navigateCallBack }: { id: number | null | undefined, navigateCallBack: Function }) => {
   alert('Swipe from left');
+  navigateCallBack(id)
 };
-const swipeFromRightOpen = () => {
-  // alert('Swipe from right');
-  //do nothing
-};
-const ListItem = ({ id, title, amount, description, category }:
+const ListItem = ({ id, title, amount, description, category, navigateCallBack }:
   {
     id?: number | null | undefined,
     title?: String | null | undefined,
     amount?: Number | null | undefined,
     description?: String | null | undefined,
-    category?: Category | null | undefined
+    category?: Category | null | undefined,
+    navigateCallBack: Function
   }) => {
 
   const selectedColor = (category?.colourHex) ? '#' + category.colourHex : '#03c2fc'
   return (<Swipeable
     renderLeftActions={() => LeftSwipeActions(selectedColor)}
-    renderRightActions={rightSwipeActions}
-    onSwipeableRightOpen={swipeFromRightOpen}
-    onSwipeableLeftOpen={swipeFromLeftOpen}
+    renderRightActions={() => rightSwipeActions({ id })}
+    onSwipeableLeftOpen={() => swipeFromLeftOpen({ id, navigateCallBack })}
   >
-    <View style={{
-      flex: 1,
-      flexDirection: "row",
-    }}>
+    <View style={styles.expenseItemWrapper}>
       <View style={{ flexBasis: 10, width: 10, backgroundColor: selectedColor }}></View>
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignContent: "space-between",
-          paddingHorizontal: 30,
-          paddingVertical: 20,
-          backgroundColor: 'white',
-        }}
-      >
-
+      <View style={styles.expenseItemDisplayContainer}>
         <Text style={{ flex: 1, fontSize: 24 }}>
           {title}
         </Text>
@@ -135,6 +91,14 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
       setPasswordHash(retrivedUserHash);
     }
   }
+  const navigateCallBack = (id: number | null | undefined) => {
+    if (id === undefined || id == null) {
+      alert("Transaction could not be found!")
+    } else {
+      // navigation.navigate('ExpenseDetails', { expenseId: clickedExpenseId })
+    }
+
+  }
   const dailyGrouping = splitTransationsOnDate(data)
   return (
     <>
@@ -155,7 +119,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                   }
                   return String(ele.id)
                 }}
-                renderItem={({ item }) => <ListItem {...item} />}
+                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
                 ItemSeparatorComponent={() => <Separator />}
               />
 
@@ -211,4 +175,34 @@ const styles = StyleSheet.create({
     flexBasis: 2,
     backgroundColor: '#c9c9c9',
   },
+  seeDetailsText: {
+    color: '#40394a',
+    paddingHorizontal: 10,
+    fontWeight: '100',
+    fontSize: 30,
+    paddingVertical: 20,
+  },
+  deleteContainer: {
+    backgroundColor: '#fc0303',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+  },
+  deleteText: {
+    color: '#1b1a17',
+    paddingHorizontal: 10,
+    fontWeight: '600',
+    paddingVertical: 20,
+  },
+  expenseItemDisplayContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignContent: "space-between",
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+    backgroundColor: 'white',
+  },
+  expenseItemWrapper: {
+    flex: 1,
+    flexDirection: "row",
+  }
 });
