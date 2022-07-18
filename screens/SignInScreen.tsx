@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal, ActivityIndicator  } from 'react-native';
+import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal, ActivityIndicator } from 'react-native';
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import Colors from '../constants/Colors';
@@ -10,43 +10,42 @@ import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/gen
 import Styles from "../constants/Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'>) {
+export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [usernamePayload, setUsernamePayload] = React.useState("");
   const [passwordPayload, setPasswordPayload] = React.useState("");
-  
-  const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument,{
-    variables: {username:usernamePayload,password:passwordPayload},
+
+  const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument, {
+    variables: { username: usernamePayload, password: passwordPayload },
     onCompleted: (data) => {
-      if(data?.signIn.__typename === "SignInSuccess"){
-        setData();       
+      if (data?.signIn.__typename === "SignInSuccess") {
+        setData();
       }
     },
-    onError:(data) => {
+    onError: (data) => {
       console.log(data);
     }
   });
 
 
   const setData = async () => {
-    try{
-      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash: "undefined");
-      navigation.replace('Root'); 
-      
-    } catch (error){
-      data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage: "undefined error";
+    try {
+      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash : "undefined");
+      navigation.navigate('Root');
+    } catch (error) {
+      data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage : "undefined error";
     }
   }
 
   const handleLogin = () => {
-    
+
     setUsernamePayload(username);
     setPasswordPayload(password);
     triggerLogin();
 
   }
-    
+
   return (
     <View style={Styles.container}>
       <Text style={Styles.title}>Sign into your account</Text>
@@ -56,24 +55,24 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
         ) : (
           <Text style={Styles.alert}>{data?.signIn.errorMessage}</Text>
         )) : (
-        <ActivityIndicator size='large'/>
+        <ActivityIndicator size='large' />
       )}
-      <View style= {styles.textfields}>
-        <TextInput 
-          style = {styles.input}
-          placeholder = "Username"
+      <View style={styles.textfields}>
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
           onChangeText={(username) => setUsername(username)}
-          value = {username}
-          >
+          value={username}
+        >
         </TextInput>
-        
-        <TextInput 
-          style = {styles.input}
-          placeholder = "Password"
+
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
           onChangeText={(password) => setPassword(password)}
-          value = {password}
+          value={password}
           secureTextEntry={true}
-          >
+        >
         </TextInput>
       </View>
       <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordModal')} style={styles.helpLink}>
@@ -82,7 +81,7 @@ export default function SignInScreen({navigation}: RootStackScreenProps<'SignIn'
         </Text>
       </TouchableOpacity>
 
-      <Button text="Sign In" onPress={() => handleLogin()} accessibilityLabel={"Sign In Button"}  />
+      <Button text="Sign In" onPress={() => handleLogin()} accessibilityLabel={"Sign In Button"} />
 
       {/* Uncomment below code when sign in status is unknown! */}
       {/* {!loading && <Text>{data?.signIn.__typename == "SignInSuccess" ? "Successful sign in": "Failed sign in"}</Text> } */}
