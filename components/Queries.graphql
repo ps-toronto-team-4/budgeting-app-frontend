@@ -85,7 +85,6 @@ query getExpenses ($passwordHash: String!) {
       expenses {
         amount
         id
-        title
         description
         category {
           colourHex
@@ -102,4 +101,78 @@ query getExpenses ($passwordHash: String!) {
       exceptionName
     }
   }
+}
+
+mutation createMerchant($passwordHash: String!, $name: String!, $description: String, $defaultCategoryId: Int){
+    createMerchant(passwordHash: $passwordHash, name: $name, description: $description, defaultCategoryId: $defaultCategoryId ){
+        __typename
+        ...on MerchantSuccess{
+            merchant {
+                id
+                name
+                description
+                defaultCategory {
+                    id
+                    name
+                    colourHex
+                    description
+                }
+
+            }
+        }
+
+        ...on  FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+
+}
+
+query getMerchant ($passwordHash: String!, $id: Int!){
+    merchant(passwordHash: $passwordHash, id: $id){
+        __typename
+        ...on MerchantSuccess{
+            merchant {
+                id
+                name
+                description
+                defaultCategory {
+                    id
+                    name
+                    colourHex
+                    description
+                }
+            }
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query getMerchants($passwordHash:String!){
+    merchants(passwordHash: $passwordHash){
+        __typename
+        ...on MerchantsSuccess{
+            merchants {
+                id
+                name
+                description
+                defaultCategory {
+                    id
+                    name
+                    colourHex
+                    description
+                }
+            }
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
 }

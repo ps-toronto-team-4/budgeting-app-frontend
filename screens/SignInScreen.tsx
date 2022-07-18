@@ -33,7 +33,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
   const setData = async () => {
     try {
       await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash : "undefined");
-      navigation.navigate('Root');
+      navigation.navigate('CreateMerchant');
     } catch (error) {
       data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage : "undefined error";
     }
