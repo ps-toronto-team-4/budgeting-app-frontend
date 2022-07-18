@@ -51,6 +51,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
 
   const register = () => {
     setCheck(true);
+    setPwordRules(true);
     if (password && pwordConfirm && (pwordConfirm === password) && fname && lname && email && username) {
       if (lengthCheck && lettersCheck && numberCheck && specialCheck && minCheck && formatCheck && emailRegex && minPhone) {
         createUser();
