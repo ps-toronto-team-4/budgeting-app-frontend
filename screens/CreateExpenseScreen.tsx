@@ -99,8 +99,8 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
         }
     });
     const [amount, setAmount] = useState('0.00');
-    const [merchantListVisible, setMerchantListVisible] = useState(false);
-    const [categoryListVisible, setCategoryListVisible] = useState(false);
+    const [merchantsExpanded, setMerchantsExpanded] = useState(false);
+    const [categoriesExpanded, setCategoriesExpanded] = useState(false);
     const merchantInputRef = useRef<TextInput>(null);
     const categoryInputRef = useRef<TextInput>(null);
 
@@ -135,21 +135,9 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
         );
     }
 
-    function expandMerchants() {
-        setMerchantListVisible(true);
-    }
-
-    function collapseMerchants() {
-        setMerchantListVisible(false);
-    }
-
-    function toggleMerchants() {
-        setMerchantListVisible(!merchantListVisible);
-    }
-
     function handleMerchantRowPress() {
-        if (!merchantListVisible) {
-            expandMerchants();
+        if (!merchantsExpanded) {
+            setMerchantsExpanded(true);
             merchantInputRef.current?.focus();
         }
     }
