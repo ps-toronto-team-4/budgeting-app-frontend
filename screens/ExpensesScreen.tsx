@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
 import { ColorValue } from "react-native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,21 +16,14 @@ import {
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RootTabScreenProps } from "../types";
-<<<<<<< HEAD
-
+import AddButton from "../components/AddButton";
 
 //TODO
-// - order dates
 // - Have special names for today and yesterday
+// - close delete on back navigate
+// - make deltet a trash can
 
-=======
-import AddButton from "../components/AddButton";
-const todoList = [
-  { id: '1', text: 'Learn JavaScript' },
-  { id: '2', text: 'Learn React' },
-  { id: '3', text: 'Learn TypeScript' },
-];
->>>>>>> origin/P13-Hark-Add-Expense-Screen
+
 const Separator = () => <View style={styles.itemSeparator} />;
 const LeftSwipeActions = (selectedColor: String) => {
   return (
@@ -52,8 +45,12 @@ const rightSwipeActions = ({ id }: { id: number | null | undefined }) => {
     </View>
   );
 };
-const swipeFromLeftOpen = ({ id, navigateCallBack }: { id: number | null | undefined, navigateCallBack: Function }) => {
-  alert('Swipe from left');
+const swipeFromLeftOpen = ({ id, navigateCallBack, swipeableRef }
+  : { id: number | null | undefined, navigateCallBack: Function, swipeableRef: React.MutableRefObject<any> }) => {
+  if (swipeableRef.current != null) {
+    const casted = swipeableRef as React.MutableRefObject<Swipeable>
+    casted.current.close()
+  }
   navigateCallBack(id)
 };
 const ListItem = ({ id, title, amount, description, category, navigateCallBack }:
@@ -65,18 +62,19 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
     category?: Category | null | undefined,
     navigateCallBack: Function
   }) => {
-
+  const swipeableRef = useRef(null);
   const selectedColor = (category?.colourHex) ? '#' + category.colourHex : '#03c2fc'
   return (<Swipeable
+    ref={swipeableRef}
     renderLeftActions={() => LeftSwipeActions(selectedColor)}
     renderRightActions={() => rightSwipeActions({ id })}
-    onSwipeableLeftOpen={() => swipeFromLeftOpen({ id, navigateCallBack })}
+    onSwipeableLeftOpen={() => swipeFromLeftOpen({ id, navigateCallBack, swipeableRef })}
   >
     <View style={styles.expenseItemWrapper}>
       <View style={{ flexBasis: 10, width: 10, backgroundColor: selectedColor }}></View>
       <View style={styles.expenseItemDisplayContainer}>
         <Text style={{ flex: 1, fontSize: 24 }}>
-          {title}
+          {description}
         </Text>
         <Text style={{ fontSize: 24 }}>
           ${amount}
@@ -98,13 +96,17 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     const retrivedUserHash = await AsyncStorage.getItem('passwordHash');
     if (retrivedUserHash != null) {
       setPasswordHash(retrivedUserHash);
+    } else {
+      console.error("Can't retrive password hash")
     }
   }
+  console.log(data)
   const navigateCallBack = (id: number | null | undefined) => {
     if (id === undefined || id == null) {
       alert("Transaction could not be found!")
     } else {
       // navigation.navigate('ExpenseDetails', { expenseId: clickedExpenseId })
+      navigation.navigate('ExpenseDetails');
     }
 
   }
@@ -112,6 +114,8 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
   function handleAddExpense() {
     navigation.navigate('CreateExpense');
   }
+
+  console.log(dailyGrouping)
 
   return (
     <>
@@ -138,6 +142,10 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
 
             </View>)
           })}
+          {data?.expenses.__typename == 'FailurePayload' && <View>
+            <Text>{data.expenses.errorMessage}</Text>
+            <Text>{data.expenses.exceptionName}</Text>
+          </View>}
         </ScrollView>
       </SafeAreaView>
       <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>
@@ -155,6 +163,7 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined) => {
   if (data.expenses.__typename == 'ExpensesSuccess') {
     data.expenses.expenses.forEach(item => {
       if (item?.date == undefined) {
+        console.warn("date is undefined for transation")
         return
       }
       const date = item?.date.split(' ')[0]
