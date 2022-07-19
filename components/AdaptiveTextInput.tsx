@@ -19,16 +19,14 @@ type AdaptiveTextInputProps = TextInputProps & {
 
 export default function AdaptiveTextInput(props: AdaptiveTextInputProps) {
     const { style, value, ...otherProps } = props;
-    const [ fontLoaded ] = useFonts({B612Mono_700Bold});
+    const [fontLoaded] = useFonts({ B612Mono_700Bold });
 
     if (!fontLoaded) {
         return <View></View>
     }
 
     return (
-        <>
-            <TextInput style={[style, styles.input, {width: (value?.length || 0) * props.charWidth + props.charWidth}]} value={value} {...otherProps}></TextInput>
-        </>
+        <TextInput style={[style, styles.input, { width: (value?.length || 0) * props.charWidth + props.charWidth }]} value={value} {...otherProps}></TextInput>
     );
 }
 

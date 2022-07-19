@@ -1,19 +1,35 @@
 import { useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
-import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
+import { useState, useEffect, useRef } from "react";
+import { GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
 
-import { StyleSheet, View, Text, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
 import AdaptiveTextInput from "../components/AdaptiveTextInput";
 import { AntDesign, Feather } from '@expo/vector-icons';
-import { transform } from "@babel/core";
 import Button from "../components/Button";
+import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
+import { DropdownRow } from "../components/DropdownRow";
 
 export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'Budget'>) {
-    const [ passwordHash, setpasswordHash ] = useState('');
-    const [ amount, setAmount ] = useState('0.00');
+    const [passwordHash, setpasswordHash] = useState('');
+    const { loading: merchantDataLoading, data: merchantData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+        variables: {
+            passwordHash: passwordHash
+        }
+    });
+    const { loading: categoryDataLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+        variables: {
+            passwordHash: passwordHash
+        }
+    });
+    const [amount, setAmount] = useState('0.00');
+    const [merchant, setMerchant] = useState('');
+    const [category, setCategory] = useState('');
+    const [merchantExpanded, setMerchantExpanded] = useState(false);
+    const [categoryExpanded, setCategoryExpanded] = useState(false);
+    const [detailsHeight, setDetailsHeight] = useState(20);
 
     useEffect(() => {
         getData();
@@ -45,39 +61,66 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
             <View style={styles.amountInputContainer}>
                 <View style={styles.dollarSignAndAmountInput}>
                     <Text style={styles.dollarSign}>$</Text>
-                    <AdaptiveTextInput keyboardType="numeric" style={{fontSize: 50}} charWidth={30} value={amount} onChangeText={handleAmountChange} onBlur={handleAmountBlur}></AdaptiveTextInput>
+                    <AdaptiveTextInput
+                        keyboardType="numeric"
+                        style={{ fontSize: 50 }}
+                        charWidth={30}
+                        value={amount}
+                        onChangeText={handleAmountChange}
+                        onBlur={handleAmountBlur}>
+                    </AdaptiveTextInput>
                 </View>
             </View>
-            <View style={styles.categoryContainer}>
-                <Text style={styles.categoryLabel}>Category:</Text>
-                <TextInput style={styles.categoryInput} placeholder="Select Category"></TextInput>
-                <AntDesign name="down" size={20} color="black" />
+            <DropdownRow
+                label="Merchants"
+                data={
+                    merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                        merchantData.merchants.merchants.map(x => x.name) : []
+                }
+                onSelect={setMerchant}
+                expanded={merchantExpanded}
+                onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
+                onCollapse={() => setMerchantExpanded(false)} />
+            <DropdownRow
+                label="Categories"
+                data={
+                    categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                        categoryData.categories.categories.map(x => x.name) : []
+                }
+                onSelect={setCategory}
+                expanded={categoryExpanded}
+                onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
+                onCollapse={() => setCategoryExpanded(false)} />
+            <View style={styles.row}>
+                <View style={styles.fieldContainer}>
+                    <View style={styles.fieldLabelAndInputContainer}>
+                        <Text style={styles.fieldLabel}>Date:</Text>
+                        <TextInput
+                            style={styles.fieldInput}
+                            placeholder="Select Date"
+                            editable={false}>
+                        </TextInput>
+                    </View>
+                </View>
             </View>
-            <View style={styles.categoryContainer}>
-                <Text style={styles.categoryLabel}>Merchant:</Text>
-                <TextInput style={styles.categoryInput} placeholder="Select Merchant"></TextInput>
-                <AntDesign name="down" size={20} color="black" />
-            </View>
-            <View style={styles.categoryContainer}>
-                <Text style={styles.categoryLabel}>Date:</Text>
-                <TextInput style={styles.categoryInput} placeholder="Select Date"></TextInput>
-            </View>
-            <View style={styles.categoryContainer}>
-                <Text style={styles.categoryLabel}>Recurrence:</Text>
-                <TextInput style={styles.categoryInput} placeholder="One time"></TextInput>
-                <AntDesign name="down" size={20} color="black" />
-            </View>
-            <View style={styles.detailsContainer}>
+            <View style={styles.detailsRow}>
                 <View style={styles.detailsIconAndLabel}>
-                    <Feather style={styles.detailsIcon} name="bar-chart" size={24} color="black" />
-                    <Text style={styles.detailsLabel}>Details:</Text>
+                    <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
+                    <Text style={styles.fieldLabel}>Details:</Text>
                 </View>
-                <TextInput style={styles.detailsInput} placeholder="Enter Details"></TextInput>
+                <TextInput
+                    style={[styles.detailsInput, { height: detailsHeight }]}
+                    placeholder="Enter Details"
+                    multiline={true}
+                    textAlignVertical="top"
+                    scrollEnabled={false}
+                    onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}>
+                </TextInput>
             </View>
             <View style={styles.buttonContainer}>
                 <Button text="Save Expense" accessibilityLabel="Button to Save Expense"></Button>
             </View>
-        </View>
+        </View >
     );
 }
 
@@ -102,31 +145,40 @@ const styles = StyleSheet.create({
     },
     amountInput: {
         fontSize: 50,
-        height:200,
+        height: 200,
         width: 100,
         padding: 0,
     },
-    categoryContainer: {
-        flexDirection: 'row',
-        paddingHorizontal: 30,
-        justifyContent: 'space-between',
-        // backgroundColor: 'red',
+    row: {
         alignItems: 'center',
-        paddingVertical: 10,
         borderTopWidth: 1,
         borderTopColor: 'rgba(0,0,0,0.3)',
+        paddingVertical: 10,
+        paddingHorizontal: 30,
     },
-    categoryLabel: {
+    fieldContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 320,
+    },
+    fieldLabelAndInputContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: 280,
+    },
+    fieldLabel: {
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 15,
     },
-    categoryInput: {
-        fontSize: 20,
+    fieldInput: {
+        fontSize: 15,
+        width: 180
     },
-    detailsContainer: {
+    detailsRow: {
         flexDirection: 'row',
         paddingHorizontal: 27,
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         paddingVertical: 10,
         borderTopWidth: 1,
@@ -137,23 +189,24 @@ const styles = StyleSheet.create({
     detailsIconAndLabel: {
         flexDirection: 'row',
         paddingHorizontal: 0,
-        marginHorizontal: 0,
+        marginRight: 27,
+        alignItems: 'center',
     },
     detailsIcon: {
-        transform: [{rotateZ: '90deg'}, {rotateY: '180deg'}],
+        transform: [{ rotateZ: '90deg' }, { rotateY: '180deg' }],
         marginRight: 5,
     },
-    detailsLabel: {
-        fontWeight: 'bold',
-        fontSize: 20,
-    },
     detailsInput: {
-        fontSize: 20,
+        fontSize: 15,
+        width: 250,
     },
     buttonContainer: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'flex-start',
         paddingTop: 60,
+    },
+    listItem: {
+        fontSize: 15,
     },
 });
