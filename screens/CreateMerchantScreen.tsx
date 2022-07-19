@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Styles from "../constants/Styles";
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { CreateMerchantDocument, CreateMerchantMutation, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
+import { CreateMerchantDocument, CreateMerchantMutation, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
 
@@ -20,11 +20,11 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         variables: { passwordHash: passwordHash },
         onCompleted: (data) => {
             if (data?.merchants.__typename === "MerchantsSuccess") {
-                for (let index = 0; index < data?.merchants.merchants.length; index++) {
-                    const element = data?.merchants.merchants[index];
-                    console.log(element);
+                // for (let index = 0; index < data?.merchants.merchants.length; index++) {
+                //     const element = data?.merchants.merchants[index];
+                //     console.log(element);
 
-                }
+                // }
 
                 // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
                 // this will display a Found it! on the console.
@@ -36,6 +36,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     console.log("Merchant Name is not found.");
                     console.log(merchantName);
                     setValidMerchant(true);
+                    mutationCreate();
                     // console.log(passwordHash);
                 }
 
@@ -66,19 +67,19 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
 
     const [mutationCreate] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
-        variables: { passwordHash: passwordHash, merchantName: merchantName },
+        variables: { passwordHash, merchantName, details },
         onError: (error => {
             Alert.alert(error.message);
         }),
-        onCompleted: (() => navigation.navigate("Root"))
+        onCompleted: () => {
+            console.log('Completed Mutation.');
+        }
     });
 
     const handleMerchant = () => {
         setMerchantName(merchantName);
         setDetails(details);
         merchantsQuery();
-        //handleExisting();
-        //
 
     }
 

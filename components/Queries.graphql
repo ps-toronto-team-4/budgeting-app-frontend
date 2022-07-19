@@ -104,7 +104,12 @@ query getExpenses ($passwordHash: String!) {
 }
 
 mutation createMerchant($passwordHash: String!, $name: String!, $description: String, $defaultCategoryId: Int){
-    createMerchant(passwordHash: $passwordHash, name: $name, description: $description, defaultCategoryId: $defaultCategoryId ){
+    createMerchant(
+        passwordHash: $passwordHash,
+        name: $name, 
+        description: $description, 
+        defaultCategoryId: $defaultCategoryId 
+    ){
         __typename
         ...on MerchantSuccess{
             merchant {
