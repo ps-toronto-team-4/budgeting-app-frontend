@@ -61,7 +61,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
 
   useEffect(() => {
     setLengthCheck(password.length >= 8);
-    setLettersCheck(/([A-Z].?[a-z])|([a-z].?[A-Z])/.test(password));
+    setLettersCheck(/[A-Z]/.test(password) && /[a-z]/.test(password));
     setNumberCheck(/\d/.test(password));
     setSpecialCheck(/[^A-Za-z0-9]/.test(password));
   }, [password]);
