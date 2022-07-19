@@ -114,8 +114,8 @@ query getExpense($passwordHash: String!, $expenseId: Int!) {
     }
 }
 
-mutation createExpense($passwordHash: String!, $amount: Float!, $epochDate: Int!) {
-    createExpense(passwordHash: $passwordHash, amount: $amount, epochDate: $epochDate) {
+mutation createExpense($passwordHash: String!, $amount: Float!, $epochDate: Int!, $merchantId: Int, $categoryId: Int, $desc: String) {
+    createExpense(passwordHash: $passwordHash, amount: $amount, epochDate: $epochDate, merchantId: $merchantId, categoryId: $categoryId, description: $desc) {
         ...on ExpenseSuccess {
             expense {
                 id
