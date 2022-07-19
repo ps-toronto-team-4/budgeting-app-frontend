@@ -31,6 +31,7 @@ To make writing graphql easier, it is recommended you install the [Apollo GraphQ
 - [React Native - Getting Started](https://reactnative.dev/docs/getting-started)
 - [React Native - Components Doc](https://reactnative.dev/docs/components-and-apis)
 - [Expo Docs](https://docs.expo.dev/)
+- [Expo Icons](https://icons.expo.fyi/)
 - [Apollo Client with React](https://www.apollographql.com/docs/react)
 - [Apollo Client - React Native Integration](https://www.apollographql.com/docs/react/integrations/react-native)
 - [GraphQL Language Reference](https://graphql.org/learn/)
