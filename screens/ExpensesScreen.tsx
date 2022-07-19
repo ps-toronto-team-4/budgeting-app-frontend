@@ -74,7 +74,7 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
       <View style={{ flexBasis: 10, width: 10, backgroundColor: selectedColor }}></View>
       <View style={styles.expenseItemDisplayContainer}>
         <Text style={{ flex: 1, fontSize: 24 }}>
-          {category?.name}
+          {category?.name || 'Uncategorized'}
         </Text>
         <Text style={{ fontSize: 24 }}>
           ${amount}
