@@ -1,6 +1,6 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
-import { GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
+import { CreateExpenseDocument, CreateExpenseMutation, GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
 
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
 import { RootTabScreenProps } from "../types";
@@ -11,6 +11,8 @@ import { AntDesign, Feather } from '@expo/vector-icons';
 import Button from "../components/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
 import { DropdownRow } from "../components/DropdownRow";
+import CalendarPicker from "react-native-calendar-picker";
+import moment, { Moment } from "moment";
 
 export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'Budget'>) {
     const [passwordHash, setpasswordHash] = useState('');
@@ -25,11 +27,24 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
         }
     });
     const [amount, setAmount] = useState('0.00');
-    const [merchant, setMerchant] = useState('');
-    const [category, setCategory] = useState('');
+    const [merchantId, setMerchantId] = useState<number | null>(null);
+    const [categoryId, setCategoryId] = useState<number | null>(null);
     const [merchantExpanded, setMerchantExpanded] = useState(false);
     const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [detailsHeight, setDetailsHeight] = useState(20);
+    const [calendarShown, setCalendarShown] = useState(false);
+    const [date, setDate] = useState(moment());
+    const [desc, setDesc] = useState('');
+    const [submit, { loading: submitLoading, data: submitData }] = useMutation<CreateExpenseMutation>(CreateExpenseDocument, {
+        variables: {
+            passwordHash: passwordHash,
+            amount: parseFloat(amount),
+            epochDate: date.unix(),
+            merchantId: merchantId,
+            categoryId: categoryId,
+            desc: desc || null,
+        }
+    });
 
     useEffect(() => {
         getData();
@@ -56,6 +71,25 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
         setAmount(text);
     }
 
+    function selectMerchant(name: string) {
+        if (merchantData?.merchants.__typename === 'MerchantsSuccess') {
+            const found = merchantData?.merchants.merchants.find(merchant => merchant.name === name);
+            if (found !== undefined) setMerchantId(found?.id);
+        }
+    }
+
+    function selectCategory(name: string) {
+        if (categoryData?.categories.__typename === 'CategoriesSuccess') {
+            const found = categoryData?.categories.categories.find(cat => cat.name === name);
+            if (found !== undefined) setCategoryId(found?.id);
+        }
+    }
+
+    function handleSubmit() {
+        submit();
+        navigation.navigate('Root');
+    }
+
     return (
         <View style={styles.screen}>
             <View style={styles.amountInputContainer}>
@@ -77,7 +111,7 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     merchantData?.merchants.__typename === 'MerchantsSuccess' ?
                         merchantData.merchants.merchants.map(x => x.name) : []
                 }
-                onSelect={setMerchant}
+                onSelect={selectMerchant}
                 expanded={merchantExpanded}
                 onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
                 onCollapse={() => setMerchantExpanded(false)} />
@@ -87,21 +121,40 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.map(x => x.name) : []
                 }
-                onSelect={setCategory}
+                onSelect={selectCategory}
                 expanded={categoryExpanded}
                 onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
                 onCollapse={() => setCategoryExpanded(false)} />
-            <View style={styles.row}>
-                <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
-                        <Text style={styles.fieldLabel}>Date:</Text>
-                        <TextInput
-                            style={styles.fieldInput}
-                            placeholder="Select Date"
-                            editable={false}>
-                        </TextInput>
+            <View>
+                <TouchableHighlight
+                    style={calendarShown ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
+                    underlayColor="rgba(0,0,0,0.1)"
+                    onPress={() => setCalendarShown(true)}>
+                    <View style={styles.fieldContainer}>
+                        <View style={styles.fieldLabelAndInputContainer}>
+                            <Text style={styles.fieldLabel}>Date:</Text>
+                            <TextInput
+                                style={styles.fieldInput}
+                                placeholder="Select Date"
+                                value={
+                                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.month()] +
+                                    " " + date.date() + " " + date.year()
+                                }
+                                editable={false}>
+                            </TextInput>
+                        </View>
                     </View>
-                </View>
+                </TouchableHighlight>
+                {
+                    calendarShown ?
+                        <View style={styles.calendarContainer}>
+                            <CalendarPicker
+                                onDateChange={(date, type) => { setDate(date); setCalendarShown(false); }}
+                                width={300} />
+                        </View>
+                        :
+                        <View></View>
+                }
             </View>
             <View style={styles.detailsRow}>
                 <View style={styles.detailsIconAndLabel}>
@@ -114,11 +167,16 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     multiline={true}
                     textAlignVertical="top"
                     scrollEnabled={false}
-                    onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}>
+                    onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}
+                    onChangeText={setDesc}
+                    value={desc}>
                 </TextInput>
             </View>
             <View style={styles.buttonContainer}>
-                <Button text="Save Expense" accessibilityLabel="Button to Save Expense"></Button>
+                <Button
+                    text="Save Expense"
+                    accessibilityLabel="Button to Save Expense"
+                    onPress={handleSubmit} />
             </View>
         </View >
     );
@@ -185,6 +243,8 @@ const styles = StyleSheet.create({
         borderTopColor: 'rgba(0,0,0,0.3)',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(0,0,0,0.3)',
+        zIndex: -1,
+        elevation: -1,
     },
     detailsIconAndLabel: {
         flexDirection: 'row',
@@ -205,8 +265,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start',
         paddingTop: 60,
+        zIndex: -1,
+        elevation: -1,
     },
     listItem: {
         fontSize: 15,
+    },
+    calendarContainer: {
+        alignSelf: 'center',
+        width: 300,
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: 'black',
+        position: 'absolute',
+        top: 43,
+        left: '50%',
+        transform: [{ translateX: -150 }],
     },
 });
