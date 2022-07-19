@@ -92,13 +92,13 @@ function ShowBudgets({ data }: { data: Array<CategoryItem> }) {
     const RightSwipeOpen = () => {
         return (
             <View
-                style={{ flex: 1, backgroundColor: '#fc0303', justifyContent: 'center' }}
+                style={{ flex: 1, backgroundColor: '#fc0303', justifyContent: 'center', alignItems: 'flex-end' }}
             >
                 <Text
                     style={{
-                        color: '#1b1a17',
+                        color: 'white',
                         paddingHorizontal: 10,
-                        fontWeight: '600',
+                        fontWeight: 'bold',
                         paddingVertical: 20,
                     }}
                 >
@@ -136,7 +136,7 @@ function ShowBudgets({ data }: { data: Array<CategoryItem> }) {
                                 {item.category.name}
                             </Text>
                             <Text style={{ fontSize: 24 }}>
-                                Button ...
+                                ...
                             </Text>
                         </View>
                         <View style={{
@@ -146,11 +146,17 @@ function ShowBudgets({ data }: { data: Array<CategoryItem> }) {
                             paddingHorizontal: 30,
                             paddingVertical: 20,
                         }}>
-                            <View>
-                                planed
+                            <View style={{ flex: 1 }}>
+                                <Text>Planed</Text>
+                                <View style={{ borderColor: 'black', borderWidth: 2, minHeight: 50, justifyContent: 'center', alignItems: "center", }}>
+                                    <Text>$10,00</Text>
+                                </View>
                             </View>
-                            <View>
-                                actual
+                            <View style={{ flex: 1 }}>
+                                <Text>Actual</Text>
+                                <View style={{ borderColor: 'black', borderWidth: 2, minHeight: 50, justifyContent: 'center', alignItems: "center", }}>
+                                    <Text>$10,00</Text>
+                                </View>
                             </View>
                         </View>
                     </View>
@@ -218,8 +224,9 @@ const styles = StyleSheet.create({
     },
     itemSeparator: {
         flex: 1,
-        height: 1,
-        backgroundColor: '#444',
+        height: 3,
+        flexBasis: 3,
+        backgroundColor: '#969696',
     },
 
 
