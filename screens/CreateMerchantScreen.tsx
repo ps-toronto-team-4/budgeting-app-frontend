@@ -14,9 +14,38 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [passwordHash, setpasswordHash] = React.useState("");
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
-    const [check, setCheck] = React.useState(false);
+    const [validMerchant, setValidMerchant] = React.useState(false);
 
-    const [merchantsQuery, { loading, error, data }] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, { variables: { passwordHash: passwordHash } });
+    const [merchantsQuery, { loading, error, data }] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+        variables: { passwordHash: passwordHash },
+        onCompleted: (data) => {
+            if (data?.merchants.__typename === "MerchantsSuccess") {
+                for (let index = 0; index < data?.merchants.merchants.length; index++) {
+                    const element = data?.merchants.merchants[index];
+                    console.log(element);
+
+                }
+
+                // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
+                // this will display a Found it! on the console.
+                if (data?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
+                    console.log("Found it!");
+                    setValidMerchant(false);
+
+                } else {
+                    console.log("Merchant Name is not found.");
+                    console.log(merchantName);
+                    setValidMerchant(true);
+                    // console.log(passwordHash);
+                }
+
+
+            }
+        },
+        onError: (error) => {
+            console.log(error.message);
+        }
+    });
 
     useEffect(() => {
         getData();
@@ -48,29 +77,19 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         setMerchantName(merchantName);
         setDetails(details);
         merchantsQuery();
-        handleExisting();
+        //handleExisting();
         //
 
     }
 
-    function handleExisting() {
-
-
-        if ((data?.__typename == "Query") === undefined) {
-            return false;
-        }
-
-
-        const listOfNames = data?.merchants.__typename == "MerchantsSuccess" ? data?.merchants.merchants.map(ele => ele.name) : ["undefined"];
-
-        console.log("I got into handleExisting function and if statemnt")
-        if (merchantName in listOfNames) {
-            navigation.navigate('Root');
+    function HandleExisting() {
+        if (validMerchant) {
+            return (
+                <Text style={styles.alert}>This merchant already exists.</Text>
+            );
         } else {
-            //mutationCreate();
+            return (<></>);
         }
-
-
     }
 
 
@@ -96,7 +115,10 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     placeholder='(mandatory)'
                     onChangeText={(merchantName) => setMerchantName(merchantName)}
                     value={merchantName} />
+
             </View>
+            {validMerchant ? (<HandleExisting />) : (<></>)}
+
             <View style={[styles.categoryContainer]}>
                 <Text style={[styles.categoryLabel, { width: '100%' }]}>Details:</Text>
                 <TextInput
@@ -135,6 +157,9 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 75,
 
-    }
+    },
+    alert: {
+        color: 'red',
+    },
 
 });
