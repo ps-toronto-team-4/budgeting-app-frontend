@@ -25,6 +25,7 @@ import BudgetScreen from '../screens/BudgetScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
+import CreateCategoryScreen from '../screens/CreateCategoryScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -59,6 +60,7 @@ function RootNavigator() {
       <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{
         title: 'Expense Details', headerTitleAlign: "center", headerShadowVisible: false, headerTitleStyle: {fontWeight: "bold"} 
       }} />
+      <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerShown: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>

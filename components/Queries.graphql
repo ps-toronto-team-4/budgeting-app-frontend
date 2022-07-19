@@ -69,13 +69,28 @@ mutation createUser($fname: String!, $lname: String!, $username: String!, $email
     }
 }
 
+mutation createCategory($passwordHash: String!, $name: String!, $color: String!, $details: String) {
+    createCategory(name: $name, colourHex: $color, description: $details, passwordHash: $passwordHash) {
+        __typename
+        ...on CategorySuccess {
+            category {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
 query getExpenses($passwordHash: String!) {
     expenses(passwordHash: $passwordHash) {
         ... on ExpensesSuccess {
             expenses {
                 amount
                 id
-                title
                 description
                 category {
                     colourHex
