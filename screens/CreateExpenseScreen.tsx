@@ -136,6 +136,7 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
     const [category, setCategory] = useState('');
     const [merchantExpanded, setMerchantExpanded] = useState(false);
     const [categoryExpanded, setCategoryExpanded] = useState(false);
+    const [detailsHeight, setDetailsHeight] = useState(20);
 
     useEffect(() => {
         getData();
@@ -205,12 +206,19 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     </View>
                 </View>
             </View>
-            <View style={styles.detailsContainer}>
+            <View style={styles.detailsRow}>
                 <View style={styles.detailsIconAndLabel}>
-                    <Feather style={styles.detailsIcon} name="bar-chart" size={24} color="black" />
+                    <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
                     <Text style={styles.fieldLabel}>Details:</Text>
                 </View>
-                <TextInput style={styles.detailsInput} placeholder="Enter Details"></TextInput>
+                <TextInput
+                    style={[styles.detailsInput, { height: detailsHeight }]}
+                    placeholder="Enter Details"
+                    multiline={true}
+                    textAlignVertical="top"
+                    scrollEnabled={false}
+                    onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}>
+                </TextInput>
             </View>
             <View style={styles.buttonContainer}>
                 <Button text="Save Expense" accessibilityLabel="Button to Save Expense"></Button>
@@ -270,10 +278,10 @@ const styles = StyleSheet.create({
         fontSize: 15,
         width: 180
     },
-    detailsContainer: {
+    detailsRow: {
         flexDirection: 'row',
         paddingHorizontal: 27,
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         paddingVertical: 10,
         borderTopWidth: 1,
@@ -284,7 +292,7 @@ const styles = StyleSheet.create({
     detailsIconAndLabel: {
         flexDirection: 'row',
         paddingHorizontal: 0,
-        marginHorizontal: 0,
+        marginRight: 27,
         alignItems: 'center',
     },
     detailsIcon: {
@@ -293,6 +301,7 @@ const styles = StyleSheet.create({
     },
     detailsInput: {
         fontSize: 15,
+        width: 250,
     },
     buttonContainer: {
         flex: 1,
