@@ -202,7 +202,11 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                 <View style={styles.fieldContainer}>
                     <View style={styles.fieldLabelAndInputContainer}>
                         <Text style={styles.fieldLabel}>Date:</Text>
-                        <TextInput style={styles.fieldInput} placeholder="Select Date"></TextInput>
+                        <TextInput
+                            style={styles.fieldInput}
+                            placeholder="Select Date"
+                            editable={false}>
+                        </TextInput>
                     </View>
                 </View>
             </View>
