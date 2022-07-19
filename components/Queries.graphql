@@ -69,25 +69,20 @@ mutation createUser($fname: String!, $lname: String!, $username: String!, $email
     }
 }
 
-query getExpenses($passwordHash: String!) {
+query getExpenses ($passwordHash: String!) {
     expenses(passwordHash: $passwordHash) {
         ... on ExpensesSuccess {
             expenses {
                 amount
                 id
-                title
                 description
                 category {
                     colourHex
                     name
                 }
-                merchant {
-                    name
-                    description
-                }
             }
         }
-
+        
         ... on FailurePayload{
             errorMessage
             exceptionName
@@ -109,6 +104,44 @@ query getExpense($passwordHash: String!, $expenseId: Int!) {
                 }
                 description
                 date
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation createExpense($passwordHash: String!, $amount: Float!, $epochDate: Int!) {
+    createExpense(passwordHash: $passwordHash, amount: $amount, epochDate: $epochDate) {
+        ...on ExpenseSuccess {
+            expense {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query getMerchants($passwordHash: String!) {
+    merchants(passwordHash: $passwordHash) {
+        ...on MerchantsSuccess {
+            merchants {
+                id
+                name
+                description
+                defaultCategory {
+                    id
+                    name
+                    description
+                    colourHex
+                }
             }
         }
 

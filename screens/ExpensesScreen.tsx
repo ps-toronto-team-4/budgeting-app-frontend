@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RootTabScreenProps } from "../types";
+import AddButton from "../components/AddButton";
 const todoList = [
   { id: '1', text: 'Learn JavaScript' },
   { id: '2', text: 'Learn React' },
@@ -117,6 +118,11 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     variables: { passwordHash: userHash }
   });
   console.log(data);
+
+  function handleAddExpense() {
+    navigation.navigate('CreateExpense');
+  }
+
   return (
     <>
       <StatusBar />
@@ -138,6 +144,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
           />
         }
       </SafeAreaView>
+      <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>
     </>
   );
 }
@@ -150,5 +157,10 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 1,
     backgroundColor: '#444',
+  },
+  addExpenseBtn: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
   },
 });
