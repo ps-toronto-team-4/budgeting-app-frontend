@@ -17,7 +17,7 @@ export type CategoriesPayload = CategoriesSuccess | FailurePayload;
 
 export type CategoriesSuccess = {
   __typename?: 'CategoriesSuccess';
-  categories: Array<Maybe<Category>>;
+  categories: Array<Category>;
 };
 
 export type Category = {
@@ -312,7 +312,7 @@ export type GetCategoriesQueryVariables = Exact<{
 }>;
 
 
-export type GetCategoriesQuery = { __typename?: 'Query', categories: { __typename: 'CategoriesSuccess', categories: Array<{ __typename?: 'Category', id: number, name: string, colourHex: string, description?: string | null } | null> } | { __typename: 'FailurePayload', exceptionName?: string | null, errorMessage?: string | null } };
+export type GetCategoriesQuery = { __typename?: 'Query', categories: { __typename: 'CategoriesSuccess', categories: Array<{ __typename?: 'Category', id: number, name: string, colourHex: string, description?: string | null }> } | { __typename: 'FailurePayload', exceptionName?: string | null, errorMessage?: string | null } };
 
 export type CreateUserMutationVariables = Exact<{
   fname: Scalars['String'];

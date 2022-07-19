@@ -14,17 +14,24 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [passwordHash, setpasswordHash] = React.useState("");
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
-    const [validMerchant, setValidMerchant] = React.useState(false);
+    const [defCategoryId, setDefCategoryId] = React.useState("");
+    const [validMerchant, setValidMerchant] = React.useState(true);
+    const [check, setCheck] = React.useState(false);
 
-    const [merchantsQuery, { loading, error, data }] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+    const [createMerchant, { loading, data }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
+        variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: defCategoryId },
+        onError: (error => {
+            Alert.alert(error.message);
+        }),
+        onCompleted: () => {
+            console.log('Completed Mutation.');
+        }
+    })
+
+    const [merchantsQuery] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash },
         onCompleted: (data) => {
             if (data?.merchants.__typename === "MerchantsSuccess") {
-                // for (let index = 0; index < data?.merchants.merchants.length; index++) {
-                //     const element = data?.merchants.merchants[index];
-                //     console.log(element);
-
-                // }
 
                 // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
                 // this will display a Found it! on the console.
@@ -36,11 +43,16 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     console.log("Merchant Name is not found.");
                     console.log(merchantName);
                     setValidMerchant(true);
-                    mutationCreate();
-                    // console.log(passwordHash);
                 }
 
 
+            } else {
+                console.log("Something went wrong within the Lazy Query.");
+            }
+
+            if (validMerchant) {
+                console.log("I was here"); // Reaches this part of the code.
+                createMerchant();
             }
         },
         onError: (error) => {
@@ -64,27 +76,15 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     }
 
 
-
-
-    const [mutationCreate] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
-        variables: { passwordHash, merchantName, details },
-        onError: (error => {
-            Alert.alert(error.message);
-        }),
-        onCompleted: () => {
-            console.log('Completed Mutation.');
-        }
-    });
-
     const handleMerchant = () => {
-        setMerchantName(merchantName);
-        setDetails(details);
+        setCheck(true);
         merchantsQuery();
 
     }
 
     function HandleExisting() {
-        if (validMerchant) {
+
+        if (!check || !validMerchant) {
             return (
                 <Text style={styles.alert}>This merchant already exists.</Text>
             );
@@ -94,18 +94,14 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     }
 
 
-
-
-
-
-    // function RequiredField({ input }: { input: string }) {
-    //     return (
-    //         (!check || input) ? (
-    //             <></>
-    //         ) : (
-    //             <Text style={styles.alert}>this field is required</Text>
-    //         ))
-    // }
+    function RequiredField({ input }: { input: string }) {
+        return (
+            (!check || input) ? (
+                <></>
+            ) : (
+                <Text style={styles.alert}>this field is required</Text>
+            ))
+    }
 
     return (
         <SafeAreaView style={Styles.container}>
@@ -116,9 +112,9 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     placeholder='(mandatory)'
                     onChangeText={(merchantName) => setMerchantName(merchantName)}
                     value={merchantName} />
-
             </View>
-            {validMerchant ? (<HandleExisting />) : (<></>)}
+            <RequiredField input={merchantName} />
+            {validMerchant ? (<></>) : (<HandleExisting />)}
 
             <View style={[styles.categoryContainer]}>
                 <Text style={[styles.categoryLabel, { width: '100%' }]}>Details:</Text>
@@ -129,9 +125,26 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     value={details} />
             </View>
 
+            <View style={[styles.categoryContainer]}>
+                <Text style={[styles.categoryLabel, { width: '100%' }]}>Category:</Text>
+                <TextInput
+                    style={styles.categoryInput}
+                    placeholder='(optional)'
+                    onChangeText={(defCategoryId) => setDefCategoryId(defCategoryId)}
+                    value={defCategoryId} />
+            </View>
+
             <View style={styles.buttonBox}>
                 <Button text={"Save Merchant"} accessibilityLabel={"Save Merchant"} onPress={() => handleMerchant()} />
             </View>
+            {!loading ? (
+                data?.createMerchant.__typename === "MerchantSuccess" ? (
+                    <Text>Merchant created successfully!</Text>
+                ) : (
+                    <Text style={styles.alert}>{data?.createMerchant.errorMessage}</Text>
+                )) : (
+                <ActivityIndicator size='large' />
+            )}
         </SafeAreaView>
     );
 }
