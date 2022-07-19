@@ -30,6 +30,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }),
         onCompleted: () => {
             console.log('Completed Mutation.');
+            navigation.navigate('Root');
         }
     })
 
@@ -139,19 +140,13 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             <RequiredField input={merchantName} />
             {validMerchant ? (<></>) : (<HandleExisting />)}
 
-            <View style={styles.detailsRow}>
-                <View style={styles.detailsIconAndLabel}>
-                    <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
-                    <Text style={styles.fieldLabel}>Details:</Text>
-                </View>
+            <View style={[styles.categoryContainer]}>
+                <Text style={[styles.fieldLabel, { width: '100%' }]}>Details:</Text>
                 <TextInput
-                    style={[styles.detailsInput, { height: detailsHeight }]}
-                    placeholder="Enter Details"
-                    multiline={true}
-                    textAlignVertical="top"
-                    scrollEnabled={false}
-                    onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}>
-                </TextInput>
+                    style={styles.fieldInput}
+                    placeholder='(optional)'
+                    onChangeText={(details) => setDetails(details)}
+                    value={details} />
             </View>
 
             <DropdownRow
@@ -197,10 +192,10 @@ const styles = StyleSheet.create({
     },
     categoryLabel: {
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 15,
     },
     categoryInput: {
-        fontSize: 20,
+        fontSize: 15,
     },
     buttonBox: {
         position: "absolute",
