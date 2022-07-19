@@ -1,13 +1,16 @@
-import { gql, useMutation } from '@apollo/client';
-import React, { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet } from 'react-native';
+import { useMutation } from '@apollo/client';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '../../components/Themed';
 import { RootStackScreenProps, RootTabScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
+import Styles from "../../constants/Styles";
 import { styles, eyeIconSize } from './SignUpScreen.styles';
 import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
+import PhoneInput from 'react-native-phone-number-input';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignUp'>) {
 
@@ -18,28 +21,74 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [pwordConfirm, setPwordConfirm] = useState("")
+
   const [check, setCheck] = useState(false)
   const [pwordCheck, setPwordCheck] = useState(false)
+  const [userCheck, setUserCheck] = useState(false)
   const [pwordRules, setPwordRules] = useState(false)
   const [emailCheck, setEmailCheck] = useState(false)
   const [phoneCheck, setPhoneCheck] = useState(false)
   const [hidePword, setHidePword] = useState(true)
+ 
+  const [lengthCheck, setLengthCheck] = useState(true)
+  const [lettersCheck, setLettersCheck] = useState(true)
+  const [numberCheck, setNumberCheck] = useState(true)
+  const [specialCheck, setSpecialCheck] = useState(true)
+  const [minCheck, setMinCheck] = useState(true)
+  const [maxCheck, setMaxCheck] = useState(true)
+  const [formatCheck, setFormatCheck] = useState(true)
+  const [emailRegex, setEmailRegex] = useState(true)
+  const [minPhone, setMinPhone] = useState(true)
 
   // Create user graphql query
-  const [createUser, { loading, error, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
+  const [createUser, { loading, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
     variables: { fname, lname, username, email, phone, password },
     onError: (error => {
       Alert.alert(error.message);
     }),
-    onCompleted: (() =>
-      navigation.navigate("Root")
-    )
+    onCompleted: (() => setData())
   })
 
-  const register = async () => {
+  const register = () => {
     setCheck(true);
-    if (password && fname && username && email) {
-      createUser();
+    setPwordRules(true);
+    if (password && pwordConfirm && (pwordConfirm === password) && fname && lname && email && username) {
+      if (lengthCheck && lettersCheck && numberCheck && specialCheck && minCheck && formatCheck && emailRegex && minPhone) {
+        createUser();
+      }
+    }
+  }
+
+  useEffect(() => {
+    setLengthCheck(password.length >= 8);
+    setLettersCheck(/[A-Z]/.test(password) && /[a-z]/.test(password));
+    setNumberCheck(/\d/.test(password));
+    setSpecialCheck(/[^A-Za-z0-9]/.test(password));
+  }, [password]);
+
+  useEffect(() => {
+    setMinCheck(username.length >= 4);
+    setMaxCheck(username.length === 16);
+    setFormatCheck(/^[A-Za-z0-9_.]*$/.test(username));
+  }, [username]);
+
+  useEffect(() => {
+    setEmailRegex(/^[^/\\*;:,{}\[\]()$?]+@+[^/\\~`*;:,|{}\[\]=()%$?]+[.]{1}[^/\\~`*;:,|{}\[\]=()%$?]+$/.test(email));
+  }, [email])
+
+  useEffect(() => {
+    setMinPhone(phone.length === 0 || phone.length >= 6);
+  }, [phone]);
+
+  const setData = async () => {
+    if (data?.signUp.__typename === "CreateUserSuccess") {
+      try {
+        await AsyncStorage.setItem('passwordHash', data.signUp.passwordHash);
+        navigation.replace('Root');
+      } catch (error) {
+        console.log(error);
+        Alert.alert("Something went wrong");
+      }
     }
   }
 
@@ -48,15 +97,11 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
       (!check || input) ? (
         <></>
       ) : (
-        <Text style={styles.alert}>this field is required</Text>
+        <Text style={styles.alert}>This field is required</Text>
       ))
   }
 
   function PasswordRules() {
-    let lengthCheck = password.length >= 8;
-    let lettersCheck = /([A-Z].?[a-z])|([a-z].?[A-Z])/.test(password);
-    let numberCheck = /\d/.test(password);
-    let specialCheck = /[^A-Za-z0-9]/.test(password);
     if (lettersCheck && lengthCheck && numberCheck && specialCheck) {
       return (<></>);
     }
@@ -72,44 +117,51 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   }
 
   function CheckEmail() {
-    let emailRegex = /^[^/\\*;:,{}\[\]()$?]+@+[^/\\~`*;:,|{}\[\]=()%$?]+[.]{1}[^/\\~`*;:,|{}\[\]=()%$?]+$/;
-    if (!emailCheck || !email || emailRegex.test(email)) {
+    if (!emailCheck || !email || emailRegex) {
       return (<></>);
     } else {
-      return (
-        <Text style={styles.alert}>Invalid email address</Text>
-      )
+      return (<Text style={styles.alert}>Invalid email address</Text>)
     }
   }
 
   function FormatPhone(newPhone: string) {
-    setPhone(newPhone.replaceAll(/[^0-9]/g, ""));
+    setPhone(newPhone.replace(/[^0-9]/g, "").substring(0,15));
     setPhoneCheck(false);
   }
 
   function CheckPhone() {
-    let phoneRegex = /^[0-9]{7,15}$/;
-    if (!phoneCheck || !phone || phoneRegex.test(phone)) {
-      return (<></>);
+    if (phoneCheck && phone && !minPhone) {
+      return (<Text style={styles.alert}>Invalid phone number</Text>);
+    } else if (phone.length === 15) {
+      return (<Text style={styles.alert}>Maximum length reached</Text>)
     } else {
-      return (
-        <Text style={styles.alert}>Invalid phone number</Text>
-      )
+      return (<></>)
     }
   }
 
+  function UsernameRules() {
+    if (username && userCheck && !minCheck) {
+      return (<Text style={styles.alert}>Username must have at least 4 characters</Text>)
+    } else if (maxCheck) {
+      return (<Text style={styles.alert}>Maximum length reached</Text>)
+    } else if (!formatCheck) {
+      return (<Text style={styles.alert}>Username can only include letters, numbers, underscore (_) and dot (.)</Text>)
+    } else {
+      return (<></>);
+  }}
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create a New Account</Text>
+    <View style={Styles.container}>
+      <Text style={Styles.title}>Create a New Account</Text>
       {!loading ? (
         data?.signUp.__typename === "CreateUserSuccess" ? (
-          <Text>Account created succesfully! Logging you in...</Text>
+          <Text>Account created successfully! Logging you in...</Text>
         ) : (
-          <Text>{data?.signUp.errorMessage}</Text>
+          <Text style={styles.alert}>{data?.signUp.errorMessage}</Text>
         )) : (
         <ActivityIndicator size='large' />
       )}
-      <ScrollView style={styles.separator}>
+      <ScrollView >
         <TextInput
           style={styles.formField}
           onChangeText={(fname) => setFname(fname)}
@@ -126,14 +178,16 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
         <RequiredField input={lname} />
         <TextInput
           style={styles.formField}
-          onChangeText={(username) => setUsername(username)}
+          onChangeText={(user) => {setUsername(user.substring(0,16)); setUserCheck(false)}}
+          onBlur={() => setUserCheck(true)}
           value={username}
           placeholder="Username*"
         />
         <RequiredField input={username} />
+        <UsernameRules/>
         <TextInput
           style={styles.formField}
-          onChangeText={(email) => { setEmail(email.replaceAll(/\s+/g, "")); setEmailCheck(false) }}
+          onChangeText={(email) => { setEmail(email.replace(/\s+/g, "")); setEmailCheck(false) }}
           onBlur={() => setEmailCheck(true)}
           value={email}
           placeholder="Email*"
@@ -166,15 +220,17 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           (!pwordCheck || (pwordConfirm === password)) ? (
             <RequiredField input={pwordConfirm} />
           ) : (
-            (<Text style={styles.alert}>password fields need to match</Text>)
+            (<Text style={styles.alert}>Password fields need to match</Text>)
           )
         }
-        <TextInput
-          style={styles.formField}
-          onChangeText={(newPhone) => FormatPhone(newPhone)}
-          onBlur={() => setPhoneCheck(true)}
-          value={phone}
-          keyboardType="phone-pad"
+        <PhoneInput
+          containerStyle={styles.phoneContainer}
+          textContainerStyle={styles.textField}
+          countryPickerButtonStyle={styles.countryBtn}
+          codeTextStyle={styles.codeText}
+          disableArrowIcon={true}
+          defaultCode='CA'
+          textInputProps={{onChangeText: (phone) => {FormatPhone(phone); setPhoneCheck(false)}, onBlur: () => setPhoneCheck(true), value: phone, style: styles.phoneInput}}
           placeholder="Phone Number (optional)"
         />
         <CheckPhone />
