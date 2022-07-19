@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
-import { Category, GetCategoriesDocument, GetCategoriesQuery, Merchant } from "../components/generated";
+import { GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
 
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
 import { RootTabScreenProps } from "../types";
@@ -10,114 +10,7 @@ import AdaptiveTextInput from "../components/AdaptiveTextInput";
 import { AntDesign, Feather } from '@expo/vector-icons';
 import Button from "../components/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
-
-const DropdownItem = ({ name, onSelect }: { name: string, onSelect: (name: string) => void }) => (
-    <TouchableHighlight
-        style={styles.row}
-        underlayColor="rgba(0,0,0,0.1)"
-        onPress={() => onSelect(name)}>
-        <View style={[styles.fieldContainer, { paddingLeft: 70 }]}>
-            <Text style={styles.listItem}>{name}</Text>
-        </View>
-    </TouchableHighlight>
-);
-
-type DropdownRowProps = {
-    label: string;
-    data: string[];
-    onSelect: (name: string) => void;
-    expanded?: boolean;
-    onExpand?: () => void;
-    onCollapse?: () => void;
-};
-
-const DropdownRow = ({ label, data, onSelect, expanded: expandedProp, onExpand, onCollapse }: DropdownRowProps) => {
-    const inputRef = useRef<TextInput>(null);
-    const [value, setValue] = useState('');
-    const [expandedState, setExpandedState] = useState(expandedProp || false);
-    // recalculates on each render (prop or state change).
-    const expanded = expandedProp || (expandedProp === undefined && expandedState);
-
-    const collapse = () => {
-        if (expanded) {
-            setExpandedState(false);
-            inputRef.current?.blur();
-            onCollapse && onCollapse();
-        }
-    };
-
-    const handleRowPress = () => {
-        if (!expanded) {
-            setValue('');
-            setExpandedState(true);
-            inputRef.current?.focus();
-            onExpand && onExpand();
-        }
-    };
-
-    const handleIconPress = () => {
-        // propogate press event to merchant row because propagation
-        // is prevented by the icon for some reason.
-        handleRowPress();
-        collapse();
-    };
-
-    function renderDropdownItem({ item }: { item: { name: string, onSelect: (name: string) => void } }) {
-        return (
-            <DropdownItem name={item.name} onSelect={item.onSelect}></DropdownItem>
-        );
-    }
-
-    function handleSelect(name: string) {
-        setValue(name);
-        collapse();
-        onSelect(name);
-    }
-
-    return (
-        <>
-            <TouchableHighlight
-                underlayColor="rgba(0,0,0,0.1)"
-                style={expanded ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
-                onPress={handleRowPress}>
-                <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
-                        <Text style={styles.fieldLabel}>{label}:</Text>
-                        <TextInput
-                            style={styles.fieldInput}
-                            editable={expanded}
-                            placeholder={"Select " + label}
-                            ref={inputRef}
-                            value={value}
-                            onChangeText={setValue}>
-                        </TextInput>
-                    </View>
-                    <AntDesign
-                        name={expanded ? 'up' : 'down'}
-                        size={20}
-                        color="black"
-                        onPress={handleIconPress} />
-                </View>
-            </TouchableHighlight>
-            {
-                (expanded) ?
-                    <FlatList
-                        data={
-                            data.filter(name => {
-                                return name.toLowerCase().startsWith(value.toLowerCase())
-                            }).map(name => {
-                                return { name: name, onSelect: handleSelect }
-                            })
-                        }
-                        renderItem={renderDropdownItem}
-                        keyExtractor={item => item.name}>
-                    </FlatList>
-                    :
-                    <View></View>
-            }
-        </>
-    );
-};
+import { DropdownRow } from "../components/DropdownRow";
 
 export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'Budget'>) {
     const [passwordHash, setpasswordHash] = useState('');
