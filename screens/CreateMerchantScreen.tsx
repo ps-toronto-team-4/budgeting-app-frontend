@@ -7,7 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Styles from "../constants/Styles";
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { CreateMerchantDocument, CreateMerchantMutation, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
+import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
+import { DropdownRow } from "../components/DropdownRow";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
 
@@ -17,8 +18,10 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [defCategoryId, setDefCategoryId] = React.useState("");
     const [validMerchant, setValidMerchant] = React.useState(true);
     const [check, setCheck] = React.useState(false);
+    const [categoryOpen, setCategoryOpen] = React.useState(false);
+    const [categoryId, setCategoryId] = React.useState<number | null>(null);
 
-    const [createMerchant, { loading, data }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
+    const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: defCategoryId },
         onError: (error => {
             Alert.alert(error.message);
@@ -27,6 +30,12 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             console.log('Completed Mutation.');
         }
     })
+
+    const { loading: categoryLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument,
+        {
+            variables: { passwordHash: passwordHash }
+        }
+    )
 
     const [merchantsQuery] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash },
@@ -93,6 +102,15 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     }
 
+    function handleCategorySelect(categoryName: String) {
+        if (categoryData?.categories.__typename == "CategoriesSuccess") {
+            const foundCategory = categoryData.categories.categories.find(x => x.name == categoryName);
+
+            if (foundCategory !== undefined) {
+                setCategoryId(foundCategory.id);
+            }
+        }
+    }
 
     function RequiredField({ input }: { input: string }) {
         return (
@@ -125,26 +143,27 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     value={details} />
             </View>
 
-            <View style={[styles.categoryContainer]}>
-                <Text style={[styles.categoryLabel, { width: '100%' }]}>Category:</Text>
-                <TextInput
-                    style={styles.categoryInput}
-                    placeholder='(optional)'
-                    onChangeText={(defCategoryId) => setDefCategoryId(defCategoryId)}
-                    value={defCategoryId} />
-            </View>
-
+            <DropdownRow
+                label="Categories"
+                data={
+                    categoryData?.categories.__typename == "CategoriesSuccess" ?
+                        categoryData.categories.categories.map(x => x.name) : []
+                }
+                onSelect={handleCategorySelect}
+                expanded={categoryOpen}
+                onExpand={() => { setCategoryOpen(true); }}
+                onCollapse={() => setCategoryOpen(false)} />
             <View style={styles.buttonBox}>
                 <Button text={"Save Merchant"} accessibilityLabel={"Save Merchant"} onPress={() => handleMerchant()} />
             </View>
-            {!loading ? (
+            {/* {!loading ? (
                 data?.createMerchant.__typename === "MerchantSuccess" ? (
                     <Text>Merchant created successfully!</Text>
                 ) : (
                     <Text style={styles.alert}>{data?.createMerchant.errorMessage}</Text>
                 )) : (
                 <ActivityIndicator size='large' />
-            )}
+            )} */}
         </SafeAreaView>
     );
 }

@@ -25,11 +25,8 @@ import BudgetScreen from '../screens/BudgetScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
-<<<<<<< HEAD
 import CreateMerchant from '../screens/CreateMerchantScreen';
-=======
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
->>>>>>> C8-Expenses
 
 // declare global {
 //   namespace ReactNavigation{
@@ -61,15 +58,11 @@ function RootNavigator() {
       <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
-<<<<<<< HEAD
-      <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="CreateMerchant" component={CreateMerchant} options={{ headerTitle: 'Create Merchant', headerTransparent: true, headerTitleAlign: 'center', }} />
-=======
       <Stack.Screen name='CreateExpense' component={CreateExpenseScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{
         title: 'Expense Details', headerTitleAlign: "center", headerShadowVisible: false, headerTitleStyle: { fontWeight: "bold" }
       }} />
->>>>>>> C8-Expenses
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
