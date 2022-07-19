@@ -179,9 +179,9 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                 label="Categories"
                 data={
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                        categoryData.categories.categories.map(x => x?.name || 'jermie pls') : []
+                        categoryData.categories.categories.map(x => x.name) : []
                 }
-                onSelect={(name) => { setCategory(name); console.log(name); }} />
+                onSelect={setCategory} />
             <View style={styles.row}>
                 <View style={styles.fieldContainer}>
                     <View style={styles.fieldLabelAndInputContainer}>
