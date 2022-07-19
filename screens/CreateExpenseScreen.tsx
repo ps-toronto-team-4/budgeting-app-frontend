@@ -26,25 +26,32 @@ type DropdownRowProps = {
     label: string;
     data: string[];
     onSelect: (name: string) => void;
+    expanded?: boolean;
+    onExpand?: () => void;
+    onCollapse?: () => void;
 };
 
-const DropdownRow = ({ label, data, onSelect }: DropdownRowProps) => {
-    const [expanded, setExpanded] = useState(false);
+const DropdownRow = ({ label, data, onSelect, expanded: expandedProp, onExpand, onCollapse }: DropdownRowProps) => {
     const inputRef = useRef<TextInput>(null);
     const [value, setValue] = useState('');
+    const [expandedState, setExpandedState] = useState(expandedProp || false);
+    // recalculates on each render (prop or state change).
+    const expanded = expandedProp || (expandedProp === undefined && expandedState);
 
     const collapse = () => {
         if (expanded) {
-            setExpanded(false);
+            setExpandedState(false);
             inputRef.current?.blur();
+            onCollapse && onCollapse();
         }
     };
 
     const handleRowPress = () => {
         if (!expanded) {
             setValue('');
-            setExpanded(true);
+            setExpandedState(true);
             inputRef.current?.focus();
+            onExpand && onExpand();
         }
     };
 
@@ -127,6 +134,8 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
     const [amount, setAmount] = useState('0.00');
     const [merchant, setMerchant] = useState('');
     const [category, setCategory] = useState('');
+    const [merchantExpanded, setMerchantExpanded] = useState(false);
+    const [categoryExpanded, setCategoryExpanded] = useState(false);
 
     useEffect(() => {
         getData();
@@ -174,14 +183,20 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     merchantData?.merchants.__typename === 'MerchantsSuccess' ?
                         merchantData.merchants.merchants.map(x => x.name) : []
                 }
-                onSelect={(name) => { setMerchant(name); console.log(name); }} />
+                onSelect={setMerchant}
+                expanded={merchantExpanded}
+                onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
+                onCollapse={() => setMerchantExpanded(false)} />
             <DropdownRow
                 label="Categories"
                 data={
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.map(x => x.name) : []
                 }
-                onSelect={setCategory} />
+                onSelect={setCategory}
+                expanded={categoryExpanded}
+                onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
+                onCollapse={() => setCategoryExpanded(false)} />
             <View style={styles.row}>
                 <View style={styles.fieldContainer}>
                     <View style={styles.fieldLabelAndInputContainer}>
