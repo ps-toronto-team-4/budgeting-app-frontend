@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
 import { Category, GetCategoriesDocument, GetCategoriesQuery, Merchant } from "../components/generated";
 
-import { StyleSheet, View, Text, TextInput, GestureResponderEvent, ScrollView, FlatList, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
@@ -11,18 +11,24 @@ import { AntDesign, Feather } from '@expo/vector-icons';
 import Button from "../components/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
 
-const DropdownItem = ({ name, callback }: { name: string, callback: (name: string) => void }) => (
+const DropdownItem = ({ name, onSelect }: { name: string, onSelect: (name: string) => void }) => (
     <TouchableHighlight
         style={styles.row}
         underlayColor="rgba(0,0,0,0.1)"
-        onPress={() => callback(name)}>
+        onPress={() => onSelect(name)}>
         <View style={[styles.fieldContainer, { paddingLeft: 70 }]}>
             <Text style={styles.listItem}>{name}</Text>
         </View>
     </TouchableHighlight>
 );
 
-const DropdownRow = ({ label, data, callback }: { label: string, data: string[], callback: (name: string) => void }) => {
+type DropdownRowProps = {
+    label: string;
+    data: string[];
+    onSelect: (name: string) => void;
+};
+
+const DropdownRow = ({ label, data, onSelect }: DropdownRowProps) => {
     const [expanded, setExpanded] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const [value, setValue] = useState('');
@@ -49,16 +55,16 @@ const DropdownRow = ({ label, data, callback }: { label: string, data: string[],
         collapse();
     };
 
-    function renderDropdownItem({ item }: { item: { name: string, callback: (name: string) => void } }) {
+    function renderDropdownItem({ item }: { item: { name: string, onSelect: (name: string) => void } }) {
         return (
-            <DropdownItem name={item.name} callback={item.callback}></DropdownItem>
+            <DropdownItem name={item.name} onSelect={item.onSelect}></DropdownItem>
         );
     }
 
     function handleSelect(name: string) {
         setValue(name);
         collapse();
-        callback(name);
+        onSelect(name);
     }
 
     return (
@@ -89,8 +95,15 @@ const DropdownRow = ({ label, data, callback }: { label: string, data: string[],
             {
                 (expanded) ?
                     <FlatList
-                        data={data.filter(name => name.toLowerCase().startsWith(value.toLowerCase())).map(name => { return { name: name, callback: handleSelect } })}
-                        renderItem={renderDropdownItem}>
+                        data={
+                            data.filter(name => {
+                                return name.toLowerCase().startsWith(value.toLowerCase())
+                            }).map(name => {
+                                return { name: name, onSelect: handleSelect }
+                            })
+                        }
+                        renderItem={renderDropdownItem}
+                        keyExtractor={item => item.name}>
                     </FlatList>
                     :
                     <View></View>
@@ -145,7 +158,14 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
             <View style={styles.amountInputContainer}>
                 <View style={styles.dollarSignAndAmountInput}>
                     <Text style={styles.dollarSign}>$</Text>
-                    <AdaptiveTextInput keyboardType="numeric" style={{ fontSize: 50 }} charWidth={30} value={amount} onChangeText={handleAmountChange} onBlur={handleAmountBlur}></AdaptiveTextInput>
+                    <AdaptiveTextInput
+                        keyboardType="numeric"
+                        style={{ fontSize: 50 }}
+                        charWidth={30}
+                        value={amount}
+                        onChangeText={handleAmountChange}
+                        onBlur={handleAmountBlur}>
+                    </AdaptiveTextInput>
                 </View>
             </View>
             <DropdownRow
@@ -154,14 +174,14 @@ export default function CreateExpenseScreen({ navigation }: RootTabScreenProps<'
                     merchantData?.merchants.__typename === 'MerchantsSuccess' ?
                         merchantData.merchants.merchants.map(x => x.name) : []
                 }
-                callback={(name) => { setMerchant(name); console.log(name); }} />
+                onSelect={(name) => { setMerchant(name); console.log(name); }} />
             <DropdownRow
                 label="Categories"
                 data={
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.map(x => x?.name || 'jermie pls') : []
                 }
-                callback={(name) => { setCategory(name); console.log(name); }} />
+                onSelect={(name) => { setCategory(name); console.log(name); }} />
             <View style={styles.row}>
                 <View style={styles.fieldContainer}>
                     <View style={styles.fieldLabelAndInputContainer}>
