@@ -27,6 +27,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       CreateExpense: 'create-expense',
       ForgotPasswordModal: 'ForgotPassword',
       NotFound: '*',
+      CreateMerchant: 'create-merchant',
     },
   },
 };
