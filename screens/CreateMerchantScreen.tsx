@@ -214,9 +214,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
     buttonContainer: {
-        alignItems: 'center',
-        position: 'relative',
-        top: 250,
+        alignSelf: 'center',
+        justifyContent: 'flex-end',
+        top: '30%',
     },
     fieldLabel: {
         fontWeight: 'bold',
