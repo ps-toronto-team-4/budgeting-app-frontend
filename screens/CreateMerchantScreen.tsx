@@ -42,36 +42,9 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     )
 
-    const [merchantsQuery] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, {
-        variables: { passwordHash: passwordHash },
-        onCompleted: (data) => {
-            if (data?.merchants.__typename === "MerchantsSuccess" && merchantName.length != 0) {
-                // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
-                // this will display a Found it! on the console.
-                if (data?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
-                    console.log("Found it!");
-                    setValidMerchant(false);
-                    setDisabledButton(true);
+    const { loading: manyMerchantsLoading, data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+        variables: { passwordHash: passwordHash }
 
-                } else {
-                    console.log("Merchant Name is not found.");
-                    setDisabledButton(false);
-                    console.log(merchantName);
-                    setValidMerchant(true);
-                    createMerchant();
-
-                }
-
-
-            } else {
-                console.log("Something went wrong within the Lazy Query.");
-                setDisabledButton(true);
-            }
-
-        },
-        onError: (error) => {
-            console.log(error.message);
-        }
     });
 
     useEffect(() => {
@@ -93,6 +66,34 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const handleMerchant = () => {
         setCheck(true);
         merchantsQuery();
+    }
+
+    const merchantsQuery = () => {
+        if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName.length != 0) {
+            // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
+            // this will display a Found it! on the console.
+            if (manyMerchantsData?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
+                console.log("Found it!");
+                setValidMerchant(false);
+                setDisabledButton(true);
+
+            } else {
+                console.log("Merchant Name is not found.");
+                setDisabledButton(false);
+                console.log(merchantName);
+                setValidMerchant(true);
+                createMerchant();
+
+            }
+
+
+        } else {
+            console.log("Something went wrong within the Lazy Query.");
+            setDisabledButton(true);
+        }
+
+
+
     }
 
     function HandleExisting() {
