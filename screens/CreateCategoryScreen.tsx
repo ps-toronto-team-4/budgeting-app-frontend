@@ -44,13 +44,16 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
     onCompleted: (data => {
       if (data.categories.__typename === 'CategoriesSuccess') {
         data.categories.categories.forEach((item) => {
-          if (item.name === name) {
+          if (item.name.toLowerCase === name.toLowerCase) {
             setNameCheck(true)
           }
           if (item.colourHex === color) {
             setColorCheck(true)
           }
         })
+        if (color && name && !colorCheck && !nameCheck) {
+          createCategory();
+        }
       }
     })
   })
@@ -64,11 +67,9 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
 
   const saveCategory = () => {
     setCheck(true);
+    if (color || name) {
     getCategories();
-    if (color && name && !colorCheck && !nameCheck) {
-      createCategory();
-    }
-  } 
+  }}
 
   return (
     <View style={Styles.container}>
