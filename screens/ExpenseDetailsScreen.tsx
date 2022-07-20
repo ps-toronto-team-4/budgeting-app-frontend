@@ -32,8 +32,8 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                         amount: data.expense.expense.amount.toString(),
                         date: moment(data.expense.expense.date),
                         desc: data.expense.expense.description || '',
-                        merchantId: data.expense.expense.merchant?.id,
-                        categoryId: data.expense.expense.category?.id,
+                        merchant: { id: data.expense.expense.merchant?.id, name: data.expense.expense.merchant?.name },
+                        category: { id: data.expense.expense.category?.id, name: data.expense.expense.category?.name },
                     } : undefined
                 ))
             });

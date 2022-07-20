@@ -23,11 +23,20 @@ export type DropdownRowProps = {
     expanded?: boolean;
     onExpand?: () => void;
     onCollapse?: () => void;
+    defaultValue?: string;
 };
 
-export function DropdownRow({ label, data, onSelect, expanded: expandedProp, onExpand, onCollapse }: DropdownRowProps) {
+export function DropdownRow({
+    label,
+    data,
+    onSelect,
+    expanded: expandedProp,
+    onExpand,
+    onCollapse,
+    defaultValue,
+}: DropdownRowProps) {
     const inputRef = useRef<TextInput>(null);
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState(defaultValue || '');
     const [expandedState, setExpandedState] = useState(expandedProp || false);
     // recalculates on each render (prop or state change).
     const expanded = expandedProp || (expandedProp === undefined && expandedState);

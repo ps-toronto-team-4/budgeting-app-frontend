@@ -27,8 +27,8 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         }
     });
     const [amount, setAmount] = useState(route.params?.amount || '0.00');
-    const [merchantId, setMerchantId] = useState<number | null>(route.params?.merchantId || null);
-    const [categoryId, setCategoryId] = useState<number | null>(route.params?.categoryId || null);
+    const [merchantId, setMerchantId] = useState<number | null>(route.params?.merchant?.id || null);
+    const [categoryId, setCategoryId] = useState<number | null>(route.params?.category?.id || null);
     const [merchantExpanded, setMerchantExpanded] = useState(false);
     const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [detailsHeight, setDetailsHeight] = useState(20);
@@ -111,6 +111,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                     merchantData?.merchants.__typename === 'MerchantsSuccess' ?
                         merchantData.merchants.merchants.map(x => x.name) : []
                 }
+                defaultValue={route.params?.merchant?.name || ''}
                 onSelect={selectMerchant}
                 expanded={merchantExpanded}
                 onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
@@ -121,6 +122,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.map(x => x.name) : []
                 }
+                defaultValue={route.params?.category?.name || ''}
                 onSelect={selectCategory}
                 expanded={categoryExpanded}
                 onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
