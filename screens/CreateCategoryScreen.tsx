@@ -1,4 +1,4 @@
-import { StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
 
 import { Text, View, RequiredField } from '../components/Themed';
 import Button from '../components/Button';
@@ -8,18 +8,20 @@ import { RootStackScreenProps } from '../types';
 import TextInput from '../components/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation } from '@apollo/client';
-import { CreateCategoryDocument, CreateCategoryMutation } from '../components/generated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useMutation, useLazyQuery } from '@apollo/client';
+import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../components/generated';
+import { getAuth } from '../components/GetAuth';
 
 export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
+
   const [name, setName] = useState("")
   const [details, setDetails] = useState("")
   const [color, setColor] = useState("")
   const [check, setCheck] = useState(false)
   const [selectedColor, setSelectedColor] = useState("")
   const [passwordHash, setPasswordHash] = useState("")
+  const [nameCheck, setNameCheck] = useState(false)
+  const [colorCheck, setColorCheck] = useState(false)
 
   // Create user graphql query
   const [createCategory, { loading, data }] = useMutation<CreateCategoryMutation>(CreateCategoryDocument, {
@@ -34,20 +36,26 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
     })
   })
 
-  const getAuth = async () => {
-    try {
-      const value = await AsyncStorage.getItem('passwordHash');
-      if (value) {
-        setPasswordHash(value);
-      } else {
-        Alert.alert("You must sign in first");
-        navigation.replace("Welcome");
+  const [getCategories] = useLazyQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+    variables: { passwordHash },
+    onError: (error => {
+      Alert.alert(error.message);
+    }),
+    onCompleted: (data => {
+      if (data.categories.__typename === 'CategoriesSuccess') {
+        data.categories.categories.forEach((item) => {
+          if (item.name === name) {
+            setNameCheck(true)
+          }
+          if (item.colourHex === color) {
+            setColorCheck(true)
+          }
+        })
       }
-    } catch(e) {
-      Alert.alert("Something went wrong")
-    }
-  };
-  getAuth();
+    })
+  })
+
+  getAuth((value: React.SetStateAction<string>) => setPasswordHash(value));
 
   useEffect(() => {
     let newColor = selectedColor.substring(1);
@@ -56,10 +64,11 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
 
   const saveCategory = () => {
     setCheck(true);
-    if(color && name) {
+    getCategories();
+    if (color && name && !colorCheck && !nameCheck) {
       createCategory();
-    } 
-  }
+    }
+  } 
 
   return (
     <View style={Styles.container}>
@@ -74,20 +83,31 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
         )
       )}
       <TextInput
-        onChangeText={(name) => setName(name)}
+        onChangeText={(name) => {setName(name); setNameCheck(false)}}
         value={name}
         placeholder="Name"
       />
+      {nameCheck? (
+        <Text style={Styles.alert}>This category already exists</Text>
+      ) : (
+        <></>
+      )}
       <RequiredField check={check} input={name} />
       <View style={style.palette}>
       <ColorPalette 
-        onChange={(colour: React.SetStateAction<string>) => setSelectedColor(colour)}
+        onChange={(colour: React.SetStateAction<string>) => {setSelectedColor(colour); setColorCheck(false)}}
         value={selectedColor}
+        colors={['#EB4034', '#EB7734', '#EBC034', '#D3EB34', '#96EB34', '#30B027', '#27B097', '#2797B0', '#273BB0', '#784FD6','#773D9C', '#B662BF', '#ED72D0', '#B82562', '#99DDFF', '#ABE8A9', '#E6E287', '#77768C', '#DDDDDD']}
         titleStyles={style.colorTitle}
         title={"Select Category Color:"}
         icon={<Ionicons name="checkmark-circle-outline" style={style.icon} size={38} color="black" />}
       />
       </View>
+      {colorCheck? (
+        <Text style={Styles.alert}>There is already a category with this color</Text>
+      ) : (
+        <></>
+      )}
       <RequiredField check={check} input={color} />
       <TextInput
         onChangeText={(details) => setDetails(details)}
@@ -100,16 +120,6 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
 }
 
 const style = StyleSheet.create({
-  image: {
-    height: 150,
-    width: 200,
-    marginVertical: 80
-  },
-  registerCaption: {
-    fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 5,
-  },
   colorTitle: {
     textAlign: 'center',
     fontSize: 20
