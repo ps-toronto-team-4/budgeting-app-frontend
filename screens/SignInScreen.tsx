@@ -16,6 +16,15 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
   const [usernamePayload, setUsernamePayload] = React.useState("");
   const [passwordPayload, setPasswordPayload] = React.useState("");
 
+
+  const setData = async () => {
+    try {
+      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash : "undefined");
+      navigation.navigate('Root');
+    } catch (error) {
+      data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage : "undefined error";
+    }
+  }
   const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument, {
     variables: { username: usernamePayload, password: passwordPayload },
     onCompleted: (data) => {
@@ -30,14 +39,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
   });
 
 
-  const setData = async () => {
-    try {
-      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash : "undefined");
-      navigation.navigate('Root');
-    } catch (error) {
-      data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage : "undefined error";
-    }
-  }
+
 
   const handleLogin = () => {
 

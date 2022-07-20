@@ -148,6 +148,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     return (<View>
       <Text>{title}</Text>
       {itemsRender}
+      {/* <Text>hi</Text> */}
     </View>)
   }
 
@@ -160,18 +161,19 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
           Expenses
         </Text>
         <ScrollView>
-          {dailyGrouping && <> {
-            dailyGrouping.map((gItem, index) => {
-              return (<FakeFlatList
-                data={gItem.item}
-                title={gItem.key}
-                key={index}
-                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
-                ItemSeparatorComponent={() => <Separator />}
-              />)
-            })}
-            <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
-          </>
+          {dailyGrouping && (
+            <View>
+              {dailyGrouping.map((gItem, index) => {
+                return (<FakeFlatList
+                  data={gItem.item}
+                  title={gItem.key}
+                  key={index}
+                  renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
+                  ItemSeparatorComponent={() => <Separator />}
+                />)
+              })}
+              <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
+            </View>)
           }
           {data?.expenses.__typename == 'FailurePayload' && <View>
             <Text>{data.expenses.errorMessage}</Text>
@@ -179,7 +181,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
           </View>}
         </ScrollView>
       </SafeAreaView>
-      <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>\
+      <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>
 
     </>
   );
