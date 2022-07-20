@@ -8,20 +8,20 @@ import { RootStackScreenProps } from '../types';
 import TextInput from '../components/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useLazyQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../components/generated';
-import { getAuth } from '../components/GetAuth';
+import { useAuth } from '../hooks/useAuth';
 
 export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
 
   const [name, setName] = useState("")
   const [details, setDetails] = useState("")
   const [color, setColor] = useState("")
-  const [check, setCheck] = useState(false)
+  const [check, setCheck] = useState(false) // true if need to check required fields
   const [selectedColor, setSelectedColor] = useState("")
-  const [passwordHash, setPasswordHash] = useState("")
   const [nameCheck, setNameCheck] = useState(false)
   const [colorCheck, setColorCheck] = useState(false)
+  const {passwordHash, loading: hashLoading} = useAuth()
 
   // Create user graphql query
   const [createCategory, { loading, data }] = useMutation<CreateCategoryMutation>(CreateCategoryDocument, {
@@ -36,14 +36,27 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
     })
   })
 
-  const [getCategories] = useLazyQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-    variables: { passwordHash },
+  const {data: categoriesData, refetch} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+    variables: { passwordHash: passwordHash },
     onError: (error => {
       Alert.alert(error.message);
-    }),
-    onCompleted: (data => {
-      if (data.categories.__typename === 'CategoriesSuccess') {
-        data.categories.categories.forEach((item) => {
+    })
+  });
+
+  useEffect(() => {
+    let newColor = selectedColor.substring(1);
+    setColor(newColor);
+  }, [selectedColor]);
+
+  useEffect(() => {
+    refetch({ passwordHash: passwordHash });
+  }, [hashLoading, passwordHash]);
+
+  const saveCategory = () => {
+    setCheck(true);
+    if (color || name) {
+      if (categoriesData?.categories.__typename === 'CategoriesSuccess') {
+        categoriesData.categories.categories.forEach((item) => {
           if (item.name.toLowerCase === name.toLowerCase) {
             setNameCheck(true)
           }
@@ -55,25 +68,11 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
           createCategory();
         }
       }
-    })
-  })
-
-  getAuth((value: React.SetStateAction<string>) => setPasswordHash(value));
-
-  useEffect(() => {
-    let newColor = selectedColor.substring(1);
-    setColor(newColor);
-  }, [selectedColor]);
-
-  const saveCategory = () => {
-    setCheck(true);
-    if (color || name) {
-    getCategories();
-  }}
+    }
+  }
 
   return (
     <View style={Styles.container}>
-      <Text style={Styles.title}>Create a New Category</Text>
       {loading ? (
         <ActivityIndicator size={'large'}/>
       ) : (
