@@ -147,8 +147,11 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                 />
 
 
+            </View>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <RequiredField input={merchantName} />
                 {validMerchant ? (<></>) : (<HandleExisting />)}
+
             </View>
 
             <View style={styles.row}>
