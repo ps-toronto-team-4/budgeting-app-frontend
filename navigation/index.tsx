@@ -71,8 +71,8 @@ function RootNavigator() {
         headerShadowVisible: false,
         headerTitleStyle: { fontWeight: "bold" },
       }} />
-      <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{ headerTitle: 'Edit Category', headerShadowVisible: false }} />
+      <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerTitle: 'Create a New Category', headerShadowVisible: false }} />
       <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
