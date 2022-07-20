@@ -1,20 +1,44 @@
 import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { Category, GetExpenseDocument, GetExpenseQuery } from "../components/generated";
-import { ColorValue } from "react-native"
+import { ColorValue, TouchableOpacity } from "react-native"
 import Colors from "../constants/Colors";
 
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackScreenProps } from "../types";
+import { Feather } from "@expo/vector-icons";
+import moment from "moment";
+
+const EditButton = (onPress: () => void) => (
+    <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
+        <Feather name="edit-2" size={15} color="black" />
+    </TouchableOpacity>
+);
 
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
-    const [ passwordHash, setPasswordHash ] = React.useState("");
+    const [passwordHash, setPasswordHash] = React.useState("");
     const { expenseId, ...otherParams } = route.params;
     const { loading, error, data } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
         variables: { passwordHash: passwordHash, expenseId: expenseId }
     });
+
+    useEffect(() => {
+        if (data) {
+            navigation.setOptions({
+                headerRight: () => EditButton(() => navigation.navigate('UpdateExpense',
+                    data.expense.__typename === 'ExpenseSuccess' ? {
+                        amount: data.expense.expense.amount.toString(),
+                        date: moment(data.expense.expense.date),
+                        desc: data.expense.expense.description || '',
+                        merchantId: data.expense.expense.merchant?.id,
+                        categoryId: data.expense.expense.category?.id,
+                    } : undefined
+                ))
+            });
+        }
+    }, [data]);
 
     useEffect(() => {
         getData();
@@ -48,7 +72,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
         const day = jsDate.getDate().toString(); // eg: 31
         // Surely there is an easier way to do this. Not worth importing a new npm package though b/c that's unnecessary package bloat.
         const dayWithPostfix = day.endsWith('1') ? day + 'st' : (day.endsWith('2') ? day + 'nd' : (day.endsWith('3') ? day + 'rd' : day + 'th'));
-        return months[jsDate.getMonth()-1] + ' ' + dayWithPostfix + ', ' + jsDate.getFullYear();
+        return months[jsDate.getMonth() - 1] + ' ' + dayWithPostfix + ', ' + jsDate.getFullYear();
     }
 
     const expenseTypename = data?.expense.__typename;
@@ -63,8 +87,8 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                         </View>
                         <View style={styles.catAndAmount}>
                             <View style={styles.catColorAndName}>
-                                <View style={[styles.catColor, {backgroundColor: data?.expense.expense.category ? "#" + data.expense.expense.category.colourHex : Colors.light.uncategorizedColor}]}></View>
-                                <Text style={styles.catName}>{data?.expense.expense.category?.name ? data?.expense.expense.category?.name : "Uncategorized"}</Text>                                
+                                <View style={[styles.catColor, { backgroundColor: data?.expense.expense.category ? "#" + data.expense.expense.category.colourHex : Colors.light.uncategorizedColor }]}></View>
+                                <Text style={styles.catName}>{data?.expense.expense.category?.name ? data?.expense.expense.category?.name : "Uncategorized"}</Text>
                             </View>
                             <Text style={styles.amount}>${formatAmount(data?.expense.expense.amount)}</Text>
                         </View>
@@ -82,7 +106,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                         </View>
                         <View style={styles.separator}></View>
                     </View>
-                :
+                    :
                     <Text>{expenseTypename === "FailurePayload" ? data?.expense.exceptionName : ""}</Text>
             }
         </View>

@@ -97,10 +97,12 @@ query getExpense($passwordHash: String!, $expenseId: Int!) {
             expense {
                 amount
                 category {
+                    id
                     name
                     colourHex
                 }
                 merchant {
+                    id
                     name
                 }
                 description

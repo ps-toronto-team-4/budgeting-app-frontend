@@ -14,7 +14,7 @@ import { DropdownRow } from "../components/DropdownRow";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 
-export default function CreateExpenseScreen({ navigation }: RootStackScreenProps<'CreateExpense'>) {
+export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateExpense'>) {
     const [passwordHash, setpasswordHash] = useState('');
     const { loading: merchantDataLoading, data: merchantData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: {
@@ -26,15 +26,15 @@ export default function CreateExpenseScreen({ navigation }: RootStackScreenProps
             passwordHash: passwordHash
         }
     });
-    const [amount, setAmount] = useState('0.00');
-    const [merchantId, setMerchantId] = useState<number | null>(null);
-    const [categoryId, setCategoryId] = useState<number | null>(null);
+    const [amount, setAmount] = useState(route.params?.amount || '0.00');
+    const [merchantId, setMerchantId] = useState<number | null>(route.params?.merchantId || null);
+    const [categoryId, setCategoryId] = useState<number | null>(route.params?.categoryId || null);
     const [merchantExpanded, setMerchantExpanded] = useState(false);
     const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [detailsHeight, setDetailsHeight] = useState(20);
     const [calendarShown, setCalendarShown] = useState(false);
-    const [date, setDate] = useState(moment());
-    const [desc, setDesc] = useState('');
+    const [date, setDate] = useState(route.params?.date || moment());
+    const [desc, setDesc] = useState(route.params?.desc || '');
     const [submit, { loading: submitLoading, data: submitData }] = useMutation<CreateExpenseMutation>(CreateExpenseDocument, {
         variables: {
             passwordHash: passwordHash,
