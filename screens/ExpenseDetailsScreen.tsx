@@ -20,8 +20,16 @@ const EditButton = (onPress: () => void) => (
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
     const [passwordHash, setPasswordHash] = React.useState("");
     const { expenseId, ...otherParams } = route.params;
-    const { loading, error, data } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
+    const { loading, error, data, refetch } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
         variables: { passwordHash: passwordHash, expenseId: expenseId }
+    });
+
+    useEffect(() => {
+        if (route.params.refresh) {
+            refetch({
+                passwordHash: passwordHash, expenseId: expenseId
+            });
+        }
     });
 
     useEffect(() => {
@@ -29,6 +37,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
             navigation.setOptions({
                 headerRight: () => EditButton(() => navigation.navigate('UpdateExpense',
                     data.expense.__typename === 'ExpenseSuccess' ? {
+                        id: data.expense.expense.id,
                         amount: data.expense.expense.amount.toString(),
                         date: moment(data.expense.expense.date),
                         desc: data.expense.expense.description || '',

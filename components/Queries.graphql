@@ -95,6 +95,7 @@ query getExpense($passwordHash: String!, $expenseId: Int!) {
     expense(passwordHash: $passwordHash, id: $expenseId) {
         ...on ExpenseSuccess {
             expense {
+                id
                 amount
                 category {
                     id
@@ -119,6 +120,21 @@ query getExpense($passwordHash: String!, $expenseId: Int!) {
 
 mutation createExpense($passwordHash: String!, $amount: Float!, $epochDate: Int!, $merchantId: Int, $categoryId: Int, $desc: String) {
     createExpense(passwordHash: $passwordHash, amount: $amount, epochDate: $epochDate, merchantId: $merchantId, categoryId: $categoryId, description: $desc) {
+        ...on ExpenseSuccess {
+            expense {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation updateExpense($passwordHash: String!, $id: Int!, $amount: Float!, $epochDate: Int!, $merchantId: Int, $categoryId: Int, $desc: String) {
+    updateExpense(passwordHash: $passwordHash, id: $id, amount: $amount, epochDate: $epochDate, merchantId: $merchantId, categoryId: $categoryId, description: $desc) {
         ...on ExpenseSuccess {
             expense {
                 id

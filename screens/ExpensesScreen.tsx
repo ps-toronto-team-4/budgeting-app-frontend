@@ -104,7 +104,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     if (id === undefined || id == null) {
       alert("Transaction could not be found!")
     } else {
-      navigation.navigate('ExpenseDetails', { expenseId: id })
+      navigation.navigate('ExpenseDetails', { expenseId: id, refresh: false })
     }
 
   }

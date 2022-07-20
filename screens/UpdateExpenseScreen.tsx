@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
-import { CreateExpenseDocument, CreateExpenseMutation, GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
+import { CreateExpenseDocument, CreateExpenseMutation, GetCategoriesDocument, GetCategoriesQuery, UpdateExpenseDocument, UpdateExpenseMutation } from "../components/generated";
 
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
 import { RootStackScreenProps } from "../types";
@@ -35,9 +35,10 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
     const [calendarShown, setCalendarShown] = useState(false);
     const [date, setDate] = useState(route.params?.date || moment());
     const [desc, setDesc] = useState(route.params?.desc || '');
-    const [submit, { loading: submitLoading, data: submitData }] = useMutation<CreateExpenseMutation>(CreateExpenseDocument, {
+    const [submit, { loading: submitLoading, data: submitData }] = useMutation<UpdateExpenseMutation>(UpdateExpenseDocument, {
         variables: {
             passwordHash: passwordHash,
+            id: route.params?.id,
             amount: parseFloat(amount),
             epochDate: date.unix(),
             merchantId: merchantId,
@@ -87,7 +88,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
 
     function handleSubmit() {
         submit();
-        navigation.navigate('Root');
+        navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0, refresh: true });
     }
 
     return (
