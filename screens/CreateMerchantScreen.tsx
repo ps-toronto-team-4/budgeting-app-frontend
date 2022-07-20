@@ -126,9 +126,14 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             ))
     }
 
+    function updatedText() {
+        setDisabledButton(false);
+        setValidMerchant(true);
+    }
+
     return (
         <SafeAreaView style={styles.screen}>
-            <View style={[styles.categoryContainer]}>
+            <View style={styles.row}>
                 <View>
                     <Text style={styles.fieldLabel}>Merchant:</Text>
 
@@ -138,32 +143,36 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     placeholder='(mandatory)'
                     onChangeText={(merchantName) => setMerchantName(merchantName)}
                     value={merchantName}
-                    onChange={() => setDisabledButton(false)}
+                    onChange={() => updatedText()}
                 />
-            </View>
-            <RequiredField input={merchantName} />
-            {validMerchant ? (<></>) : (<HandleExisting />)}
 
-            <View style={[styles.categoryContainer]}>
-                <Text style={[styles.fieldLabel, { width: '100%' }]}>Details:</Text>
+
+                <RequiredField input={merchantName} />
+                {validMerchant ? (<></>) : (<HandleExisting />)}
+            </View>
+
+            <View style={styles.row}>
+                <Text style={styles.fieldLabel}>Details:</Text>
                 <TextInput
-                    style={styles.fieldInput}
+                    style={[styles.fieldInput]}
                     placeholder='(optional)'
                     onChangeText={(details) => setDetails(details)}
                     value={details} />
             </View>
+            <View style={{}}>
+                <DropdownRow
+                    label="Categories"
+                    data={
+                        categoryData?.categories.__typename == "CategoriesSuccess" ?
+                            categoryData.categories.categories.map(x => x.name) : []
+                    }
+                    onSelect={handleCategorySelect}
+                    expanded={categoryOpen}
+                    onExpand={() => { setCategoryOpen(true); }}
+                    onCollapse={() => setCategoryOpen(false)} />
+            </View>
 
-            <DropdownRow
-                label="Categories"
-                data={
-                    categoryData?.categories.__typename == "CategoriesSuccess" ?
-                        categoryData.categories.categories.map(x => x.name) : []
-                }
-                onSelect={handleCategorySelect}
-                expanded={categoryOpen}
-                onExpand={() => { setCategoryOpen(true); }}
-                onCollapse={() => setCategoryOpen(false)} />
-            <View style={styles.buttonBox}>
+            <View style={styles.buttonContainer}>
                 <Button text="Save Merchant"
                     accessibilityLabel={"Save Merchant"}
                     onPress={() => handleMerchant()}
@@ -188,75 +197,27 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.light.background,
         justifyContent: 'center',
-        alignItems: 'center'
-    },
-    categoryContainer: {
-        flexDirection: "row",
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
-        paddingVertical: 10,
-        paddingHorizontal: 90,
-    },
-    categoryLabel: {
-        fontWeight: 'bold',
-        fontSize: 15,
-    },
-    categoryInput: {
-        fontSize: 15,
-    },
-    buttonBox: {
-        position: "absolute",
-        bottom: 75,
-
     },
     alert: {
         color: 'red',
     },
     row: {
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(0,0,0,0.3)',
         paddingVertical: 10,
         paddingHorizontal: 30,
     },
-    detailsRow: {
-        flexDirection: 'row',
-        paddingHorizontal: 27,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingVertical: 10,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
-    },
-    detailsIconAndLabel: {
-        flexDirection: 'row',
-        paddingHorizontal: 0,
-        marginRight: 27,
-        alignItems: 'center',
-    },
-    detailsIcon: {
-        transform: [{ rotateZ: '90deg' }, { rotateY: '180deg' }],
-        marginRight: 5,
-    },
-    detailsInput: {
-        fontSize: 15,
-        width: 250,
-    },
     buttonContainer: {
-        flex: 1,
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingTop: 60,
-    },
-    listItem: {
-        fontSize: 15,
+        position: 'relative',
+        top: 250,
     },
     fieldLabel: {
         fontWeight: 'bold',
         fontSize: 15,
+        paddingLeft: 5,
     },
     fieldInput: {
         fontSize: 15,
