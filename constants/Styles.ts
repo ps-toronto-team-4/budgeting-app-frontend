@@ -9,13 +9,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     title: {
-        fontSize: 20,
+        fontSize: 32,
+        // Not a system font on Android
+        // fontFamily: 'Gill Sans MT',
+        marginHorizontal: 25,
+        marginVertical: '5%',
+        textAlign: 'center',
         fontWeight: 'bold',
     },
     alert: {
         color: 'red',
         marginHorizontal: 5,
         marginBottom: 8,
+        maxWidth: 250,
+        textAlign: 'center'
     },
     separator: {
         marginVertical: 30,

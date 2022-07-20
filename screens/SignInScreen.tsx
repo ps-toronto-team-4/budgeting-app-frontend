@@ -7,8 +7,8 @@ import { Text, View } from '../components/Themed';
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Styles from "../constants/Styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");
@@ -25,7 +25,6 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
     },
     onError: (data) => {
       console.log(data);
-
     }
   });
 
@@ -54,7 +53,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
         data?.signIn.__typename === "SignInSuccess" ? (
           <Text>Sign in successful</Text>
         ) : (
-          <Text>{data?.signIn.errorMessage}</Text>
+          <Text style={Styles.alert}>{data?.signIn.errorMessage}</Text>
         )) : (
         <ActivityIndicator size='large' />
       )}
