@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
-import { CreateExpenseDocument, CreateExpenseMutation, GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
+import { CreateExpenseDocument, CreateExpenseMutation, GetCategoriesDocument, GetCategoriesQuery, UpdateExpenseDocument, UpdateExpenseMutation } from "../components/generated";
 
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
 import { RootStackScreenProps } from "../types";
@@ -14,7 +14,7 @@ import { DropdownRow } from "../components/DropdownRow";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 
-export default function CreateExpenseScreen({ navigation }: RootStackScreenProps<'CreateExpense'>) {
+export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateExpense'>) {
     const [passwordHash, setpasswordHash] = useState('');
     const { loading: merchantDataLoading, data: merchantData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: {
@@ -26,18 +26,19 @@ export default function CreateExpenseScreen({ navigation }: RootStackScreenProps
             passwordHash: passwordHash
         }
     });
-    const [amount, setAmount] = useState('0.00');
-    const [merchantId, setMerchantId] = useState<number | null>(null);
-    const [categoryId, setCategoryId] = useState<number | null>(null);
+    const [amount, setAmount] = useState(route.params?.amount || '0.00');
+    const [merchantId, setMerchantId] = useState<number | null>(route.params?.merchant?.id || null);
+    const [categoryId, setCategoryId] = useState<number | null>(route.params?.category?.id || null);
     const [merchantExpanded, setMerchantExpanded] = useState(false);
     const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [detailsHeight, setDetailsHeight] = useState(20);
     const [calendarShown, setCalendarShown] = useState(false);
-    const [date, setDate] = useState(moment());
-    const [desc, setDesc] = useState('');
-    const [submit, { loading: submitLoading, data: submitData }] = useMutation<CreateExpenseMutation>(CreateExpenseDocument, {
+    const [date, setDate] = useState(route.params?.date || moment());
+    const [desc, setDesc] = useState(route.params?.desc || '');
+    const [submit, { loading: submitLoading, data: submitData }] = useMutation<UpdateExpenseMutation>(UpdateExpenseDocument, {
         variables: {
             passwordHash: passwordHash,
+            id: route.params?.id,
             amount: parseFloat(amount),
             epochDate: date.unix(),
             merchantId: merchantId,
@@ -87,7 +88,7 @@ export default function CreateExpenseScreen({ navigation }: RootStackScreenProps
 
     function handleSubmit() {
         submit();
-        navigation.navigate('Root');
+        navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0, refresh: true });
     }
 
     return (
@@ -111,6 +112,7 @@ export default function CreateExpenseScreen({ navigation }: RootStackScreenProps
                     merchantData?.merchants.__typename === 'MerchantsSuccess' ?
                         merchantData.merchants.merchants.map(x => x.name) : []
                 }
+                defaultValue={route.params?.merchant?.name || ''}
                 onSelect={selectMerchant}
                 expanded={merchantExpanded}
                 onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
@@ -121,6 +123,7 @@ export default function CreateExpenseScreen({ navigation }: RootStackScreenProps
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.map(x => x.name) : []
                 }
+                defaultValue={route.params?.category?.name || ''}
                 onSelect={selectCategory}
                 expanded={categoryExpanded}
                 onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
