@@ -69,7 +69,7 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
   return (
     <Swipeable
       ref={swipeableRef}
-      renderLeftActions={() => LeftSwipeActions(selectedColor)}
+      // renderLeftActions={() => LeftSwipeActions(selectedColor)}
       renderRightActions={() => rightSwipeActions({ id })}
       onSwipeableLeftOpen={() => swipeFromLeftOpen({ id, navigateCallBack, swipeableRef })}
     >
