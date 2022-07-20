@@ -20,8 +20,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [check, setCheck] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
     const [categoryId, setCategoryId] = React.useState<number | null>(null);
-    const [detailsHeight, setDetailsHeight] = React.useState(20);
-
+    const [disabledButton, setDisabledButton] = React.useState(false);
 
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: categoryId },
@@ -46,24 +45,27 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [merchantsQuery] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash },
         onCompleted: (data) => {
-            if (data?.merchants.__typename === "MerchantsSuccess") {
-
+            if (data?.merchants.__typename === "MerchantsSuccess" && merchantName.length != 0) {
                 // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
                 // this will display a Found it! on the console.
                 if (data?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
                     console.log("Found it!");
                     setValidMerchant(false);
+                    setDisabledButton(true);
 
                 } else {
                     console.log("Merchant Name is not found.");
+                    setDisabledButton(false);
                     console.log(merchantName);
                     setValidMerchant(true);
                     createMerchant();
+
                 }
 
 
             } else {
                 console.log("Something went wrong within the Lazy Query.");
+                setDisabledButton(true);
             }
 
         },
@@ -91,7 +93,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const handleMerchant = () => {
         setCheck(true);
         merchantsQuery();
-
     }
 
     function HandleExisting() {
@@ -115,12 +116,13 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     }
 
+
     function RequiredField({ input }: { input: string }) {
         return (
             (!check || input) ? (
                 <></>
             ) : (
-                <Text style={styles.alert}>this field is required</Text>
+                <Text style={styles.alert}>This field is required</Text>
             ))
     }
 
@@ -135,7 +137,9 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     style={styles.fieldInput}
                     placeholder='(mandatory)'
                     onChangeText={(merchantName) => setMerchantName(merchantName)}
-                    value={merchantName} />
+                    value={merchantName}
+                    onChange={() => setDisabledButton(false)}
+                />
             </View>
             <RequiredField input={merchantName} />
             {validMerchant ? (<></>) : (<HandleExisting />)}
@@ -160,7 +164,11 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                 onExpand={() => { setCategoryOpen(true); }}
                 onCollapse={() => setCategoryOpen(false)} />
             <View style={styles.buttonBox}>
-                <Button text={"Save Merchant"} accessibilityLabel={"Save Merchant"} onPress={() => handleMerchant()} />
+                <Button text="Save Merchant"
+                    accessibilityLabel={"Save Merchant"}
+                    onPress={() => handleMerchant()}
+                    disabled={disabledButton}
+                />
             </View>
             {!merchantLoading ? (
                 merchantData?.createMerchant.__typename === "MerchantSuccess" ? (
