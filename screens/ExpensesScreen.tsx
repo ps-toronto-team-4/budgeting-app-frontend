@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
 import { ColorValue, TouchableHighlight } from "react-native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,6 +23,7 @@ import AddButton from "../components/AddButton";
 // - Have special names for today and yesterday
 // - close delete on back navigate
 // - make deltet a trash can
+// - lazy render of lists
 
 
 const Separator = () => <View style={styles.itemSeparator} />;
@@ -121,6 +122,34 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     navigation.navigate('CreateExpense');
   }
 
+  const FakeFlatList = (
+    {
+      data,
+      title,
+      renderItem,
+      ItemSeparatorComponent }:
+      {
+        data: Array<any>,
+        title: string,
+        key: number | string,
+        renderItem: (item: any) => ReactElement,
+        ItemSeparatorComponent: () => ReactElement
+      }) => {
+
+    const itemsRender = data.map((item: any, index: number) => {
+
+      return (<View key={index}>
+        {index != 0 && ItemSeparatorComponent()}
+        {renderItem({ item })}
+      </View>)
+    })
+
+    return (<View>
+      <Text>{title}</Text>
+      {itemsRender}
+    </View>)
+  }
+
 
   return (
     <>
@@ -131,22 +160,15 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         </Text>
         <ScrollView>
           {dailyGrouping && dailyGrouping.map((gItem, index) => {
-            return (<View key={index}>
-              <Text>{gItem.key}</Text>
-              <FlatList
-                data={gItem.item}
-                keyExtractor={(ele) => {
-                  if (ele == null) {
-                    return ''
-                  }
-                  return String(ele.id)
-                }}
-                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
-                ItemSeparatorComponent={() => <Separator />}
-              />
-
-            </View>)
-          })}
+            return (<FakeFlatList
+              data={gItem.item}
+              title={gItem.key}
+              key={index}
+              renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
+              ItemSeparatorComponent={() => <Separator />}
+            />)
+          })
+          }
           {data?.expenses.__typename == 'FailurePayload' && <View>
             <Text>{data.expenses.errorMessage}</Text>
             <Text>{data.expenses.exceptionName}</Text>
@@ -166,7 +188,7 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined) => {
   let dailyGrouping: { [key: string]: Array<any> } = {}
 
   if (data.expenses.__typename == 'ExpensesSuccess') {
-    data.expenses.expenses.slice(0, 20).forEach(item => {
+    data.expenses.expenses.forEach(item => {
       if (item?.date == undefined) {
         console.warn("date is undefined for transation")
         return
