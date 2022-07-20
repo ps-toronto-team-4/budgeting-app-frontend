@@ -30,6 +30,7 @@ import CreateExpenseScreen from '../screens/CreateExpenseScreen';
 
 import { View } from '../components/Themed';
 import UpdateExpenseScreen from '../screens/UpdateExpenseScreen';
+import UpdateMerchantScreen from '../screens/UpdateMerchantScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -70,6 +71,7 @@ function RootNavigator() {
         headerTitleStyle: { fontWeight: "bold" },
       }} />
       <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
+      <Stack.Screen name="UpdateMerchant" component={UpdateMerchantScreen} options={{ headerTitle: 'Update Merchant', headerTransparent: true, headerTitleAlign: 'center', }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>

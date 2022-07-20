@@ -27,6 +27,7 @@ export type RootStackParamList = {
   CreateExpense: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
+  UpdateMerchant: { id: number, name: string, description: string, category?: { id?: number, name?: string } }
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
