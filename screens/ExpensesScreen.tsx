@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
-import { ColorValue, TouchableHighlight } from "react-native"
+import { Button, ColorValue, TouchableHighlight } from "react-native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import React from 'react';
@@ -95,6 +95,7 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
   const [passwordHash, setPasswordHash] = useState('');
+  const [amountToRender, setAmountToRender] = useState(20);
   const { loading, error, data } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
   });
@@ -117,7 +118,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     }
 
   }
-  const dailyGrouping = splitTransationsOnDate(data)
+  const dailyGrouping = splitTransationsOnDate(data, amountToRender)
   function handleAddExpense() {
     navigation.navigate('CreateExpense');
   }
@@ -159,15 +160,18 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
           Expenses
         </Text>
         <ScrollView>
-          {dailyGrouping && dailyGrouping.map((gItem, index) => {
-            return (<FakeFlatList
-              data={gItem.item}
-              title={gItem.key}
-              key={index}
-              renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
-              ItemSeparatorComponent={() => <Separator />}
-            />)
-          })
+          {dailyGrouping && <> {
+            dailyGrouping.map((gItem, index) => {
+              return (<FakeFlatList
+                data={gItem.item}
+                title={gItem.key}
+                key={index}
+                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
+                ItemSeparatorComponent={() => <Separator />}
+              />)
+            })}
+            <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
+          </>
           }
           {data?.expenses.__typename == 'FailurePayload' && <View>
             <Text>{data.expenses.errorMessage}</Text>
@@ -175,12 +179,13 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
           </View>}
         </ScrollView>
       </SafeAreaView>
-      <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>
+      <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>\
+
     </>
   );
 }
 
-const splitTransationsOnDate = (data: GetExpensesQuery | undefined) => {
+const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRender: number) => {
   if (data === undefined || data?.expenses.__typename == 'FailurePayload') {
     return undefined
   }
@@ -188,7 +193,20 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined) => {
   let dailyGrouping: { [key: string]: Array<any> } = {}
 
   if (data.expenses.__typename == 'ExpensesSuccess') {
-    data.expenses.expenses.slice(0, 20).forEach(item => { // REMOIVE THIS AFTER DEMO- TOO LAGGY WITH OUT
+    const listOfEle = JSON.parse(JSON.stringify(data.expenses.expenses));
+
+    listOfEle.sort((a: any, b: any) => {
+      if (a === undefined || b === undefined || a == null || b == null) {
+        return 0
+      }
+      if (a.date > b.date) {
+        return -1
+      } else if (a.date < b.date) {
+        return 1
+      }
+      return 0
+    })
+    listOfEle.slice(0, amountToRender).forEach((item: any) => { // REMOIVE THIS AFTER DEMO- TOO LAGGY WITH OUT
       if (item?.date == undefined) {
         console.warn("date is undefined for transation")
         return
