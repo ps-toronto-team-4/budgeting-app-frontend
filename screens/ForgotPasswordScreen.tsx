@@ -35,7 +35,7 @@ export default function ForgotPasswordScreen({ navigation }: RootStackScreenProp
               </ClipPath>
             </Defs>
           </Svg>
-          <Text style={styles.contactemail}>Please contact <strong>{contactemail}</strong> for assistance with resetting your password.</Text>
+          <Text style={styles.contactemail}>Please contact <Text style={{fontWeight: 'bold'}}>{contactemail}</Text> for assistance with resetting your password.</Text>
         </View>
       </Modal>
     </View>

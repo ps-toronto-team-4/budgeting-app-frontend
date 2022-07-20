@@ -18,10 +18,12 @@ export type RootStackParamList = {
   Welcome: undefined;
   SignIn: undefined;
   SignUp: undefined;
-  ExpenseDetails: undefined;
+  ExpenseDetails: { expenseId: number };
   ForgotPasswordModal: undefined;
   Expenses: undefined;
+  CreateExpense: undefined;
   NotFound: undefined;
+  CreateMerchant: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
