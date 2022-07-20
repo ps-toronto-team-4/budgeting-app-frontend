@@ -25,11 +25,6 @@ export const styles = StyleSheet.create({
         marginVertical: 20,
         height: 1,
     },
-    alert: {
-        color: 'red',
-        marginHorizontal: 5,
-        marginBottom: 8,
-    },
     reqs: {
         color: 'gray',
         fontSize: 14,

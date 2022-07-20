@@ -11,6 +11,11 @@ const styles = StyleSheet.create( {
         fontSize: 20,
         fontWeight: 'bold',
     },
+    alert: {
+        color: 'red',
+        marginHorizontal: 5,
+        marginBottom: 8,
+    },
     separator: {
         marginVertical: 30,
         height: 1,
