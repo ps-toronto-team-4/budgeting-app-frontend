@@ -1,16 +1,16 @@
 import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
 
-import { Text, View, RequiredField } from '../components/Themed';
-import Button from '../components/Button';
+import { Text, View, RequiredField } from '../../components/Themed';
+import Button from '../../components/Button';
 import React, { useEffect, useState } from 'react';
-import Styles from '../constants/Styles';
-import { RootStackScreenProps } from '../types';
-import TextInput from '../components/TextInput';
+import Styles from '../../constants/Styles';
+import { RootStackScreenProps } from '../../types';
+import TextInput from '../../components/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery } from '@apollo/client';
-import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../components/generated';
-import { useAuth } from '../hooks/useAuth';
+import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../../components/generated';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
 

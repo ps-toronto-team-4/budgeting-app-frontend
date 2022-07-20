@@ -25,7 +25,7 @@ import BudgetScreen from '../screens/BudgetScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
-import CreateCategoryScreen from '../screens/CreateCategoryScreen';
+import CreateCategoryScreen from '../screens/CategoryScreens/CreateCategoryScreen';
 import CreateMerchant from '../screens/CreateMerchantScreen';
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
 
