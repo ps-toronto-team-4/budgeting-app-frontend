@@ -148,6 +148,19 @@ mutation updateExpense($passwordHash: String!, $id: Int!, $amount: Float!, $epoc
     }
 }
 
+mutation deleteExpense($passwordHash: String!, $id: Int!) {
+    deleteExpense(passwordHash: $passwordHash, id: $id) {
+        ...on DeleteSuccess {
+            successMessage
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
 query getMerchants($passwordHash: String!) {
     merchants(passwordHash: $passwordHash) {
         ...on MerchantsSuccess {
