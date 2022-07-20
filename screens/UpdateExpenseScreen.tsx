@@ -107,7 +107,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 </View>
             </View>
             <DropdownRow
-                label="Merchants"
+                label="Merchant"
                 data={
                     merchantData?.merchants.__typename === 'MerchantsSuccess' ?
                         merchantData.merchants.merchants.map(x => x.name) : []
@@ -118,7 +118,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
                 onCollapse={() => setMerchantExpanded(false)} />
             <DropdownRow
-                label="Categories"
+                label="Category"
                 data={
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.map(x => x.name) : []

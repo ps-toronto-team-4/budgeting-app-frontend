@@ -30,7 +30,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }),
         onCompleted: () => {
             console.log('Completed Mutation.');
-            navigation.navigate('Root');
+            navigation.navigate('CreateExpense', { refresh: true });
         }
     })
 

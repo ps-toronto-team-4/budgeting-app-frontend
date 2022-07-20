@@ -120,7 +120,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
   }
   const dailyGrouping = splitTransationsOnDate(data, amountToRender)
   function handleAddExpense() {
-    navigation.navigate('CreateExpense');
+    navigation.navigate('CreateExpense', { refresh: false });
   }
 
   const FakeFlatList = (

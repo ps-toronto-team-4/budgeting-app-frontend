@@ -14,18 +14,22 @@ import { DropdownRow } from "../components/DropdownRow";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 
-export default function CreateExpenseScreen({ navigation }: RootStackScreenProps<'CreateExpense'>) {
+export default function CreateExpenseScreen({ navigation, route }: RootStackScreenProps<'CreateExpense'>) {
     const [passwordHash, setpasswordHash] = useState('');
-    const { loading: merchantDataLoading, data: merchantData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
-        variables: {
-            passwordHash: passwordHash
+    const { loading: merchantDataLoading, data: merchantData, refetch: refetchMerchants } =
+        useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+            variables: {
+                passwordHash: passwordHash
+            }
         }
-    });
-    const { loading: categoryDataLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-        variables: {
-            passwordHash: passwordHash
+        );
+    const { loading: categoryDataLoading, data: categoryData, refetch: refetchCategories } =
+        useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+            variables: {
+                passwordHash: passwordHash
+            }
         }
-    });
+        );
     const [amount, setAmount] = useState('0.00');
     const [merchantId, setMerchantId] = useState<number | null>(null);
     const [categoryId, setCategoryId] = useState<number | null>(null);
@@ -43,6 +47,17 @@ export default function CreateExpenseScreen({ navigation }: RootStackScreenProps
             merchantId: merchantId,
             categoryId: categoryId,
             desc: desc || null,
+        }
+    });
+
+    useEffect(() => {
+        if (route.params.refresh) {
+            refetchMerchants({
+                passwordHash: passwordHash,
+            });
+            refetchCategories({
+                passwordHash: passwordHash,
+            });
         }
     });
 
@@ -106,22 +121,25 @@ export default function CreateExpenseScreen({ navigation }: RootStackScreenProps
                 </View>
             </View>
             <DropdownRow
-                label="Merchants"
+                label="Merchant"
                 data={
                     merchantData?.merchants.__typename === 'MerchantsSuccess' ?
                         merchantData.merchants.merchants.map(x => x.name) : []
                 }
                 onSelect={selectMerchant}
+                onCreateNew={() => { navigation.navigate('CreateMerchant'); setMerchantExpanded(false); }}
                 expanded={merchantExpanded}
                 onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
                 onCollapse={() => setMerchantExpanded(false)} />
             <DropdownRow
-                label="Categories"
+                label="Category"
                 data={
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.map(x => x.name) : []
                 }
                 onSelect={selectCategory}
+                // change to CreateCategory once that is merged
+                onCreateNew={() => { navigation.navigate('CreateMerchant'); setCategoryExpanded(false); }}
                 expanded={categoryExpanded}
                 onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
                 onCollapse={() => setCategoryExpanded(false)} />
