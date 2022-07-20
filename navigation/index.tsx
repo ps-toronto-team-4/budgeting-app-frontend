@@ -25,12 +25,13 @@ import BudgetScreen from '../screens/BudgetScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
-import CreateCategoryScreen from '../screens/CreateCategoryScreen';
+import CreateCategoryScreen from '../screens/CategoryScreens/CreateCategoryScreen';
 import CreateMerchant from '../screens/CreateMerchantScreen';
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
 
 import { View } from '../components/Themed';
 import UpdateExpenseScreen from '../screens/UpdateExpenseScreen';
+import EditCategoryScreen from '../screens/CategoryScreens/EditCategoryScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -71,6 +72,7 @@ function RootNavigator() {
         headerTitleStyle: { fontWeight: "bold" },
       }} />
       <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{ headerShown: false }} />
       <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
