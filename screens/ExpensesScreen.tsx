@@ -94,11 +94,17 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
   )
 };
 
-export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
+export default function ExpensesScreen({ navigation, route }: RootTabScreenProps<'Expenses'>) {
   const passwordHash = useAuth();
   const [amountToRender, setAmountToRender] = useState(20);
-  const { loading, error, data } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
+  const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
+  });
+  useEffect(() => {
+    if (route.params?.refresh === true) {
+      console.log('refetching');
+      refetch();
+    }
   });
   const navigateCallBack = (id: number | null | undefined) => {
     if (id === undefined || id == null) {

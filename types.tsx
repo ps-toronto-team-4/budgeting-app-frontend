@@ -23,7 +23,6 @@ export type RootStackParamList = {
   ExpenseDetails: { expenseId: number, refresh: boolean };
   UpdateExpense: { id: number, amount: number, merchant?: { id?: number, name?: string }, category?: { id?: number, name?: string }, date: string, desc?: string } | undefined,
   ForgotPasswordModal: undefined;
-  Expenses: undefined;
   CreateExpense: { refresh: boolean };
   CreateCategory: undefined;
   NotFound: undefined;
@@ -36,7 +35,7 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> = Nati
 >;
 
 export type RootTabParamList = {
-  Expenses: undefined;
+  Expenses?: { refresh?: boolean };
   Budget: undefined;
   Reports: undefined;
   Profile: undefined;
