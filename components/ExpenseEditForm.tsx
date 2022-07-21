@@ -60,7 +60,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
     const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [detailsHeight, setDetailsHeight] = useState(20);
     const [calendarShown, setCalendarShown] = useState(false);
-    const [date, setDate] = useState(initVals?.date || moment().toString());
+    const [date, setDate] = useState(initVals?.date || moment().toISOString());
     const [desc, setDesc] = useState(initVals?.desc || '');
 
     useEffect(() => {
