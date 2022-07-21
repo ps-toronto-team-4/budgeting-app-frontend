@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
-import { useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
-import { ColorValue } from "react-native"
+import { Button, ColorValue, TouchableHighlight } from "react-native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import React from 'react';
@@ -19,9 +19,11 @@ import { RootTabScreenProps } from "../types";
 import AddButton from "../components/AddButton";
 
 //TODO
+// - *IMPORTANT* fix virtualization issue
 // - Have special names for today and yesterday
 // - close delete on back navigate
 // - make deltet a trash can
+// - lazy render of lists
 
 
 const Separator = () => <View style={styles.itemSeparator} />;
@@ -64,28 +66,36 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
   }) => {
   const swipeableRef = useRef(null);
   const selectedColor = (category?.colourHex) ? '#' + category.colourHex : '#03c2fc'
-  return (<Swipeable
-    ref={swipeableRef}
-    renderLeftActions={() => LeftSwipeActions(selectedColor)}
-    renderRightActions={() => rightSwipeActions({ id })}
-    onSwipeableLeftOpen={() => swipeFromLeftOpen({ id, navigateCallBack, swipeableRef })}
-  >
-    <View style={styles.expenseItemWrapper}>
-      <View style={{ flexBasis: 10, width: 10, backgroundColor: selectedColor }}></View>
-      <View style={styles.expenseItemDisplayContainer}>
-        <Text style={{ flex: 1, fontSize: 24 }}>
-          {category?.name || 'Uncategorized'}
-        </Text>
-        <Text style={{ fontSize: 24 }}>
-          ${amount}
-        </Text>
+  return (
+    <Swipeable
+      ref={swipeableRef}
+      // renderLeftActions={() => LeftSwipeActions(selectedColor)}
+      renderRightActions={() => rightSwipeActions({ id })}
+      onSwipeableLeftOpen={() => swipeFromLeftOpen({ id, navigateCallBack, swipeableRef })}
+    >
+      <View style={styles.expenseItemWrapper}>
+        <View style={{ flexBasis: 10, width: 10, backgroundColor: selectedColor }}></View>
+        <TouchableHighlight
+          style={{ flex: 1 }}
+          onPress={() => navigateCallBack(id)}
+        >
+          <View style={styles.expenseItemDisplayContainer}>
+            <Text style={{ flex: 1, fontSize: 24 }}>
+              {category?.name || 'Uncategorized'}
+            </Text>
+            <Text style={{ fontSize: 24 }}>
+              ${amount}
+            </Text>
+          </View>
+        </TouchableHighlight>
       </View>
-    </View>
-  </Swipeable>)
+    </Swipeable>
+  )
 };
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
   const [passwordHash, setPasswordHash] = useState('');
+  const [amountToRender, setAmountToRender] = useState(20);
   const { loading, error, data } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
   });
@@ -108,9 +118,38 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     }
 
   }
-  const dailyGrouping = splitTransationsOnDate(data)
+  const dailyGrouping = splitTransationsOnDate(data, amountToRender)
   function handleAddExpense() {
     navigation.navigate('CreateExpense');
+  }
+
+  const FakeFlatList = (
+    {
+      data,
+      title,
+      renderItem,
+      ItemSeparatorComponent }:
+      {
+        data: Array<any>,
+        title: string,
+        key: number | string,
+        renderItem: (item: any) => ReactElement,
+        ItemSeparatorComponent: () => ReactElement
+      }) => {
+
+    const itemsRender = data.map((item: any, index: number) => {
+
+      return (<View key={index}>
+        {index != 0 && ItemSeparatorComponent()}
+        {renderItem({ item })}
+      </View>)
+    })
+
+    return (<View>
+      <Text>{title}</Text>
+      {itemsRender}
+      {/* <Text>hi</Text> */}
+    </View>)
   }
 
 
@@ -122,23 +161,20 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
           Expenses
         </Text>
         <ScrollView>
-          {dailyGrouping && dailyGrouping.map((gItem, index) => {
-            return (<View key={index}>
-              <Text>{gItem.key}</Text>
-              <FlatList
-                data={gItem.item}
-                keyExtractor={(ele) => {
-                  if (ele == null) {
-                    return ''
-                  }
-                  return String(ele.id)
-                }}
-                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
-                ItemSeparatorComponent={() => <Separator />}
-              />
-
+          {dailyGrouping && (
+            <View>
+              {dailyGrouping.map((gItem, index) => {
+                return (<FakeFlatList
+                  data={gItem.item}
+                  title={gItem.key}
+                  key={index}
+                  renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
+                  ItemSeparatorComponent={() => <Separator />}
+                />)
+              })}
+              <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
             </View>)
-          })}
+          }
           {data?.expenses.__typename == 'FailurePayload' && <View>
             <Text>{data.expenses.errorMessage}</Text>
             <Text>{data.expenses.exceptionName}</Text>
@@ -146,19 +182,33 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         </ScrollView>
       </SafeAreaView>
       <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>
+
     </>
   );
 }
 
-const splitTransationsOnDate = (data: GetExpensesQuery | undefined) => {
+const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRender: number) => {
   if (data === undefined || data?.expenses.__typename == 'FailurePayload') {
     return undefined
   }
 
-  var dailyGrouping: { [key: string]: Array<any> } = {}
+  let dailyGrouping: { [key: string]: Array<any> } = {}
 
   if (data.expenses.__typename == 'ExpensesSuccess') {
-    data.expenses.expenses.forEach(item => {
+    const listOfEle = JSON.parse(JSON.stringify(data.expenses.expenses));
+
+    listOfEle.sort((a: any, b: any) => {
+      if (a === undefined || b === undefined || a == null || b == null) {
+        return 0
+      }
+      if (a.date > b.date) {
+        return -1
+      } else if (a.date < b.date) {
+        return 1
+      }
+      return 0
+    })
+    listOfEle.slice(0, amountToRender).forEach((item: any) => { // REMOIVE THIS AFTER DEMO- TOO LAGGY WITH OUT
       if (item?.date == undefined) {
         console.warn("date is undefined for transation")
         return

@@ -7,6 +7,7 @@ type ButtonProps = {
     text: string;
     onPress?: ((event: GestureResponderEvent) => void) | undefined;
     accessibilityLabel: string;
+    disabled?: boolean | undefined;
 };
 
 export default function Button(props: ButtonProps) {
@@ -15,7 +16,7 @@ export default function Button(props: ButtonProps) {
     const txtColor = Colors[theme].btnText;
 
     return (
-        <TouchableOpacity onPress={props.onPress} accessibilityLabel={props.accessibilityLabel}>
+        <TouchableOpacity onPress={props.onPress} accessibilityLabel={props.accessibilityLabel} disabled={props.disabled}>
             <View style={[styles.container, { backgroundColor: bgColor }]}>
                 <Text style={[styles.text, { color: txtColor }]}>{props.text}</Text>
             </View>
