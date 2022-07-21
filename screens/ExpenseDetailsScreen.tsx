@@ -73,12 +73,12 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
         if (!date) {
             return 'undefined';
         }
-        const jsDate = new Date(date);
+        const momentDate = moment(date);
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const day = jsDate.getDate().toString(); // eg: 31
+        const day = momentDate.date().toString(); // eg: 31
         // Surely there is an easier way to do this. Not worth importing a new npm package though b/c that's unnecessary package bloat.
         const dayWithPostfix = day.endsWith('1') ? day + 'st' : (day.endsWith('2') ? day + 'nd' : (day.endsWith('3') ? day + 'rd' : day + 'th'));
-        return months[jsDate.getMonth() - 1] + ' ' + dayWithPostfix + ', ' + jsDate.getFullYear();
+        return `${months[momentDate.month() - 1]} ${dayWithPostfix}, ${momentDate.year()}`;
     }
 
     const expenseTypename = data?.expense.__typename;
