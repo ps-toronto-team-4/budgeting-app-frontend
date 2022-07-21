@@ -26,9 +26,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
 
     useEffect(() => {
         if (route.params.refresh) {
-            refetch({
-                passwordHash: passwordHash, expenseId: expenseId
-            });
+            refetch();
         }
     });
 
@@ -38,7 +36,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                 headerRight: () => EditButton(() => navigation.navigate('UpdateExpense',
                     data.expense.__typename === 'ExpenseSuccess' ? {
                         id: data.expense.expense.id,
-                        amount: data.expense.expense.amount.toString(),
+                        amount: data.expense.expense.amount,
                         date: moment(data.expense.expense.date),
                         desc: data.expense.expense.description || '',
                         merchant: { id: data.expense.expense.merchant?.id, name: data.expense.expense.merchant?.name },
@@ -66,10 +64,9 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
 
     function formatAmount(amount: number | null | undefined): string {
         if (!amount) {
-            return '';
+            return '0.00';
         }
-        const numFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-        return numFormatter.format(amount);
+        return Number(amount).toFixed(2);
     }
 
     function formatDate(date: string | null | undefined): string {
