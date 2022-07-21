@@ -200,3 +200,59 @@ query getMerchant ($passwordHash: String!, $id: Int!){
     }
 }
 
+
+query getBudgets($passwordHash: String!){
+ budgets(passwordHash:$passwordHash){
+        __typename
+        ... on BudgetsSuccess{
+            budgets{
+                id
+                year
+                month
+                budgetCategories{
+                    amount
+                    category{
+                        name
+                        colourHex
+                    }
+                    id
+                }
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+mutation createBudget($passwordHash: String!, $month:MonthType!, $year:Int!){
+    createBudget(passwordHash: $passwordHash,month: $month,year: $year){
+        __typename
+        ... on BudgetSuccess{
+            budget{
+                id
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+
+}
+
+mutation createBudgetCategory($passwordHash: String!, $budgetId:Int!, $categoryId: Int!, $amount: Float!){
+    createBudgetCategory(passwordHash: $passwordHash, budgetId: $budgetId, categoryId: $categoryId, amount: $amount){
+        __typename
+        ... on BudgetCategorySuccess{
+            budgetCategory{
+                id
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}

@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
-import { GetExpensesDocument, GetExpensesQuery } from "../components/generated";
+import { Budget, BudgetCategory, Category, GetBudgetsDocument, GetBudgetsQuery, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
 import { Button, ColorValue, FlatList, Modal, Pressable, SafeAreaView, StatusBar } from "react-native"
 
 import React from 'react';
@@ -8,6 +8,8 @@ import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Swipeable } from "react-native-gesture-handler";
+import FakeFlatList from "../components/FakeFlatList";
+import { AntDesign } from "@expo/vector-icons";
 
 
 const dumpyData = {
@@ -37,17 +39,8 @@ const dumpyData = {
     ]
 }
 
-interface CategoryItem {
-    amount: number,
-    id: number,
-    category: {
-        colorHex: string,
-        name: string,
-        description: string
-    }
-}
 
-function DoughnutChart({ data }: { data: Array<CategoryItem> }) {
+function DoughnutChart({ data }: { data: Array<BudgetCategory> }) {
     const widthAndHeight = 250
     const series = [123, 321, 123, 789, 537]
     const sliceColor = ['#F44336', '#2196F3', '#FFEB3B', '#4CAF50', '#FF9800']
@@ -56,11 +49,11 @@ function DoughnutChart({ data }: { data: Array<CategoryItem> }) {
     </View>
 }
 
-function AddBudget() {
+function AddBudget({ navi }: { navi: Function }) {
     return (<View>
         <Button
             title="Add new Budget"
-            onPress={() => alert('This will redirect to create budget screen in the future')}
+            onPress={() => navi()}
         />
         <Modal
             animationType="slide"
@@ -86,7 +79,7 @@ function AddBudget() {
     </View>)
 }
 
-function ShowBudgets({ data }: { data: Array<CategoryItem> }) {
+function ShowBudgets({ data }: { data: Array<BudgetCategory> | undefined | null }) {
 
     const Separator = () => <View style={styles.itemSeparator} />;
     const RightSwipeOpen = () => {
@@ -107,7 +100,7 @@ function ShowBudgets({ data }: { data: Array<CategoryItem> }) {
             </View>
         );
     }
-    const RowItem = (item: CategoryItem) => {
+    const RowItem = (item: BudgetCategory) => {
         return (
             <Swipeable
                 renderRightActions={RightSwipeOpen}
@@ -118,7 +111,7 @@ function ShowBudgets({ data }: { data: Array<CategoryItem> }) {
                     flexDirection: "row",
                     backgroundColor: 'white',
                 }}>
-                    <View style={{ flexBasis: 10, width: 10, backgroundColor: item.category.colorHex }}></View>
+                    <View style={{ flexBasis: 10, width: 10, backgroundColor: "#" + item.category.colourHex }}></View>
                     <View style={{ flex: 1, flexDirection: 'column' }}>
 
 
@@ -167,14 +160,8 @@ function ShowBudgets({ data }: { data: Array<CategoryItem> }) {
     }
 
     return <View>
-        <FlatList
-            data={data}
-            keyExtractor={(item) => {
-                if (item == null) {
-                    return ''
-                }
-                return String(item.id)
-            }}
+        <FakeFlatList
+            data={data ? data : []}
             renderItem={({ item }) => <RowItem {...item} />}
             ItemSeparatorComponent={() => <Separator />}
         />
@@ -185,6 +172,27 @@ export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'
     const [passwordHash, setpasswordHash] = React.useState("");
     const [budget, setBudget] = useState(dumpyData.budget)
     const [budgetCategories, setBudgetCategories] = useState(dumpyData.categories)
+    const [month, setMonth] = useState("JULY")
+    const [year, setYear] = useState(2022)
+
+    const { data, loading, refetch } = useQuery<GetBudgetsQuery>(GetBudgetsDocument, {
+        variables: { passwordHash }
+    })
+
+    const months = [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER",
+    ]
 
     useEffect(() => {
         getData();
@@ -201,22 +209,66 @@ export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'
         }
     }
 
+    const createBudgetNav = () => {
+        navigation.navigate("CreateBudget")
+    }
+
+    const backAMonth = () => {
+        const curIndex = months.indexOf(month)
+        if (curIndex == 0) {
+            setMonth(months[months.length - 1])
+            setYear(year - 1)
+        } else {
+            setMonth(months[curIndex - 1])
+        }
+    }
+
+    const forwardAMonth = () => {
+        const curIndex = months.indexOf(month)
+        if (curIndex == months.length - 1) {
+            setMonth(months[0])
+            setYear(year + 1)
+        } else {
+            setMonth(months[curIndex + 1])
+        }
+    }
+
+    const selectedBudget = data?.budgets.__typename == 'BudgetsSuccess' ? data.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined
+
     return (
         <>
             <StatusBar />
             <SafeAreaView style={styles.container}>
-                <Text style={{ textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
-                    Budget of {budget.month}
-                </Text>
-                <DoughnutChart data={budgetCategories}></DoughnutChart>
-                <AddBudget></AddBudget>
-                <ScrollView>
-                    <ShowBudgets data={budgetCategories}></ShowBudgets>
-                </ScrollView>
+                <View style={{ flexBasis: 50, flexDirection: 'row', justifyContent: "space-between" }}>
+                    <AntDesign onPress={backAMonth} style={{ flex: 1 }} name="left" size={24} color="black" />
+                    <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
+                        Budget of {year} {month}
+                    </Text>
+                    <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                        <AntDesign onPress={forwardAMonth} style={{ flex: 1 }} name="right" size={24} color="black" />
+                    </View>
+
+                </View>
+                {(selectedBudget &&
+                    <>
+                        <DoughnutChart data={selectedBudget.budgetCategories as BudgetCategory[]}></DoughnutChart>
+                        <AddBudget navi={createBudgetNav}></AddBudget>
+                        <ScrollView>
+                            <ShowBudgets data={selectedBudget.budgetCategories as BudgetCategory[]}></ShowBudgets>
+                        </ScrollView>
+                    </>)
+                    ||
+                    (<View>
+                        <Text>
+                            Wow such emptiness, make a budget for this month
+                        </Text>
+                    </View>)
+                }
             </SafeAreaView>
         </>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {

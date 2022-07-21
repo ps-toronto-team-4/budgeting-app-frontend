@@ -24,6 +24,7 @@ export type RootStackParamList = {
   CreateExpense: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
+  CreateBudget: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
