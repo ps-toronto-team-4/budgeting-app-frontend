@@ -13,6 +13,52 @@ export type Scalars = {
   Float: number;
 };
 
+export type Budget = {
+  __typename?: 'Budget';
+  budgetCategories?: Maybe<Array<BudgetCategory>>;
+  id: Scalars['Int'];
+  month: MonthType;
+  user: User;
+  year: Scalars['Int'];
+};
+
+export type BudgetCategoriesPayload = BudgetCategoriesSuccess | FailurePayload;
+
+export type BudgetCategoriesSuccess = {
+  __typename?: 'BudgetCategoriesSuccess';
+  budgetCategories: Array<BudgetCategory>;
+};
+
+export type BudgetCategory = {
+  __typename?: 'BudgetCategory';
+  amount: Scalars['Float'];
+  budget: Budget;
+  category: Category;
+  id: Scalars['Int'];
+  user: User;
+};
+
+export type BudgetCategoryPayload = BudgetCategorySuccess | FailurePayload;
+
+export type BudgetCategorySuccess = {
+  __typename?: 'BudgetCategorySuccess';
+  budgetCategory: BudgetCategory;
+};
+
+export type BudgetPayload = BudgetSuccess | FailurePayload;
+
+export type BudgetSuccess = {
+  __typename?: 'BudgetSuccess';
+  budget: Budget;
+};
+
+export type BudgetsPayload = BudgetsSuccess | FailurePayload;
+
+export type BudgetsSuccess = {
+  __typename?: 'BudgetsSuccess';
+  budgets: Array<Budget>;
+};
+
 export type CategoriesPayload = CategoriesSuccess | FailurePayload;
 
 export type CategoriesSuccess = {
@@ -24,7 +70,9 @@ export type Category = {
   __typename?: 'Category';
   colourHex: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  expenses?: Maybe<Array<Expense>>;
   id: Scalars['Int'];
+  merchants?: Maybe<Array<Merchant>>;
   name: Scalars['String'];
 };
 
@@ -91,6 +139,7 @@ export type Merchant = {
   __typename?: 'Merchant';
   defaultCategory?: Maybe<Category>;
   description?: Maybe<Scalars['String']>;
+  expenses?: Maybe<Array<Expense>>;
   id: Scalars['Int'];
   name: Scalars['String'];
 };
@@ -109,19 +158,54 @@ export type MerchantsSuccess = {
   merchants: Array<Merchant>;
 };
 
+export enum MonthType {
+  April = 'APRIL',
+  August = 'AUGUST',
+  December = 'DECEMBER',
+  February = 'FEBRUARY',
+  January = 'JANUARY',
+  July = 'JULY',
+  June = 'JUNE',
+  March = 'MARCH',
+  May = 'MAY',
+  November = 'NOVEMBER',
+  October = 'OCTOBER',
+  September = 'SEPTEMBER'
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
+  createBudget: BudgetPayload;
+  createBudgetCategory: BudgetCategoryPayload;
   createCategory: CategoryPayload;
   createExpense: ExpensePayload;
   createMerchant: MerchantPayload;
+  deleteBudget: DeletePayload;
+  deleteBudgetCategory: DeletePayload;
   deleteCategory: DeleteCategoryPayload;
   deleteExpense: DeletePayload;
   deleteMerchant: DeleteMerchantPayload;
   deleteUser: DeleteUserPayload;
   signUp: CreateUserPayload;
+  updateBudgetCategory: BudgetCategoryPayload;
   updateCategory: CategoryPayload;
   updateExpense: ExpensePayload;
   updateMerchant: MerchantPayload;
+};
+
+
+export type MutationCreateBudgetArgs = {
+  month: MonthType;
+  passwordHash: Scalars['String'];
+  year: Scalars['Int'];
+};
+
+
+export type MutationCreateBudgetCategoryArgs = {
+  amount: Scalars['Float'];
+  budgetId: Scalars['Int'];
+  categoryId: Scalars['Int'];
+  passwordHash: Scalars['String'];
 };
 
 
@@ -147,6 +231,18 @@ export type MutationCreateMerchantArgs = {
   defaultCategoryId?: InputMaybe<Scalars['Int']>;
   description?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type MutationDeleteBudgetArgs = {
+  id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type MutationDeleteBudgetCategoryArgs = {
+  id: Scalars['Int'];
   passwordHash: Scalars['String'];
 };
 
@@ -184,6 +280,13 @@ export type MutationSignUpArgs = {
 };
 
 
+export type MutationUpdateBudgetCategoryArgs = {
+  amount: Scalars['Float'];
+  id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
 export type MutationUpdateCategoryArgs = {
   colourHex: Scalars['String'];
   description?: InputMaybe<Scalars['String']>;
@@ -214,6 +317,11 @@ export type MutationUpdateMerchantArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  budget: BudgetPayload;
+  budgetByDate: BudgetPayload;
+  budgetCategories: BudgetCategoriesPayload;
+  budgetCategory: BudgetCategoryPayload;
+  budgets: BudgetsPayload;
   categories: CategoriesPayload;
   category: CategoryPayload;
   expense: ExpensePayload;
@@ -224,6 +332,35 @@ export type Query = {
   /** # Helper for testing. */
   signIn: SignInPayload;
   user?: Maybe<User>;
+};
+
+
+export type QueryBudgetArgs = {
+  id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type QueryBudgetByDateArgs = {
+  month: MonthType;
+  passwordHash: Scalars['String'];
+  year: Scalars['Int'];
+};
+
+
+export type QueryBudgetCategoriesArgs = {
+  passwordHash: Scalars['String'];
+};
+
+
+export type QueryBudgetCategoryArgs = {
+  id: Scalars['Int'];
+  passwordHash: Scalars['String'];
+};
+
+
+export type QueryBudgetsArgs = {
+  passwordHash: Scalars['String'];
 };
 
 
@@ -279,9 +416,14 @@ export type SignInSuccess = {
 
 export type User = {
   __typename?: 'User';
+  budgetCategories?: Maybe<Array<BudgetCategory>>;
+  budgets?: Maybe<Array<Budget>>;
+  categories?: Maybe<Array<Category>>;
   email: Scalars['String'];
+  expenses?: Maybe<Array<Expense>>;
   firstName: Scalars['String'];
   lastName: Scalars['String'];
+  merchants?: Maybe<Array<Merchant>>;
   phoneNumber?: Maybe<Scalars['String']>;
   username: Scalars['String'];
 };
