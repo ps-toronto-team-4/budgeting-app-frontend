@@ -2,13 +2,12 @@ import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
 
 import { Text, View, RequiredField } from '../../components/Themed';
 import Button from '../../components/Button';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery } from '@apollo/client';
 import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
@@ -20,7 +19,7 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
   const [check, setCheck] = useState(false) // true if need to check required fields
   const passwordHash = useAuth();
 
-  // Create user graphql query
+  // Create category graphql query
   const [createCategory, { loading, data }] = useMutation<CreateCategoryMutation>(CreateCategoryDocument, {
     variables: { passwordHash, name, color, details },
     onError: (error => {
@@ -42,7 +41,7 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
 
   const categoryTaken = () => {
     if (categoriesData?.categories.__typename === 'CategoriesSuccess') {
-      return true && categoriesData.categories.categories.find((cat) => {
+      return categoriesData.categories.categories.find((cat) => {
         return cat.name.toLowerCase() === name.toLowerCase()
       });
     } else {
@@ -52,7 +51,7 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
 
   const colorTaken = () => {
     if (categoriesData?.categories.__typename === 'CategoriesSuccess') {
-      return true && categoriesData.categories.categories.find((cat) => {
+      return categoriesData.categories.categories.find((cat) => {
         return cat.colourHex.toLowerCase() === color.toLowerCase()
       });
     } else {
