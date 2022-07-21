@@ -32,7 +32,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 passwordHash: passwordHash,
                 id: route.params?.id || -1, // TODO is params is undefined show error on screen
                 amount: vals.amount,
-                epochDate: vals.date.unix(),
+                epochDate: moment(vals.date).unix(),
                 merchantId: vals.merchantId || null,
                 categoryId: vals.categoryId || null,
                 desc: vals.desc || null
@@ -46,7 +46,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
             amount: route.params?.amount || 0,
             merchantId: route.params?.merchant?.id,
             categoryId: route.params?.category?.id,
-            date: route.params?.date || moment(),
+            date: route.params?.date || moment().toString(),
             desc: route.params?.desc,
         }} />
     );

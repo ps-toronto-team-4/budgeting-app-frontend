@@ -37,7 +37,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                     data.expense.__typename === 'ExpenseSuccess' ? {
                         id: data.expense.expense.id,
                         amount: data.expense.expense.amount,
-                        date: moment(data.expense.expense.date),
+                        date: data.expense.expense.date,
                         desc: data.expense.expense.description || '',
                         merchant: { id: data.expense.expense.merchant?.id, name: data.expense.expense.merchant?.name },
                         category: { id: data.expense.expense.category?.id, name: data.expense.expense.category?.name },

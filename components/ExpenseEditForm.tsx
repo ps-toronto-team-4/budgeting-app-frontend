@@ -18,7 +18,7 @@ export type FormValues = {
     amount: number;
     merchantId?: number;
     categoryId?: number;
-    date: Moment;
+    date: string;
     desc?: string;
 };
 
@@ -60,7 +60,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
     const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [detailsHeight, setDetailsHeight] = useState(20);
     const [calendarShown, setCalendarShown] = useState(false);
-    const [date, setDate] = useState(initVals?.date || moment());
+    const [date, setDate] = useState(initVals?.date || moment().toString());
     const [desc, setDesc] = useState(initVals?.desc || '');
 
     useEffect(() => {
@@ -189,8 +189,8 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                 style={styles.fieldInput}
                                 placeholder="Select Date"
                                 value={
-                                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.month()] +
-                                    " " + date.date() + " " + date.year()
+                                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
+                                    " " + moment(date).date() + " " + moment(date).year()
                                 }
                                 editable={false}>
                             </TextInput>
@@ -201,7 +201,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                     calendarShown ?
                         <View style={styles.calendarContainer}>
                             <CalendarPicker
-                                onDateChange={(date, type) => { setDate(date); setCalendarShown(false); }}
+                                onDateChange={(date, type) => { setDate(date.toString()); setCalendarShown(false); }}
                                 width={300} />
                         </View>
                         :
