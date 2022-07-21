@@ -87,7 +87,7 @@ export default function CreateExpenseScreen({ navigation }: RootStackScreenProps
 
     function handleSubmit() {
         submit();
-        navigation.navigate('Root');
+        navigation.navigate("Root", { screen: "Expenses", params: { refresh: true } });
     }
 
     return (

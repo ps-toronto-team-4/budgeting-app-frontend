@@ -93,10 +93,10 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
   )
 };
 
-export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
+export default function ExpensesScreen({ navigation, route }: RootTabScreenProps<'Expenses'>) {
   const [passwordHash, setPasswordHash] = useState('');
   const [amountToRender, setAmountToRender] = useState(20);
-  const { loading, error, data } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
+  const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
   });
   useEffect(() => {
@@ -110,6 +110,12 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
       console.error("Can't retrive password hash")
     }
   }
+  useEffect(() => {
+    if (route.params?.refresh === true) {
+      console.log('refetching');
+      refetch();
+    }
+  });
   const navigateCallBack = (id: number | null | undefined) => {
     if (id === undefined || id == null) {
       alert("Transaction could not be found!")
