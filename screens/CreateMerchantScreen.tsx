@@ -10,10 +10,11 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
 import { DropdownRow } from "../components/DropdownRow";
 import { Feather } from "@expo/vector-icons";
+import { useAuth } from "../hooks/useAuth";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
 
-    const [passwordHash, setpasswordHash] = React.useState("");
+    const passwordHash = useAuth();
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
     const [validMerchant, setValidMerchant] = React.useState(true);
@@ -47,20 +48,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
     });
 
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-    }
 
 
     const handleMerchant = () => {
