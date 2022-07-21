@@ -19,7 +19,7 @@ const EditButton = (onPress: () => void) => (
 );
 
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
-    const passwordHash = useAuth;
+    const passwordHash = useAuth();
     const { expenseId, ...otherParams } = route.params;
     const { loading, error, data, refetch } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
         variables: { passwordHash: passwordHash, expenseId: expenseId }
