@@ -12,15 +12,15 @@ import Button from "../components/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
 import { DropdownRow } from "../components/DropdownRow";
 
-export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateExpense'>) {
+export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
     const [passwordHash, setpasswordHash] = React.useState("");
-    const [merchantName, setMerchantName] = React.useState("");
-    const [merchantId, setMerchantId] = React.useState("");
-    const [details, setDetails] = React.useState("");
-    const [validMerchant, setValidMerchant] = React.useState(true);
-    const [check, setCheck] = React.useState(false);
+    const [merchantId, setMerchantId] = React.useState<number | null>(route.params.id || null);
+    const [merchantName, setMerchantName] = React.useState<string | undefined>(route.params.name || undefined);
+    const [details, setDetails] = React.useState<string | undefined>(route.params.description || undefined);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
-    const [categoryId, setCategoryId] = React.useState<number | null>(null);
+    const [validMerchant, setValidMerchant] = React.useState(false); //turn false
+    // const [check, setCheck] = React.useState(false);
+    const [categoryId, setCategoryId] = React.useState<number | null>(route.params.category?.id || null);
 
     const [updateMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<UpdateMerchantMutation>(UpdateMerchantDocument, {
         variables: { passwordHash: passwordHash, id: merchantId, name: merchantName, description: details, defaultCategoryId: categoryId },
@@ -42,33 +42,8 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         }
     )
 
-    const [merchantsQuery] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, {
-        variables: { passwordHash: passwordHash },
-        onCompleted: (data) => {
-            if (data?.merchants.__typename === "MerchantsSuccess") {
-
-                // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
-                // this will display a Found it! on the console.
-                if (data?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
-                    console.log("Found it!");
-                    setValidMerchant(false);
-
-                } else {
-                    console.log("Merchant Name is not found.");
-                    console.log(merchantName);
-                    setValidMerchant(true);
-                    updateMerchant();
-                }
-
-
-            } else {
-                console.log("Something went wrong within the Lazy Query.");
-            }
-
-        },
-        onError: (error) => {
-            console.log(error.message);
-        }
+    const { loading: manyMerchantsLoading, data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+        variables: { passwordHash: passwordHash }
     });
 
 
@@ -79,28 +54,51 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
 
     const getData = async () => {
         try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
+            const hash = await AsyncStorage.getItem('passwordHash')
+            if (hash != null) {
+                setpasswordHash(hash);
             }
         } catch (e) {
             setpasswordHash('undefined');
         }
     }
 
+    const merchantsQuery = () => {
+        if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName != undefined) {
+
+            // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
+            // this will display a Found it! on the console.
+            if (manyMerchantsData?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
+                console.log("Found it!");
+                setValidMerchant(true);
+                updateMerchant();
+
+            } else {
+                console.log("Merchant Name is not found.");
+                console.log(merchantName);
+                setValidMerchant(false);
+            }
+
+
+        } else {
+            console.log("Something went wrong within the Query.");
+        }
+
+
+    }
 
 
     const handleMerchant = () => {
-        setCheck(true);
+        // setCheck(true);
         merchantsQuery();
 
     }
 
-    function HandleExisting() {
+    function MerchantNotFound() {
 
-        if (!check || !validMerchant) {
+        if (!validMerchant) {
             return (
-                <Text style={styles.alert}>This merchant already exists.</Text>
+                <Text style={styles.alert}>This merchant does not exist.</Text>
             );
         } else {
             return (<></>);
@@ -117,9 +115,9 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         }
     }
 
-    function RequiredField({ input }: { input: string }) {
+    function RequiredField({ input }: { input: string | undefined }) {
         return (
-            (!check || input) ? (
+            (!input) ? (
                 <></>
             ) : (
                 <Text style={styles.alert}>this field is required</Text>
@@ -142,7 +140,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                     value={merchantName} />
             </View>
             <RequiredField input={merchantName} />
-            {validMerchant ? (<></>) : (<HandleExisting />)}
+            {validMerchant ? (<></>) : (<MerchantNotFound />)}
 
             <View style={[styles.categoryContainer]}>
                 <Text style={[styles.fieldLabel, { width: '100%' }]}>Details:</Text>
@@ -161,14 +159,14 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 }
                 onSelect={handleCategorySelect}
                 expanded={categoryOpen}
-                onExpand={() => { setCategoryOpen(true); }}
+                onExpand={() => { setCategoryOpen(true) }}
                 onCollapse={() => setCategoryOpen(false)} />
             <View style={styles.buttonBox}>
                 <Button text={"Save Merchant"} accessibilityLabel={"Save Merchant"} onPress={() => handleMerchant()} />
             </View>
             {!merchantLoading ? (
                 merchantData?.updateMerchant.__typename === "MerchantSuccess" ? (
-                    <Text>Merchant created successfully!</Text>
+                    <Text>Merchant updated successfully!</Text>
                 ) : (
                     <Text style={styles.alert}>{merchantData?.updateMerchant.errorMessage}</Text>
                 )) : (
