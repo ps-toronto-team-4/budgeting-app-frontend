@@ -51,7 +51,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
 
     function handleDelete() {
         deleteExpense();
-        navigation.navigate('Root');
+        navigation.navigate('Root', { screen: 'Expenses', params: { refresh: true } });
     }
 
     return (
