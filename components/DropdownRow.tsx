@@ -24,6 +24,7 @@ export type DropdownRowProps = {
     onExpand?: () => void;
     onCollapse?: () => void;
     defaultValue?: string;
+    onCreateNew?: () => void;
 };
 
 export function DropdownRow({
@@ -34,6 +35,7 @@ export function DropdownRow({
     onExpand,
     onCollapse,
     defaultValue,
+    onCreateNew,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput>(null);
     const [value, setValue] = useState(defaultValue || '');
@@ -113,7 +115,14 @@ export function DropdownRow({
                             })
                         }
                         renderItem={renderDropdownItem}
-                        keyExtractor={item => item.name}>
+                        keyExtractor={item => item.name}
+                        ListFooterComponent={
+                            onCreateNew ?
+                                <DropdownItem
+                                    name={'Create new ' + label.toLowerCase()}
+                                    onSelect={(_) => onCreateNew()} />
+                                : <View></View>
+                        }>
                     </FlatList>
                     :
                     <View></View>

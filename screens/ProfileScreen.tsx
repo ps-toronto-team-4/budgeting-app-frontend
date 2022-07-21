@@ -7,24 +7,10 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from "../hooks/useAuth";
 
 export default function ProfileScreen({ navigation }: RootTabScreenProps<'Reports'>) {
-    const [passwordHash, setpasswordHash] = React.useState("");
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-    }
+    const passwordHash = useAuth();
 
     return (
         <View>

@@ -17,6 +17,7 @@ import {
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RootTabScreenProps } from "../types";
 import AddButton from "../components/AddButton";
+import { useAuth } from "../hooks/useAuth";
 
 //TODO
 // - *IMPORTANT* fix virtualization issue
@@ -94,22 +95,11 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
 };
 
 export default function ExpensesScreen({ navigation, route }: RootTabScreenProps<'Expenses'>) {
-  const [passwordHash, setPasswordHash] = useState('');
+  const passwordHash = useAuth();
   const [amountToRender, setAmountToRender] = useState(20);
   const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
   });
-  useEffect(() => {
-    getUserDate();
-  }, []);
-  const getUserDate = async () => {
-    const retrivedUserHash = await AsyncStorage.getItem('passwordHash');
-    if (retrivedUserHash != null) {
-      setPasswordHash(retrivedUserHash);
-    } else {
-      console.error("Can't retrive password hash")
-    }
-  }
   useEffect(() => {
     if (route.params?.refresh === true) {
       console.log('refetching');
@@ -126,7 +116,7 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
   }
   const dailyGrouping = splitTransationsOnDate(data, amountToRender)
   function handleAddExpense() {
-    navigation.navigate('CreateExpense');
+    navigation.navigate('CreateExpense', { refresh: false });
   }
 
   const FakeFlatList = (
