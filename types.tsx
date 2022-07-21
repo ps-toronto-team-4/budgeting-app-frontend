@@ -25,6 +25,7 @@ export type RootStackParamList = {
   ForgotPasswordModal: undefined;
   Expenses: undefined;
   CreateExpense: { refresh: boolean };
+  CreateCategory: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
 };

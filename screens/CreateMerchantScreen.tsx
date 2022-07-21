@@ -20,8 +20,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [check, setCheck] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
     const [categoryId, setCategoryId] = React.useState<number | null>(null);
-    const [detailsHeight, setDetailsHeight] = React.useState(20);
-
+    const [disabledButton, setDisabledButton] = React.useState(false);
 
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: categoryId },
@@ -43,33 +42,9 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     )
 
-    const [merchantsQuery] = useLazyQuery<GetMerchantsQuery>(GetMerchantsDocument, {
-        variables: { passwordHash: passwordHash },
-        onCompleted: (data) => {
-            if (data?.merchants.__typename === "MerchantsSuccess") {
+    const { loading: manyMerchantsLoading, data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+        variables: { passwordHash: passwordHash }
 
-                // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
-                // this will display a Found it! on the console.
-                if (data?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
-                    console.log("Found it!");
-                    setValidMerchant(false);
-
-                } else {
-                    console.log("Merchant Name is not found.");
-                    console.log(merchantName);
-                    setValidMerchant(true);
-                    createMerchant();
-                }
-
-
-            } else {
-                console.log("Something went wrong within the Lazy Query.");
-            }
-
-        },
-        onError: (error) => {
-            console.log(error.message);
-        }
     });
 
     useEffect(() => {
@@ -91,6 +66,33 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const handleMerchant = () => {
         setCheck(true);
         merchantsQuery();
+    }
+
+    const merchantsQuery = () => {
+        if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName.length != 0) {
+            // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
+            // this will display a Found it! on the console.
+            if (manyMerchantsData?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
+                console.log("Found it!");
+                setValidMerchant(false);
+                setDisabledButton(true);
+
+            } else {
+                console.log("Merchant Name is not found.");
+                setDisabledButton(false);
+                console.log(merchantName);
+                setValidMerchant(true);
+                createMerchant();
+
+            }
+
+
+        } else {
+            console.log("Something went wrong within the Lazy Query.");
+            setDisabledButton(true);
+        }
+
+
 
     }
 
@@ -115,18 +117,24 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     }
 
+
     function RequiredField({ input }: { input: string }) {
         return (
             (!check || input) ? (
                 <></>
             ) : (
-                <Text style={styles.alert}>this field is required</Text>
+                <Text style={styles.alert}>This field is required</Text>
             ))
+    }
+
+    function updatedText() {
+        setDisabledButton(false);
+        setValidMerchant(true);
     }
 
     return (
         <SafeAreaView style={styles.screen}>
-            <View style={[styles.categoryContainer]}>
+            <View style={styles.row}>
                 <View>
                     <Text style={styles.fieldLabel}>Merchant:</Text>
 
@@ -135,32 +143,45 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     style={styles.fieldInput}
                     placeholder='(mandatory)'
                     onChangeText={(merchantName) => setMerchantName(merchantName)}
-                    value={merchantName} />
-            </View>
-            <RequiredField input={merchantName} />
-            {validMerchant ? (<></>) : (<HandleExisting />)}
+                    value={merchantName}
+                    onChange={() => updatedText()}
+                />
 
-            <View style={[styles.categoryContainer]}>
-                <Text style={[styles.fieldLabel, { width: '100%' }]}>Details:</Text>
+
+            </View>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <RequiredField input={merchantName} />
+                {validMerchant ? (<></>) : (<HandleExisting />)}
+
+            </View>
+
+            <View style={styles.row}>
+                <Text style={styles.fieldLabel}>Details:</Text>
                 <TextInput
-                    style={styles.fieldInput}
+                    style={[styles.fieldInput]}
                     placeholder='(optional)'
                     onChangeText={(details) => setDetails(details)}
                     value={details} />
             </View>
+            <View style={{}}>
+                <DropdownRow
+                    label="Categories"
+                    data={
+                        categoryData?.categories.__typename == "CategoriesSuccess" ?
+                            categoryData.categories.categories.map(x => x.name) : []
+                    }
+                    onSelect={handleCategorySelect}
+                    expanded={categoryOpen}
+                    onExpand={() => { setCategoryOpen(true); }}
+                    onCollapse={() => setCategoryOpen(false)} />
+            </View>
 
-            <DropdownRow
-                label="Categories"
-                data={
-                    categoryData?.categories.__typename == "CategoriesSuccess" ?
-                        categoryData.categories.categories.map(x => x.name) : []
-                }
-                onSelect={handleCategorySelect}
-                expanded={categoryOpen}
-                onExpand={() => { setCategoryOpen(true); }}
-                onCollapse={() => setCategoryOpen(false)} />
-            <View style={styles.buttonBox}>
-                <Button text={"Save Merchant"} accessibilityLabel={"Save Merchant"} onPress={() => handleMerchant()} />
+            <View style={styles.buttonContainer}>
+                <Button text="Save Merchant"
+                    accessibilityLabel={"Save Merchant"}
+                    onPress={() => handleMerchant()}
+                    disabled={disabledButton}
+                />
             </View>
             {!merchantLoading ? (
                 merchantData?.createMerchant.__typename === "MerchantSuccess" ? (
@@ -180,75 +201,27 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.light.background,
         justifyContent: 'center',
-        alignItems: 'center'
-    },
-    categoryContainer: {
-        flexDirection: "row",
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
-        paddingVertical: 10,
-        paddingHorizontal: 90,
-    },
-    categoryLabel: {
-        fontWeight: 'bold',
-        fontSize: 15,
-    },
-    categoryInput: {
-        fontSize: 15,
-    },
-    buttonBox: {
-        position: "absolute",
-        bottom: 75,
-
     },
     alert: {
         color: 'red',
     },
     row: {
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(0,0,0,0.3)',
         paddingVertical: 10,
         paddingHorizontal: 30,
     },
-    detailsRow: {
-        flexDirection: 'row',
-        paddingHorizontal: 27,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingVertical: 10,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
-    },
-    detailsIconAndLabel: {
-        flexDirection: 'row',
-        paddingHorizontal: 0,
-        marginRight: 27,
-        alignItems: 'center',
-    },
-    detailsIcon: {
-        transform: [{ rotateZ: '90deg' }, { rotateY: '180deg' }],
-        marginRight: 5,
-    },
-    detailsInput: {
-        fontSize: 15,
-        width: 250,
-    },
     buttonContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingTop: 60,
-    },
-    listItem: {
-        fontSize: 15,
+        alignSelf: 'center',
+        justifyContent: 'flex-end',
+        top: '30%',
     },
     fieldLabel: {
         fontWeight: 'bold',
         fontSize: 15,
+        paddingLeft: 5,
     },
     fieldInput: {
         fontSize: 15,
