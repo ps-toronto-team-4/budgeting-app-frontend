@@ -20,7 +20,8 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [validMerchant, setValidMerchant] = React.useState(true);
     const [check, setCheck] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
-    const [categoryId, setCategoryId] = React.useState<number | null>(null);
+    const [categoryId, setCategoryId] = React.useState<number | undefined>();
+    const [categoryName, setCategoryName] = React.useState("");
     const [disabledButton, setDisabledButton] = React.useState(false);
     const [merchantId, setMerchantId] = React.useState<number | undefined>();
 
@@ -106,6 +107,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
             if (foundCategory !== undefined) {
                 setCategoryId(foundCategory.id);
+                setCategoryName(foundCategory.name);
             }
         }
     }
@@ -130,7 +132,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             id: singleMerchantsData?.merchant.merchant.id,
             name: singleMerchantsData?.merchant.merchant.name,
             description: singleMerchantsData?.merchant.merchant.description,
-            category: { id: singleMerchantsData.merchant.merchant.id, name: singleMerchantsData.merchant.merchant.name },
+            category: { id: categoryId, name: categoryName },
         } : undefined
         )
     }

@@ -70,12 +70,13 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
             if (manyMerchantsData?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
                 console.log("Found it!");
                 setValidMerchant(true);
-                updateMerchant();
 
             } else {
                 console.log("Merchant Name is not found.");
-                console.log(merchantName);
+                // console.log(merchantName);
                 setValidMerchant(false);
+                updateMerchant();
+
             }
 
 
@@ -88,9 +89,9 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
 
     function MerchantNotFound() {
 
-        if (!validMerchant) {
+        if (validMerchant) {
             return (
-                <Text style={styles.alert}>This merchant does not exist.</Text>
+                <Text style={styles.alert}>This merchant already exists.</Text>
             );
         } else {
             return (<></>);
@@ -118,6 +119,10 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
 
 
 
+    function handleMerchant() {
+        merchantsQuery();
+    }
+
     return (
         <SafeAreaView style={styles.screen}>
             <View style={[styles.categoryContainer]}>
@@ -132,7 +137,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                     value={merchantName} />
             </View>
             <RequiredField input={merchantName} />
-            {!validMerchant ? (<></>) : (<MerchantNotFound />)}
+            {validMerchant ? (<MerchantNotFound />) : (<></>)}
 
             <View style={[styles.categoryContainer]}>
                 <Text style={[styles.fieldLabel, { width: '100%' }]}>Details:</Text>
@@ -156,7 +161,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 defaultValue={route.params?.category?.name}
             />
             <View style={styles.buttonBox}>
-                <Button text={"Save Merchant"} accessibilityLabel={"Save Merchant"} onPress={() => merchantsQuery()} />
+                <Button text={"Update Merchant"} accessibilityLabel={"Button to Update Merchant"} onPress={() => handleMerchant()} />
             </View>
             {!merchantLoading ? (
                 merchantData?.updateMerchant.__typename === "MerchantSuccess" ? (
@@ -252,4 +257,4 @@ const styles = StyleSheet.create({
     },
 
 
-});
+});    
