@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackScreenProps } from "../types";
 import { Feather } from "@expo/vector-icons";
 import moment from "moment";
+import { useAuth } from "../hooks/useAuth";
 
 const EditButton = (onPress: () => void) => (
     <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
@@ -18,7 +19,7 @@ const EditButton = (onPress: () => void) => (
 );
 
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
-    const [passwordHash, setPasswordHash] = React.useState("");
+    const passwordHash = useAuth;
     const { expenseId, ...otherParams } = route.params;
     const { loading, error, data, refetch } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
         variables: { passwordHash: passwordHash, expenseId: expenseId }
@@ -46,21 +47,6 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
             });
         }
     }, [data]);
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setPasswordHash(value);
-            }
-        } catch (e) {
-            setPasswordHash('undefined');
-        }
-    }
 
     function formatAmount(amount: number | null | undefined): string {
         if (!amount) {

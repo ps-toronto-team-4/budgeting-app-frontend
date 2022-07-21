@@ -19,7 +19,7 @@ const DeleteButton = ({ onPress }: { onPress: () => void }) => {
 }
 
 export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateExpense'>) {
-    const [passwordHash, setpasswordHash] = useAuth();
+    const passwordHash = useAuth();
     const [submit, _] = useMutation<UpdateExpenseMutation>(UpdateExpenseDocument);
     const [deleteExpense, { data: deletionData }] = useMutation<DeleteExpenseMutation>(DeleteExpenseDocument, {
         variables: {
