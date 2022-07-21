@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
-import { CreateExpenseDocument, CreateExpenseMutation, GetCategoriesDocument, GetCategoriesQuery, UpdateExpenseDocument, UpdateExpenseMutation } from "../components/generated";
+import { CreateExpenseDocument, CreateExpenseMutation, DeleteExpenseDocument, DeleteExpenseMutation, GetCategoriesDocument, GetCategoriesQuery, UpdateExpenseDocument, UpdateExpenseMutation } from "../components/generated";
 
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
 import { RootStackScreenProps } from "../types";
@@ -13,6 +13,15 @@ import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated
 import { DropdownRow } from "../components/DropdownRow";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
+import { TouchableOpacity } from "react-native-gesture-handler";
+
+const DeleteButton = ({ onPress }: { onPress: () => void }) => {
+    return (
+        <TouchableOpacity onPress={onPress} style={styles.deleteButton}>
+            <AntDesign name="delete" size={24} color="black" />
+        </TouchableOpacity>
+    );
+}
 
 export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateExpense'>) {
     const [passwordHash, setpasswordHash] = useState('');
@@ -46,6 +55,18 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
             desc: desc || null,
         }
     });
+    const [deleteExpense, { data: deletionData }] = useMutation<DeleteExpenseMutation>(DeleteExpenseDocument, {
+        variables: {
+            passwordHash: passwordHash,
+            id: route.params?.id,
+        }
+    });
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: (_) => <DeleteButton onPress={handleDelete} />
+        });
+    }, []);
 
     useEffect(() => {
         getData();
@@ -89,6 +110,11 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
     function handleSubmit() {
         submit();
         navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0, refresh: true });
+    }
+
+    function handleDelete() {
+        deleteExpense();
+        navigation.navigate('Root');
     }
 
     return (
@@ -189,6 +215,9 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: Colors.light.background
+    },
+    deleteButton: {
+        paddingRight: 30,
     },
     amountInputContainer: {
         height: 200,
