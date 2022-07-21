@@ -16,6 +16,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Welcome: '',
       SignIn: 'login',
       SignUp: 'register',
+      CreateCategory: 'create-category',
       Root: {
         screens: {
           Expenses: 'expenses-list',

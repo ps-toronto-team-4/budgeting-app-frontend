@@ -24,6 +24,7 @@ export type RootStackParamList = {
   UpdateExpense: { id: number, amount: string, merchant?: { id?: number, name?: string }, category?: { id?: number, name?: string }, date: Moment, desc?: string } | undefined,
   ForgotPasswordModal: undefined;
   Expenses: undefined;
+  CreateCategory: undefined;
   CreateExpense: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
