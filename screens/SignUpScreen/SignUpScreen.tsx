@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { Text, View } from '../../components/Themed';
+import { Text, View, RequiredField } from '../../components/Themed';
 import { RootStackScreenProps, RootTabScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
@@ -92,15 +92,6 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
     }
   }
 
-  function RequiredField({ input }: { input: string }) {
-    return (
-      (!check || input) ? (
-        <></>
-      ) : (
-        <Text style={styles.alert}>This field is required</Text>
-      ))
-  }
-
   function PasswordRules() {
     if (lettersCheck && lengthCheck && numberCheck && specialCheck) {
       return (<></>);
@@ -169,14 +160,14 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           value={fname}
           placeholder="First Name*"
         />
-        <RequiredField input={fname} />
+        <RequiredField check={check} input={fname} />
         <TextInput
           style={styles.formField}
           onChangeText={(lname) => setLname(lname)}
           value={lname}
           placeholder="Last Name*"
         />
-        <RequiredField input={lname} />
+        <RequiredField check={check} input={lname} />
         <TextInput
           style={styles.formField}
           onChangeText={(user) => { setUsername(user.substring(0, 16)); setUserCheck(false) }}
@@ -184,7 +175,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           value={username}
           placeholder="Username*"
         />
-        <RequiredField input={username} />
+        <RequiredField check={check} input={username} />
         <UsernameRules />
         <TextInput
           style={styles.formField}
@@ -194,7 +185,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           placeholder="Email*"
         />
         <CheckEmail />
-        <RequiredField input={email} />
+        <RequiredField check={check} input={email} />
         <View style={styles.formField}>
           <TextInput
             style={styles.pwordinput}
@@ -207,7 +198,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           />
           <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={eyeIconSize} onPress={() => setHidePword(!hidePword)} />
         </View>
-        <RequiredField input={password} />
+        <RequiredField check={check} input={password} />
         {pwordRules ? (<PasswordRules />) : (<></>)}
         <TextInput
           style={styles.formField}
@@ -219,9 +210,9 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
         />
         {
           (!pwordCheck || (pwordConfirm === password)) ? (
-            <RequiredField input={pwordConfirm} />
+            <RequiredField check={check} input={pwordConfirm} />
           ) : (
-            (<Text style={styles.alert}>Password fields need to match</Text>)
+            (<Text style={Styles.alert}>Password fields need to match</Text>)
           )
         }
         <PhoneInput

@@ -7,6 +7,8 @@ import { Text as DefaultText, View as DefaultView } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
+import styles from '../constants/Styles';
+
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -42,4 +44,13 @@ export function View(props: ViewProps) {
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+
+export function RequiredField({ check, input }: { check: boolean, input: string }) {
+  return (
+    (!check || input) ? (
+      <></>
+    ) : (
+      <Text style={styles.alert}>this field is required</Text>
+    ))
 }
