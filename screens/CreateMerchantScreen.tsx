@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Styles from "../constants/Styles";
 import { RootStackScreenProps } from "../types";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
+import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
 import { DropdownRow } from "../components/DropdownRow";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "../hooks/useAuth";
@@ -22,15 +22,16 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [categoryOpen, setCategoryOpen] = React.useState(false);
     const [categoryId, setCategoryId] = React.useState<number | null>(null);
     const [disabledButton, setDisabledButton] = React.useState(false);
+    const [merchantId, setMerchantId] = React.useState<number | undefined>();
 
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: categoryId },
         onError: (error => {
             Alert.alert(error.message);
         }),
-        onCompleted: () => {
+        onCompleted: (data) => {
             console.log('Completed Mutation.');
-            navigation.navigate('Root');
+            setMerchantId(merchantData?.createMerchant.__typename === "MerchantSuccess" ? merchantData.createMerchant.merchant.id : undefined)
         }
     })
 
@@ -45,6 +46,11 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
     const { loading: manyMerchantsLoading, data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash }
+
+    });
+
+    const { loading: singleMerchantsLoading, data: singleMerchantsData } = useQuery<GetMerchantQuery>(GetMerchantDocument, {
+        variables: { passwordHash: passwordHash, id: merchantId }
 
     });
 
@@ -119,6 +125,16 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         setValidMerchant(true);
     }
 
+    function updateMerchant() {
+        navigation.navigate('UpdateMerchant', singleMerchantsData?.merchant.__typename === "MerchantSuccess" ? {
+            id: singleMerchantsData?.merchant.merchant.id,
+            name: singleMerchantsData?.merchant.merchant.name,
+            description: singleMerchantsData?.merchant.merchant.description,
+            category: { id: singleMerchantsData.merchant.merchant.id, name: singleMerchantsData.merchant.merchant.name },
+        } : undefined
+        )
+    }
+
     return (
         <SafeAreaView style={styles.screen}>
             <View style={styles.row}>
@@ -161,6 +177,14 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     expanded={categoryOpen}
                     onExpand={() => { setCategoryOpen(true); }}
                     onCollapse={() => setCategoryOpen(false)} />
+            </View>
+
+            <View style={styles.buttonContainer}>
+                <Button text="Update Merchant"
+                    accessibilityLabel={"Button to Update Merchant"}
+                    onPress={() => updateMerchant()}
+                    disabled={disabledButton}
+                />
             </View>
 
             <View style={styles.buttonContainer}>

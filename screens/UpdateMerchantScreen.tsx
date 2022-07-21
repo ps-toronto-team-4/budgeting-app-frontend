@@ -14,13 +14,12 @@ import { DropdownRow } from "../components/DropdownRow";
 
 export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
     const [passwordHash, setpasswordHash] = React.useState("");
-    const [merchantId, setMerchantId] = React.useState<number | null>(route.params.id || null);
-    const [merchantName, setMerchantName] = React.useState<string | undefined>(route.params.name || undefined);
-    const [details, setDetails] = React.useState<string | undefined>(route.params.description || undefined);
+    const [merchantId, setMerchantId] = React.useState<number | null>(route.params?.id || null);
+    const [merchantName, setMerchantName] = React.useState<string | undefined>(route.params?.name || undefined);
+    const [details, setDetails] = React.useState<string | undefined>(route.params?.description || undefined);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
     const [validMerchant, setValidMerchant] = React.useState(false); //turn false
-    // const [check, setCheck] = React.useState(false);
-    const [categoryId, setCategoryId] = React.useState<number | null>(route.params.category?.id || null);
+    const [categoryId, setCategoryId] = React.useState<number | null>(route.params?.category?.id || null);
 
     const [updateMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<UpdateMerchantMutation>(UpdateMerchantDocument, {
         variables: { passwordHash: passwordHash, id: merchantId, name: merchantName, description: details, defaultCategoryId: categoryId },
@@ -87,13 +86,6 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
 
     }
 
-
-    const handleMerchant = () => {
-        // setCheck(true);
-        merchantsQuery();
-
-    }
-
     function MerchantNotFound() {
 
         if (!validMerchant) {
@@ -117,7 +109,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
 
     function RequiredField({ input }: { input: string | undefined }) {
         return (
-            (!input) ? (
+            (input) ? (
                 <></>
             ) : (
                 <Text style={styles.alert}>this field is required</Text>
@@ -140,7 +132,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                     value={merchantName} />
             </View>
             <RequiredField input={merchantName} />
-            {validMerchant ? (<></>) : (<MerchantNotFound />)}
+            {!validMerchant ? (<></>) : (<MerchantNotFound />)}
 
             <View style={[styles.categoryContainer]}>
                 <Text style={[styles.fieldLabel, { width: '100%' }]}>Details:</Text>
@@ -160,9 +152,11 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 onSelect={handleCategorySelect}
                 expanded={categoryOpen}
                 onExpand={() => { setCategoryOpen(true) }}
-                onCollapse={() => setCategoryOpen(false)} />
+                onCollapse={() => setCategoryOpen(false)}
+                defaultValue={route.params?.category?.name}
+            />
             <View style={styles.buttonBox}>
-                <Button text={"Save Merchant"} accessibilityLabel={"Save Merchant"} onPress={() => handleMerchant()} />
+                <Button text={"Save Merchant"} accessibilityLabel={"Save Merchant"} onPress={() => merchantsQuery()} />
             </View>
             {!merchantLoading ? (
                 merchantData?.updateMerchant.__typename === "MerchantSuccess" ? (
