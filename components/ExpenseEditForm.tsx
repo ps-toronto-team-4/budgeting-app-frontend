@@ -170,8 +170,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                 categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
                                 : undefined
                         }
-                        // change to CreateCategory once that is merged
-                        onCreateNew={() => { nav.navigate('CreateMerchant'); setCategoryExpanded(false); }}
+                        onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
                         expanded={categoryExpanded}
                         onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
                         onCollapse={() => setCategoryExpanded(false)} />
