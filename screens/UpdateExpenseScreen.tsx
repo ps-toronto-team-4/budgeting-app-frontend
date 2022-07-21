@@ -1,30 +1,38 @@
 import { useMutation } from "@apollo/client";
-import { useState, useEffect } from "react";
-import { UpdateExpenseDocument, UpdateExpenseMutation } from "../components/generated";
+import { useState, useEffect, useRef } from "react";
+import { DeleteExpenseDocument, DeleteExpenseMutation, UpdateExpenseDocument, UpdateExpenseMutation } from "../components/generated";
 
 import { RootStackScreenProps } from "../types";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ExpenseEditForm, FormValues } from "../components/ExpenseEditForm";
+import { AntDesign, Feather } from '@expo/vector-icons';
 import moment from "moment";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useAuth } from "../hooks/useAuth";
+import { StyleSheet } from "react-native";
+
+const DeleteButton = ({ onPress }: { onPress: () => void }) => {
+    return (
+        <TouchableOpacity onPress={onPress} style={styles.deleteButton}>
+            <AntDesign name="delete" size={24} color="black" />
+        </TouchableOpacity>
+    );
+}
 
 export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateExpense'>) {
-    const [passwordHash, setpasswordHash] = useState('');
+    const [passwordHash, setpasswordHash] = useAuth();
     const [submit, _] = useMutation<UpdateExpenseMutation>(UpdateExpenseDocument);
+    const [deleteExpense, { data: deletionData }] = useMutation<DeleteExpenseMutation>(DeleteExpenseDocument, {
+        variables: {
+            passwordHash: passwordHash,
+            id: route.params?.id,
+        }
+    });
 
     useEffect(() => {
-        getData();
+        navigation.setOptions({
+            headerRight: (_) => <DeleteButton onPress={handleDelete} />
+        });
     }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-    }
 
     function handleSubmit(vals: FormValues) {
         submit({
@@ -41,6 +49,11 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0, refresh: true });
     }
 
+    function handleDelete() {
+        deleteExpense();
+        navigation.navigate('Root');
+    }
+
     return (
         <ExpenseEditForm onSubmit={handleSubmit} initVals={{
             amount: route.params?.amount || 0,
@@ -51,3 +64,9 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         }} />
     );
 }
+
+const styles = StyleSheet.create({
+    deleteButton: {
+        paddingRight: 30,
+    },
+});
