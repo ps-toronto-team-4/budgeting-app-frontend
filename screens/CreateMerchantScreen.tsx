@@ -128,15 +128,15 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     /**
      *  TODO Implement the following commented function from the Settings tab.
      */
-    // function updateMerchant() {
-    //     navigation.navigate('UpdateMerchant', singleMerchantData?.merchant.__typename === "MerchantSuccess" ? {
-    //         id: singleMerchantData?.merchant.merchant.id,
-    //         name: singleMerchantData?.merchant.merchant.name,
-    //         description: singleMerchantData?.merchant.merchant.description,
-    //         category: { id: categoryId, name: categoryName },
-    //     } : undefined
-    //     )
-    // }
+    function updateMerchant() {
+        navigation.navigate('UpdateMerchant', singleMerchantData?.merchant.__typename === "MerchantSuccess" ? {
+            id: singleMerchantData?.merchant.merchant.id,
+            name: singleMerchantData?.merchant.merchant.name,
+            description: singleMerchantData?.merchant.merchant.description,
+            category: { id: categoryId, name: categoryName },
+        } : undefined
+        )
+    }
 
     return (
         <SafeAreaView style={styles.screen}>
@@ -183,13 +183,13 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             </View>
 
             {/* TODO REMOVE THIS COMMENT IN DEVELOP */}
-            {/* <View style={styles.buttonContainer}>
+            <View style={styles.buttonContainer}>
                 <Button text="Update Merchant"
                     accessibilityLabel={"Button to Update Merchant"}
                     onPress={() => updateMerchant()}
                     disabled={disabledButton}
                 />
-            </View> */}
+            </View>
 
             <View style={styles.buttonContainer}>
                 <Button text="Save Merchant"
