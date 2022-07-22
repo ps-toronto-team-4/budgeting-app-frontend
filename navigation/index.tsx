@@ -21,13 +21,13 @@ import WelcomeScreen from '../screens/WelcomeScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import ExpensesScreen from '../screens/ExpensesScreen';
-import BudgetScreen from '../screens/BudgetScreen';
+import BudgetScreen from '../screens/Budget/BudgetScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
 import CreateMerchant from '../screens/CreateMerchantScreen';
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
-import CreateBudget from '../screens/CreateBudgetScreen';
+import CreateBudget from '../screens/Budget/CreateBudgetScreen';
 
 // declare global {
 //   namespace ReactNavigation{

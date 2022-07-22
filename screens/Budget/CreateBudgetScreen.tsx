@@ -1,18 +1,18 @@
 import { useMutation, useQuery } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
-import { RootStackScreenProps } from "../types";
-import Colors from "../constants/Colors";
+import { RootStackScreenProps } from "../../types";
+import Colors from "../../constants/Colors";
 import moment, { Moment } from "moment";
-import { GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
+import { GetCategoriesDocument, GetCategoriesQuery } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
-import Button from "../components/Button";
-import AdaptiveTextInput from "../components/AdaptiveTextInput";
-import { DropdownRow } from "../components/DropdownRow";
+import Button from "../../components/Button";
+import AdaptiveTextInput from "../../components/AdaptiveTextInput";
+import { DropdownRow } from "../../components/DropdownRow";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import CalendarPicker from "react-native-calendar-picker";
 import { Feather } from "@expo/vector-icons";
-import { InputDecimal } from "../components/InputDecimal";
+import { InputDecimal } from "../../components/InputDecimal";
 
 
 
