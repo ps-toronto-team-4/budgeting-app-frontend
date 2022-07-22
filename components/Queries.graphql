@@ -271,3 +271,18 @@ mutation updateMerchant($passwordHash: String!, $id:Int!, $name: String!, $descr
         }
     }
 }
+
+mutation deleteMerchant($passwordHash: String!, $id: Int!){
+    deleteMerchant(passwordHash: $passwordHash, id: $id){
+        __typename
+        ...on DeleteSuccess{
+            successMessage
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+
+}

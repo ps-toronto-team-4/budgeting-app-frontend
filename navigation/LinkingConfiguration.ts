@@ -22,6 +22,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           Expenses: 'expenses-list',
           Reports: 'reports',
           Budget: 'budget',
+          Profile: 'profile',
         }
       },
       ExpenseDetails: 'expense-details',

@@ -39,7 +39,7 @@ export type RootTabParamList = {
   Expenses?: { refresh?: boolean };
   Budget: undefined;
   Reports: undefined;
-  Profile: undefined;
+  Profile?: { refresh?: boolean };
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<

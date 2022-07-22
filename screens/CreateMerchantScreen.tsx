@@ -1,15 +1,12 @@
-import React, { useEffect } from "react"
-import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal, ActivityIndicator, TextInput } from 'react-native';
+import React from "react"
+import { StyleSheet, SafeAreaView, Alert, ActivityIndicator, TextInput } from 'react-native';
 import Button from "../components/Button";
 import Colors from '../constants/Colors';
 import { Text, View } from '../components/Themed';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Styles from "../constants/Styles";
 import { RootStackScreenProps } from "../types";
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
 import { DropdownRow } from "../components/DropdownRow";
-import { Feather } from "@expo/vector-icons";
 import { useAuth } from "../hooks/useAuth";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
@@ -49,7 +46,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         variables: { passwordHash: passwordHash }
     });
 
-    const { loading: singleMerchantsLoading, data: singleMerchantsData } = useQuery<GetMerchantQuery>(GetMerchantDocument, {
+    const { loading: singleMerchantsLoading, data: singleMerchantData } = useQuery<GetMerchantQuery>(GetMerchantDocument, {
         variables: { passwordHash: passwordHash, id: merchantId }
 
     });
@@ -82,6 +79,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
         } else {
             console.log("Something went wrong within the Lazy Query.");
+            setValidMerchant(false);
             setDisabledButton(true);
         }
 
@@ -126,15 +124,19 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         setValidMerchant(true);
     }
 
-    function updateMerchant() {
-        navigation.navigate('UpdateMerchant', singleMerchantsData?.merchant.__typename === "MerchantSuccess" ? {
-            id: singleMerchantsData?.merchant.merchant.id,
-            name: singleMerchantsData?.merchant.merchant.name,
-            description: singleMerchantsData?.merchant.merchant.description,
-            category: { id: categoryId, name: categoryName },
-        } : undefined
-        )
-    }
+
+    /**
+     *  TODO Implement the following commented function from the Settings tab.
+     */
+    // function updateMerchant() {
+    //     navigation.navigate('UpdateMerchant', singleMerchantData?.merchant.__typename === "MerchantSuccess" ? {
+    //         id: singleMerchantData?.merchant.merchant.id,
+    //         name: singleMerchantData?.merchant.merchant.name,
+    //         description: singleMerchantData?.merchant.merchant.description,
+    //         category: { id: categoryId, name: categoryName },
+    //     } : undefined
+    //     )
+    // }
 
     return (
         <SafeAreaView style={styles.screen}>
@@ -180,13 +182,14 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     onCollapse={() => setCategoryOpen(false)} />
             </View>
 
-            <View style={styles.buttonContainer}>
+            {/* TODO REMOVE THIS COMMENT IN DEVELOP */}
+            {/* <View style={styles.buttonContainer}>
                 <Button text="Update Merchant"
                     accessibilityLabel={"Button to Update Merchant"}
                     onPress={() => updateMerchant()}
                     disabled={disabledButton}
                 />
-            </View>
+            </View> */}
 
             <View style={styles.buttonContainer}>
                 <Button text="Save Merchant"
