@@ -3,22 +3,19 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { Feather, FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable, TouchableOpacity } from 'react-native';
+import { ColorSchemeName } from 'react-native';
 
-import Colors from '../constants/Colors';
-import useColorScheme from '../hooks/useColorScheme';
 
-import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import ForgotPasswordScreen from '../screens/UserAuthScreens/ForgotPasswordScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import SignInScreen from '../screens/SignInScreen';
-import SignUpScreen from '../screens/SignUpScreen/SignUpScreen';
-import WelcomeScreen from '../screens/WelcomeScreen';
-import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
+import SignInScreen from '../screens/UserAuthScreens/SignInScreen';
+import SignUpScreen from '../screens/UserAuthScreens/SignUpScreen';
+import WelcomeScreen from '../screens/UserAuthScreens/WelcomeScreen';
+import { RootStackParamList, RootTabParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import ExpensesScreen from '../screens/ExpensesScreen';
 import BudgetScreen from '../screens/BudgetScreen';
@@ -26,13 +23,13 @@ import ReportsScreen from '../screens/ReportsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
 import CreateCategoryScreen from '../screens/CategoryScreens/CreateCategoryScreen';
-import CreateMerchant from '../screens/CreateMerchantScreen';
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
 
-import { View } from '../components/Themed';
 import UpdateExpenseScreen from '../screens/UpdateExpenseScreen';
 import EditCategoryScreen from '../screens/CategoryScreens/EditCategoryScreen';
 import CategorySettingsScreen from '../screens/CategoryScreens/CategorySettingsScreen';
+import UpdateMerchantScreen from '../screens/MerchantScreens/UpdateMerchantScreen';
+import CreateMerchant from '../screens/MerchantScreens/CreateMerchantScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -91,6 +88,7 @@ function RootNavigator() {
         headerTitleStyle: { fontWeight: 'bold' },
       }} />
       <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
+      <Stack.Screen name="UpdateMerchant" component={UpdateMerchantScreen} options={{ headerTitle: 'Update Merchant', headerTransparent: true, headerTitleAlign: 'center', }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>

@@ -21,6 +21,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           Expenses: 'expenses-list',
           Reports: 'reports',
           Budget: 'budget',
+          Profile: 'profile',
         }
       },
       CreateCategory: 'create-category',
@@ -31,6 +32,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       ForgotPasswordModal: 'ForgotPassword',
       NotFound: '*',
       CreateMerchant: 'create-merchant',
+      UpdateMerchant: 'update-merchant',
     },
   },
 };

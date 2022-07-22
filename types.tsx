@@ -28,6 +28,7 @@ export type RootStackParamList = {
   CategorySettings: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
+  UpdateMerchant: { id: number, name: string, description?: string | null, category?: { id?: number, name?: string } } | undefined,
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -39,7 +40,7 @@ export type RootTabParamList = {
   Expenses?: { refresh?: boolean };
   Budget: undefined;
   Reports: undefined;
-  Profile: undefined;
+  Profile?: { refresh?: boolean };
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<

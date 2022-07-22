@@ -276,3 +276,41 @@ query getMerchant ($passwordHash: String!, $id: Int!){
     }
 }
 
+mutation updateMerchant($passwordHash: String!, $id:Int!, $name: String!, $description: String, $defaultCategoryId: Int){
+    updateMerchant(passwordHash: $passwordHash, id:$id, name: $name, description:$description, defaultCategoryId:$defaultCategoryId){
+        __typename
+        ...on MerchantSuccess{
+            merchant {
+                id
+                name
+                description
+                defaultCategory {
+                    id
+                    name
+                    colourHex
+                    description
+                }
+            }
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation deleteMerchant($passwordHash: String!, $id: Int!){
+    deleteMerchant(passwordHash: $passwordHash, id: $id){
+        __typename
+        ...on DeleteSuccess{
+            successMessage
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+
+}
