@@ -2,17 +2,15 @@ import { useState, useRef } from "react";
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
 import Colors from "../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
+import { TouchableRow } from "./TouchableRow";
 
 export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name: string) => void }) {
-    return (
-        <TouchableHighlight
-            style={styles.row}
-            underlayColor="rgba(0,0,0,0.1)"
-            onPress={() => onSelect(name)}>
-            <View style={[styles.fieldContainer, { paddingLeft: 70 }]}>
-                <Text style={styles.listItem}>{name}</Text>
-            </View>
-        </TouchableHighlight>
+    return ( // todo fix below
+        <TouchableRow onPress={() => onSelect(name)} topBorder={true}>
+            {/* <View style={[styles.fieldContainer, { paddingLeft: 70 }]}> */}
+            <Text style={styles.listItem}>{name}</Text>
+            {/* </View> */}
+        </TouchableRow>
     );
 };
 
@@ -81,29 +79,26 @@ export function DropdownRow({
 
     return (
         <>
-            <TouchableHighlight
-                underlayColor="rgba(0,0,0,0.1)"
-                style={expanded ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
-                onPress={handleRowPress}>
-                <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
-                        <Text style={styles.fieldLabel}>{label}:</Text>
-                        <TextInput
-                            style={styles.fieldInput}
-                            editable={expanded}
-                            placeholder={"Select " + label}
-                            ref={inputRef}
-                            value={value}
-                            onChangeText={setValue}>
-                        </TextInput>
-                    </View>
-                    <AntDesign
-                        name={expanded ? 'up' : 'down'}
-                        size={20}
-                        color="black"
-                        onPress={handleIconPress} />
+            <TouchableRow
+                topBorder={true}
+                onPress={() => handleRowPress()}>
+                <View style={styles.fieldLabelAndInputContainer}>
+                    <Text style={styles.fieldLabel}>{label}:</Text>
+                    <TextInput
+                        style={styles.fieldInput}
+                        editable={expanded}
+                        placeholder={"Select " + label}
+                        ref={inputRef}
+                        value={value}
+                        onChangeText={setValue}>
+                    </TextInput>
                 </View>
-            </TouchableHighlight>
+                <AntDesign
+                    name={expanded ? 'up' : 'down'}
+                    size={20}
+                    color="black"
+                    onPress={handleIconPress} />
+            </TouchableRow>
             {
                 (expanded) ?
                     <FlatList
@@ -138,12 +133,6 @@ const styles = StyleSheet.create({
         borderTopColor: 'rgba(0,0,0,0.3)',
         paddingVertical: 10,
         paddingHorizontal: 30,
-    },
-    fieldContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: 320,
     },
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
