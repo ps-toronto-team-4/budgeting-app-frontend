@@ -120,7 +120,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
     }
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); setCalendarShown(false); }}>
             <View style={styles.screen}>
                 <View style={styles.amountInputContainer}>
                     <View style={styles.dollarSignAndAmountInput}>
@@ -152,7 +152,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                             }
                             onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
                             expanded={merchantExpanded}
-                            onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
+                            onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
                             onCollapse={() => setMerchantExpanded(false)} />
                         :
                         <View></View>
@@ -173,7 +173,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                             }
                             onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
                             expanded={categoryExpanded}
-                            onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
+                            onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
                             onCollapse={() => setCategoryExpanded(false)} />
                         :
                         <View></View>
