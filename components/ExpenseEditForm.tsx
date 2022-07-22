@@ -267,21 +267,18 @@ const styles = StyleSheet.create({
         borderTopColor: 'rgba(0,0,0,0.3)',
         paddingVertical: 10,
         paddingHorizontal: 30,
-        backgroundColor: 'green',
     },
     fieldContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         width: 320,
-        backgroundColor: 'red',
     },
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         width: 280,
-        backgroundColor: 'purple',
     },
     fieldLabel: {
         fontWeight: 'bold',
