@@ -151,10 +151,9 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                     : undefined
                             }
                             onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
-                        // expanded={merchantExpanded}
-                        // onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
-                        // onCollapse={() => setMerchantExpanded(false)}
-                        />
+                            expanded={merchantExpanded}
+                            onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
+                            onCollapse={() => setMerchantExpanded(false)} />
                         :
                         <View></View>
                 }
@@ -173,10 +172,9 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                     : undefined
                             }
                             onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
-                        // expanded={categoryExpanded}
-                        // onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
-                        // onCollapse={() => setCategoryExpanded(false)}
-                        />
+                            expanded={categoryExpanded}
+                            onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
+                            onCollapse={() => setCategoryExpanded(false)} />
                         :
                         <View></View>
                 }
