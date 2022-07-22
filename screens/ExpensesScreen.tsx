@@ -177,8 +177,9 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
           </View>}
         </ScrollView>
       </SafeAreaView>
-      <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>
-
+      <View style={styles.addExpenseBtn}>
+        <AddButton size={100} onPress={handleAddExpense} />
+      </View>
     </>
   );
 }
