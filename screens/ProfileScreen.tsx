@@ -1,10 +1,8 @@
 import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
-import { ColorValue } from "react-native";
-
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import Button from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
