@@ -2,12 +2,15 @@ import { GestureResponderEvent, StyleSheet, Image } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import Button from '../components/Button';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Styles from '../constants/Styles';
 import { RootStackScreenProps } from '../types';
+import { useAuth } from '../hooks/useAuth';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 
 export default function WelcomeScreen({ navigation }: RootStackScreenProps<'Welcome'>) {
+  useAuthRedirect();
 
   function onPressSignIn(_: GestureResponderEvent) {
     navigation.navigate('SignIn');
