@@ -24,7 +24,8 @@ export type RootStackParamList = {
   ForgotPasswordModal: undefined;
   Expenses: undefined;
   CreateCategory: undefined;
-  EditCategory: undefined;
+  EditCategory: { id: number, name: string, color: string, details?: string | null };
+  CategorySettings: undefined;
   CreateExpense: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;

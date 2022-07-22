@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery } from '@apollo/client';
 import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
+import { colorsList } from '../../constants/CategoryColors';
 
 export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
   const [name, setName] = useState('')
@@ -84,7 +85,7 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
         <ColorPalette
           onChange={(color: string) => setColor(color.substring(1))}
           value={'#' + color}
-          colors={['#EB4034', '#EB7734', '#EBC034', '#D3EB34', '#96EB34', '#30B027', '#27B097', '#2797B0', '#273BB0', '#784FD6', '#773D9C', '#B662BF', '#ED72D0', '#B82562', '#99DDFF', '#ABE8A9', '#E6E287', '#77768C', '#DDDDDD']}
+          colors={colorsList}
           titleStyles={style.colorTitle}
           title={"Select Category Color:"}
           icon={<Ionicons name="checkmark-circle-outline" style={style.icon} size={38} color="black" />}
