@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackScreenProps } from "../types";
 import { Feather } from "@expo/vector-icons";
 import moment from "moment";
+import { useAuth } from "../hooks/useAuth";
 
 const EditButton = (onPress: () => void) => (
     <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
@@ -18,7 +19,7 @@ const EditButton = (onPress: () => void) => (
 );
 
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
-    const [passwordHash, setPasswordHash] = React.useState("");
+    const passwordHash = useAuth();
     const { expenseId, ...otherParams } = route.params;
     const { loading, error, data, refetch } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
         variables: { passwordHash: passwordHash, expenseId: expenseId }
@@ -26,9 +27,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
 
     useEffect(() => {
         if (route.params.refresh) {
-            refetch({
-                passwordHash: passwordHash, expenseId: expenseId
-            });
+            refetch();
         }
     });
 
@@ -38,8 +37,8 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                 headerRight: () => EditButton(() => navigation.navigate('UpdateExpense',
                     data.expense.__typename === 'ExpenseSuccess' ? {
                         id: data.expense.expense.id,
-                        amount: data.expense.expense.amount.toString(),
-                        date: moment(data.expense.expense.date),
+                        amount: data.expense.expense.amount,
+                        date: data.expense.expense.date,
                         desc: data.expense.expense.description || '',
                         merchant: { id: data.expense.expense.merchant?.id, name: data.expense.expense.merchant?.name },
                         category: { id: data.expense.expense.category?.id, name: data.expense.expense.category?.name },
@@ -49,39 +48,23 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
         }
     }, [data]);
 
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setPasswordHash(value);
-            }
-        } catch (e) {
-            setPasswordHash('undefined');
-        }
-    }
-
     function formatAmount(amount: number | null | undefined): string {
         if (!amount) {
-            return '';
+            return '0.00';
         }
-        const numFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-        return numFormatter.format(amount);
+        return Number(amount).toFixed(2);
     }
 
     function formatDate(date: string | null | undefined): string {
         if (!date) {
             return 'undefined';
         }
-        const jsDate = new Date(date);
+        const momentDate = moment(date);
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const day = jsDate.getDate().toString(); // eg: 31
+        const day = momentDate.date().toString(); // eg: 31
         // Surely there is an easier way to do this. Not worth importing a new npm package though b/c that's unnecessary package bloat.
         const dayWithPostfix = day.endsWith('1') ? day + 'st' : (day.endsWith('2') ? day + 'nd' : (day.endsWith('3') ? day + 'rd' : day + 'th'));
-        return months[jsDate.getMonth() - 1] + ' ' + dayWithPostfix + ', ' + jsDate.getFullYear();
+        return `${months[momentDate.month() - 1]} ${dayWithPostfix}, ${momentDate.year()}`;
     }
 
     const expenseTypename = data?.expense.__typename;

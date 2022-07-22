@@ -13,7 +13,6 @@ import { Feather } from "@expo/vector-icons";
 import { useAuth } from "../hooks/useAuth";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
-
     const passwordHash = useAuth();
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
@@ -33,6 +32,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         onCompleted: (data) => {
             console.log('Completed Mutation.');
             setMerchantId(merchantData?.createMerchant.__typename === "MerchantSuccess" ? merchantData.createMerchant.merchant.id : undefined)
+            navigation.navigate('CreateExpense', { refresh: true });
         }
     })
 
@@ -47,7 +47,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
     const { loading: manyMerchantsLoading, data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash }
-
     });
 
     const { loading: singleMerchantsLoading, data: singleMerchantsData } = useQuery<GetMerchantQuery>(GetMerchantDocument, {
