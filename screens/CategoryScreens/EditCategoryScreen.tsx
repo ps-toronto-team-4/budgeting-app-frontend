@@ -1,4 +1,4 @@
-import { StyleSheet, Alert, ActivityIndicator, StatusBar } from 'react-native';
+import { StyleSheet, Alert, ActivityIndicator, Modal } from 'react-native';
 
 import { Text, View, RequiredField } from '../../components/Themed';
 import Button from '../../components/Button';
@@ -9,17 +9,19 @@ import TextInput from '../../components/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery } from '@apollo/client';
-import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, GetCategoriesDocument } from '../../components/generated';
+import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, GetCategoriesDocument, DeleteCategoryMutation, DeleteCategoryDocument } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 
 export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 
-  const [check, setCheck] = useState(false)
   const { id, name, color, details } = route.params
+  const [check, setCheck] = useState(false)
   const [newName, setNewName] = useState(name)
   const [newColor, setNewColor] = useState(color)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [newDetails, setNewDetails] = useState(details)
+
   const passwordHash = useAuth();
 
   const {data: categoriesData} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
@@ -36,6 +38,18 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
     }),
     onCompleted: (data => {
       if (data.updateCategory.__typename === 'CategorySuccess') {
+        navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root");
+      }
+    })
+  });
+
+  const [deleteCategory, { data: deleteData }] = useMutation<DeleteCategoryMutation>(DeleteCategoryDocument, {
+    variables: { passwordHash, id },
+    onError: (error => {
+      Alert.alert(error.message);
+    }),
+    onCompleted: (data => {
+      if (data.deleteCategory.__typename === 'DeleteSuccess') {
         navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root");
       }
     })
@@ -110,6 +124,23 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
           placeholder="Details"
         />
         <Button text="Save Category" onPress={onSubmit} accessibilityLabel={'Save Category Button'}/>
+        <Button text="Delete Category" backgroundColor='red' onPress={() => setConfirmDelete(true)} accessibilityLabel={'Delete Category Button'}/>
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmDelete}
+        onRequestClose={() => setConfirmDelete(false)}
+        >
+          <View style={style.centeredView}>
+            <Text style={style.modalTitle}>Delete Category?</Text>
+            <Text style={style.modalText}>Are you sure you want to delete this category?</Text>
+            <Text style={style.modalWarn}>Warning: Budgets in this category will also be deleted.</Text>
+            <View style={style.buttonView}>
+              <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button'/>
+              <Button text="Delete" onPress={() => {deleteCategory()}} size='half' backgroundColor='red' accessibilityLabel='Delete Category button'/>
+            </View>
+          </View>
+        </Modal>
       </View>
   );
 }
@@ -125,5 +156,45 @@ const style = StyleSheet.create({
   icon: {
     paddingLeft: 2,
     paddingBottom: 1
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: "center",
+    marginVertical: '50%',
+    marginHorizontal: '10%',
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    paddingBottom: 40,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  buttonView: {
+    flexDirection: 'row',
+    width: 250,
+    justifyContent: 'space-between'
+  },
+  modalTitle: {
+    fontSize: 26,
+    // marginHorizontal: 25,
+    marginBottom: '10%',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center'
+  },
+  modalWarn: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 5
   }
 });

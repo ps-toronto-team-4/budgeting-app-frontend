@@ -101,6 +101,19 @@ mutation updateCategory($passwordHash: String!, $id: Int!, $name: String!, $colo
     }
 }
 
+mutation deleteCategory($passwordHash: String!, $id: Int!) {
+    deleteCategory(passwordHash: $passwordHash, id: $id) {
+        ...on DeleteSuccess {
+            successMessage
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
 query getExpenses ($passwordHash: String!) {
     expenses(passwordHash: $passwordHash) {
         ... on ExpensesSuccess {
