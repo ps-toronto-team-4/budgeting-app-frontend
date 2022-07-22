@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
 
-import { StyleSheet, View, Text, TextInput, TouchableHighlight, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableHighlight, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
 import AdaptiveTextInput from "../components/AdaptiveTextInput";
@@ -120,126 +120,126 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
     }
 
     return (
-        <View style={styles.screen}>
-            <View style={styles.amountInputContainer}>
-                <View style={styles.dollarSignAndAmountInput}>
-                    <Text style={styles.dollarSign}>$</Text>
-                    {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-                    <AdaptiveTextInput
-                        keyboardType="numeric"
-                        style={{ fontSize: 50 }}
-                        charWidth={30}
-                        value={amountText}
-                        onChangeText={setAmountText}
-                        onBlur={handleAmountBlur}>
-                    </AdaptiveTextInput>
-                    {/* </TouchableWithoutFeedback> */}
-                </View>
-            </View>
-            { // This is bad because it hides fields that are waiting on data that is loading
-                // without giving any loading screen indication to the user.
-                merchantData?.merchants.__typename === 'MerchantsSuccess' ?
-                    <DropdownRow
-                        label="Merchant"
-                        data={
-                            merchantData?.merchants.__typename === 'MerchantsSuccess' ?
-                                merchantData.merchants.merchants.map(x => x.name) : []
-                        }
-                        onSelect={selectMerchant}
-                        defaultValue={
-                            initVals ?
-                                merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
-                                : undefined
-                        }
-                        onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
-                        expanded={merchantExpanded}
-                        onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
-                        onCollapse={() => setMerchantExpanded(false)} />
-                    :
-                    <View></View>
-            }
-            {
-                categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                    <DropdownRow
-                        label="Category"
-                        data={
-                            categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                                categoryData.categories.categories.map(x => x.name) : []
-                        }
-                        onSelect={selectCategory}
-                        defaultValue={
-                            initVals ?
-                                categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
-                                : undefined
-                        }
-                        onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
-                        expanded={categoryExpanded}
-                        onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
-                        onCollapse={() => setCategoryExpanded(false)} />
-                    :
-                    <View></View>
-            }
-            <View>
-                <TouchableHighlight
-                    style={calendarShown ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
-                    underlayColor="rgba(0,0,0,0.1)"
-                    onPress={() => setCalendarShown(true)}>
-                    <View style={styles.fieldContainer}>
-                        <View style={styles.fieldLabelAndInputContainer}>
-                            <Text style={styles.fieldLabel}>Date:</Text>
-                            <TextInput
-                                style={styles.fieldInput}
-                                placeholder="Select Date"
-                                value={
-                                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
-                                    " " + moment(date).date() + " " + moment(date).year()
-                                }
-                                editable={false}>
-                            </TextInput>
-                        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.screen}>
+                <View style={styles.amountInputContainer}>
+                    <View style={styles.dollarSignAndAmountInput}>
+                        <Text style={styles.dollarSign}>$</Text>
+                        <AdaptiveTextInput
+                            keyboardType="numeric"
+                            style={{ fontSize: 50 }}
+                            charWidth={30}
+                            value={amountText}
+                            onChangeText={setAmountText}
+                            onBlur={handleAmountBlur}>
+                        </AdaptiveTextInput>
                     </View>
-                </TouchableHighlight>
-                {
-                    calendarShown ?
-                        <View style={styles.calendarContainer}>
-                            <CalendarPicker
-                                onDateChange={(date, type) => { setDate(date.toString()); setCalendarShown(false); }}
-                                width={300} />
-                        </View>
+                </View>
+                { // This is bad because it hides fields that are waiting on data that is loading
+                    // without giving any loading screen indication to the user.
+                    merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                        <DropdownRow
+                            label="Merchant"
+                            data={
+                                merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                                    merchantData.merchants.merchants.map(x => x.name) : []
+                            }
+                            onSelect={selectMerchant}
+                            defaultValue={
+                                initVals ?
+                                    merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
+                                    : undefined
+                            }
+                            onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
+                            expanded={merchantExpanded}
+                            onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); }}
+                            onCollapse={() => setMerchantExpanded(false)} />
                         :
                         <View></View>
                 }
-            </View>
-            <View style={styles.detailsRow}>
-                <View style={styles.detailsIconAndLabel}>
-                    <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
-                    <Text style={styles.fieldLabel}>Details:</Text>
+                {
+                    categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                        <DropdownRow
+                            label="Category"
+                            data={
+                                categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                                    categoryData.categories.categories.map(x => x.name) : []
+                            }
+                            onSelect={selectCategory}
+                            defaultValue={
+                                initVals ?
+                                    categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
+                                    : undefined
+                            }
+                            onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
+                            expanded={categoryExpanded}
+                            onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); }}
+                            onCollapse={() => setCategoryExpanded(false)} />
+                        :
+                        <View></View>
+                }
+                <View>
+                    <TouchableHighlight
+                        style={calendarShown ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
+                        underlayColor="rgba(0,0,0,0.1)"
+                        onPress={() => setCalendarShown(true)}>
+                        <View style={styles.fieldContainer}>
+                            <View style={styles.fieldLabelAndInputContainer}>
+                                <Text style={styles.fieldLabel}>Date:</Text>
+                                <TextInput
+                                    style={styles.fieldInput}
+                                    placeholder="Select Date"
+                                    value={
+                                        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
+                                        " " + moment(date).date() + " " + moment(date).year()
+                                    }
+                                    editable={false}>
+                                </TextInput>
+                            </View>
+                        </View>
+                    </TouchableHighlight>
+                    {
+                        calendarShown ?
+                            <View style={styles.calendarContainer}>
+                                <CalendarPicker
+                                    onDateChange={(date, type) => { setDate(date.toString()); setCalendarShown(false); }}
+                                    width={300} />
+                            </View>
+                            :
+                            <View></View>
+                    }
                 </View>
-                <TextInput
-                    style={[styles.detailsInput, { height: detailsHeight }]}
-                    placeholder="Enter Details"
-                    multiline={true}
-                    textAlignVertical="top"
-                    scrollEnabled={false}
-                    onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}
-                    onChangeText={setDesc}
-                    value={desc}>
-                </TextInput>
+                <View style={styles.detailsRow}>
+                    <View style={styles.detailsIconAndLabel}>
+                        <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
+                        <Text style={styles.fieldLabel}>Details:</Text>
+                    </View>
+                    <TextInput
+                        style={[styles.detailsInput, { height: detailsHeight }]}
+                        placeholder="Enter Details"
+                        multiline={true}
+                        textAlignVertical="top"
+                        scrollEnabled={false}
+                        onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}
+                        onChangeText={setDesc}
+                        value={desc}>
+                    </TextInput>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <Button
+                        text="Save Expense"
+                        accessibilityLabel="Button to Save Expense"
+                        onPress={handleSubmit} />
+                </View>
             </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    text="Save Expense"
-                    accessibilityLabel="Button to Save Expense"
-                    onPress={handleSubmit} />
-            </View>
-        </View >
+        </TouchableWithoutFeedback>
     );
 }
 
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
-        backgroundColor: Colors.light.background
+        backgroundColor: 'white',
     },
     amountInputContainer: {
         height: 200,
