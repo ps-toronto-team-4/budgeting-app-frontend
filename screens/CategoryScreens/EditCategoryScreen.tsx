@@ -81,7 +81,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
   }
 
   return (
-      <View style={Styles.container}>
+      <View style={[Styles.container, { backgroundColor: confirmDelete ? 'grey' : 'white' }]}>
         {loading ? (
           <ActivityIndicator size={'large'}/>
         ) : (
@@ -102,7 +102,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
           <></>
         )}
         <RequiredField check={check} input={newName} />
-        <View style={Styles.palette}>
+        <View style={[Styles.palette, {backgroundColor: confirmDelete ? 'grey' : 'white'}]}>
         <ColorPalette 
           onChange={(color: string) => setNewColor(color.substring(1))}
           value={'#' + newColor}
@@ -123,8 +123,8 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
           value={newDetails ||  ""}
           placeholder="Details"
         />
-        <Button text="Save Category" onPress={onSubmit} accessibilityLabel={'Save Category Button'}/>
-        <Button text="Delete Category" backgroundColor='red' onPress={() => setConfirmDelete(true)} accessibilityLabel={'Delete Category Button'}/>
+        <Button text="Save Category" disabled={confirmDelete} onPress={onSubmit} accessibilityLabel={'Save Category Button'}/>
+        <Button text="Delete Category" disabled={confirmDelete} backgroundColor='red' onPress={() => setConfirmDelete(true)} accessibilityLabel={'Delete Category Button'}/>
         <Modal
         animationType="slide"
         transparent={true}
