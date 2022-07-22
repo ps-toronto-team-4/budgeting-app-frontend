@@ -31,6 +31,8 @@ import CreateExpenseScreen from '../screens/CreateExpenseScreen';
 
 import { View } from '../components/Themed';
 import UpdateExpenseScreen from '../screens/UpdateExpenseScreen';
+import EditCategoryScreen from '../screens/CategoryScreens/EditCategoryScreen';
+import CategorySettingsScreen from '../screens/CategoryScreens/CategorySettingsScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -69,6 +71,18 @@ function RootNavigator() {
         headerTitleAlign: "center",
         headerShadowVisible: false,
         headerTitleStyle: { fontWeight: "bold" },
+      }} />
+      <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{
+        headerTitle: 'Edit Category',
+        headerTitleAlign: 'center',
+        headerShadowVisible: false,
+        headerTitleStyle: { fontWeight: 'bold' }
+      }} />
+      <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{
+        headerTitle: 'Edit Category',
+        headerTitleAlign: 'center',
+        headerShadowVisible: false,
+        headerTitleStyle: { fontWeight: 'bold' }
       }} />
       <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{
         headerTitle: 'Create New Category',
