@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
 
-import { StyleSheet, View, Text, TextInput, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableHighlight, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
 import AdaptiveTextInput from "../components/AdaptiveTextInput";
@@ -124,6 +124,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
             <View style={styles.amountInputContainer}>
                 <View style={styles.dollarSignAndAmountInput}>
                     <Text style={styles.dollarSign}>$</Text>
+                    {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
                     <AdaptiveTextInput
                         keyboardType="numeric"
                         style={{ fontSize: 50 }}
@@ -132,6 +133,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         onChangeText={setAmountText}
                         onBlur={handleAmountBlur}>
                     </AdaptiveTextInput>
+                    {/* </TouchableWithoutFeedback> */}
                 </View>
             </View>
             { // This is bad because it hides fields that are waiting on data that is loading
@@ -265,17 +267,21 @@ const styles = StyleSheet.create({
         borderTopColor: 'rgba(0,0,0,0.3)',
         paddingVertical: 10,
         paddingHorizontal: 30,
+        backgroundColor: 'green',
     },
     fieldContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         width: 320,
+        backgroundColor: 'red',
     },
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         width: 280,
+        backgroundColor: 'purple',
     },
     fieldLabel: {
         fontWeight: 'bold',

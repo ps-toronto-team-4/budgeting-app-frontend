@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         width: 280,
     },
     fieldLabel: {
