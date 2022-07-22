@@ -2,6 +2,7 @@ export const colorsList = [
     '#EB4034',
     '#EB7734',
     '#EBC034',
+    '#FFFF00',
     '#D3EB34',
     '#96EB34',
     '#30B027',

@@ -81,14 +81,14 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
       />
       {check && categoryTaken() ? <Text style={Styles.alert}>This category already exists</Text> : <></>}
       <RequiredField check={check} input={name} />
-      <View style={style.palette}>
+      <View style={Styles.palette}>
         <ColorPalette
           onChange={(color: string) => setColor(color.substring(1))}
           value={'#' + color}
           colors={colorsList}
-          titleStyles={style.colorTitle}
+          titleStyles={Styles.colorTitle}
           title={"Select Category Color:"}
-          icon={<Ionicons name="checkmark-circle-outline" style={style.icon} size={38} color="black" />}
+          icon={<Ionicons name="checkmark-circle-outline" size={30} color="black" />}
         />
       </View>
       {check && colorTaken() ? <Text style={Styles.alert}>There is already a category with this color</Text> : <></>}
@@ -102,17 +102,3 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
     </View>
   );
 }
-
-const style = StyleSheet.create({
-  colorTitle: {
-    textAlign: 'center',
-    fontSize: 20
-  },
-  palette: {
-    width: '80%'
-  },
-  icon: {
-    paddingLeft: 2,
-    paddingBottom: 1
-  }
-});

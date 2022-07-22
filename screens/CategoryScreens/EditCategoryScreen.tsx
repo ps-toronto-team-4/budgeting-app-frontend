@@ -102,14 +102,14 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
           <></>
         )}
         <RequiredField check={check} input={newName} />
-        <View style={style.palette}>
+        <View style={Styles.palette}>
         <ColorPalette 
           onChange={(color: string) => setNewColor(color.substring(1))}
           value={'#' + newColor}
           colors={colorsList}
-          titleStyles={style.colorTitle}
+          titleStyles={Styles.colorTitle}
           title={"Select Category Color:"}
-          icon={<Ionicons name="checkmark-circle-outline" style={style.icon} size={38} color="black" />}
+          icon={<Ionicons name="checkmark-circle-outline" size={30} color="black" />}
         />
         </View>
         { colorTaken() ? (
@@ -146,17 +146,6 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
 }
 
 const style = StyleSheet.create({
-  colorTitle: {
-    textAlign: 'center',
-    fontSize: 20
-  },
-  palette: {
-    width: '80%'
-  },
-  icon: {
-    paddingLeft: 2,
-    paddingBottom: 1
-  },
   centeredView: {
     flex: 1,
     justifyContent: 'space-between',

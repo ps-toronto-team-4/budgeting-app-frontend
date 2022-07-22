@@ -30,8 +30,10 @@ export default function CategorySettingsScreen({ navigation }: RootTabScreenProp
       const renderCategory = ({item}: {item: Category}) => {
         return (
         <TouchableOpacity style={style.category} onPress={() => navigation.navigate("EditCategory", {id: item.id, name: item.name, color: item.colourHex, details: item.description})}>
-            <View style={{ width: 30, margin: 5, height: 30, backgroundColor: "#" + item.colourHex, borderRadius: 90, borderWidth: 1 }} />
-            <Text style={{ fontSize: 28 }}>{item.name}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ width: 30, marginHorizontal: 15, height: 30, backgroundColor: "#" + item.colourHex, borderRadius: 90, borderWidth: 1 }} />
+            <Text style={{ fontSize: 18, marginHorizontal: 5 }}>{item.name}</Text>
+            </View>
             <MaterialIcons name="navigate-next" size={24} color="black" />
         </TouchableOpacity>
       )}
@@ -40,7 +42,6 @@ export default function CategorySettingsScreen({ navigation }: RootTabScreenProp
         <View>
             <Text>Hello from category settings!</Text>
             <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')}/>
-            <ScrollView>
                 { loading ? (<ActivityIndicator size='large'/>) : (
                     data?.categories.__typename === "CategoriesSuccess" ? (
                         <FlatList
@@ -53,7 +54,6 @@ export default function CategorySettingsScreen({ navigation }: RootTabScreenProp
                         <Text>{data?.categories.errorMessage}</Text>
                     </View>
                 ))}
-            </ScrollView>
         </View>
     );
 }
@@ -62,9 +62,11 @@ const style = StyleSheet.create ({
     category: {
         flexDirection: "row",
         alignItems: 'center',
+        justifyContent: 'space-between',
         width: '100%',
         height: 50,
         backgroundColor: 'white',
-        margin: 5
+        marginVertical: 5,
+        padding: 10
     }
 });
