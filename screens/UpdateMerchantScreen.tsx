@@ -1,18 +1,17 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { useEffect } from "react";
 import { DeleteMerchantDocument, DeleteMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, UpdateMerchantDocument, UpdateMerchantMutation } from "../components/generated";
-
 import { StyleSheet, View, Text, TextInput, ActivityIndicator, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
 import { RootStackScreenProps } from "../types";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
 import { AntDesign, Feather } from '@expo/vector-icons';
 import Button from "../components/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
 import { DropdownRow } from "../components/DropdownRow";
+import { useAuth } from "../hooks/useAuth";
 
 export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
-    const [passwordHash, setpasswordHash] = React.useState("");
+    const passwordHash = useAuth();
     const [merchantId, setMerchantId] = React.useState<number | null>(route.params?.id || null);
     const [merchantName, setMerchantName] = React.useState<string | undefined>(route.params?.name || undefined);
     const [details, setDetails] = React.useState<string | undefined>(route.params?.description || undefined);
@@ -57,23 +56,6 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
     const { loading: manyMerchantsLoading, data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash }
     });
-
-
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const hash = await AsyncStorage.getItem('passwordHash')
-            if (hash != null) {
-                setpasswordHash(hash);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-    }
 
     const merchantsQuery = () => {
         if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName != undefined && merchantName != "") {

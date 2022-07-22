@@ -125,19 +125,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     }
 
 
-    /**
-     *  TODO Implement the following commented function from the Settings tab.
-     */
-    // function updateMerchant() {
-    //     navigation.navigate('UpdateMerchant', singleMerchantData?.merchant.__typename === "MerchantSuccess" ? {
-    //         id: singleMerchantData?.merchant.merchant.id,
-    //         name: singleMerchantData?.merchant.merchant.name,
-    //         description: singleMerchantData?.merchant.merchant.description,
-    //         category: { id: categoryId, name: categoryName },
-    //     } : undefined
-    //     )
-    // }
-
     return (
         <SafeAreaView style={styles.screen}>
             <View style={styles.row}>
@@ -181,15 +168,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     onExpand={() => { setCategoryOpen(true); }}
                     onCollapse={() => setCategoryOpen(false)} />
             </View>
-
-            {/* TODO REMOVE THIS COMMENT IN DEVELOP */}
-            {/* <View style={styles.buttonContainer}>
-                <Button text="Update Merchant"
-                    accessibilityLabel={"Button to Update Merchant"}
-                    onPress={() => updateMerchant()}
-                    disabled={disabledButton}
-                />
-            </View> */}
 
             <View style={styles.buttonContainer}>
                 <Button text="Save Merchant"
