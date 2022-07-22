@@ -44,7 +44,12 @@ export function DropdownRow({
     const expanded = expandedProp === undefined ? expandedState : expandedProp
 
     useEffect(() => {
-        expanded ? inputRef.current?.focus() : inputRef.current?.blur();
+        if (expanded) {
+            setValue('');
+            inputRef.current?.focus();
+        } else {
+            inputRef.current?.blur();
+        }
     }, [expanded]);
 
     const collapse = () => {
@@ -59,7 +64,6 @@ export function DropdownRow({
     const handleRowPress = () => {
         if (!expanded) {
             onExpand && onExpand();
-            setValue('');
             if (expandedProp === undefined) {
                 setExpandedState(true);
             }

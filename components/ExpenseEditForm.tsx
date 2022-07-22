@@ -137,7 +137,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                 </View>
                 { // This is bad because it hides fields that are waiting on data that is loading
                     // without giving any loading screen indication to the user.
-                    merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                    merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded ?
                         <DropdownRow
                             label="Merchant"
                             data={
@@ -158,7 +158,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         <View></View>
                 }
                 {
-                    categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                    categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded ?
                         <DropdownRow
                             label="Category"
                             data={
@@ -178,59 +178,66 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         :
                         <View></View>
                 }
-                <View>
-                    <TouchableHighlight
-                        style={calendarShown ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
-                        underlayColor="rgba(0,0,0,0.1)"
-                        onPress={() => setCalendarShown(true)}>
-                        <View style={styles.fieldContainer}>
-                            <View style={styles.fieldLabelAndInputContainer}>
-                                <Text style={styles.fieldLabel}>Date:</Text>
+                {
+                    !merchantExpanded && !categoryExpanded ?
+                        <>
+                            <View>
+                                <TouchableHighlight
+                                    style={calendarShown ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
+                                    underlayColor="rgba(0,0,0,0.1)"
+                                    onPress={() => setCalendarShown(true)}>
+                                    <View style={styles.fieldContainer}>
+                                        <View style={styles.fieldLabelAndInputContainer}>
+                                            <Text style={styles.fieldLabel}>Date:</Text>
+                                            <TextInput
+                                                style={styles.fieldInput}
+                                                placeholder="Select Date"
+                                                value={
+                                                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
+                                                    " " + moment(date).date() + " " + moment(date).year()
+                                                }
+                                                editable={false}>
+                                            </TextInput>
+                                        </View>
+                                    </View>
+                                </TouchableHighlight>
+                                {
+                                    calendarShown ?
+                                        <View style={styles.calendarContainer}>
+                                            <CalendarPicker
+                                                onDateChange={(date, type) => { setDate(date.toString()); setCalendarShown(false); }}
+                                                width={300} />
+                                        </View>
+                                        :
+                                        <View></View>
+                                }
+                            </View>
+                            <View style={styles.detailsRow}>
+                                <View style={styles.detailsIconAndLabel}>
+                                    <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
+                                    <Text style={styles.fieldLabel}>Details:</Text>
+                                </View>
                                 <TextInput
-                                    style={styles.fieldInput}
-                                    placeholder="Select Date"
-                                    value={
-                                        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
-                                        " " + moment(date).date() + " " + moment(date).year()
-                                    }
-                                    editable={false}>
+                                    style={[styles.detailsInput, { height: detailsHeight }]}
+                                    placeholder="Enter Details"
+                                    multiline={true}
+                                    textAlignVertical="top"
+                                    scrollEnabled={false}
+                                    onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}
+                                    onChangeText={setDesc}
+                                    value={desc}>
                                 </TextInput>
                             </View>
-                        </View>
-                    </TouchableHighlight>
-                    {
-                        calendarShown ?
-                            <View style={styles.calendarContainer}>
-                                <CalendarPicker
-                                    onDateChange={(date, type) => { setDate(date.toString()); setCalendarShown(false); }}
-                                    width={300} />
+                            <View style={styles.buttonContainer}>
+                                <Button
+                                    text="Save Expense"
+                                    accessibilityLabel="Button to Save Expense"
+                                    onPress={handleSubmit} />
                             </View>
-                            :
-                            <View></View>
-                    }
-                </View>
-                <View style={styles.detailsRow}>
-                    <View style={styles.detailsIconAndLabel}>
-                        <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
-                        <Text style={styles.fieldLabel}>Details:</Text>
-                    </View>
-                    <TextInput
-                        style={[styles.detailsInput, { height: detailsHeight }]}
-                        placeholder="Enter Details"
-                        multiline={true}
-                        textAlignVertical="top"
-                        scrollEnabled={false}
-                        onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}
-                        onChangeText={setDesc}
-                        value={desc}>
-                    </TextInput>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Button
-                        text="Save Expense"
-                        accessibilityLabel="Button to Save Expense"
-                        onPress={handleSubmit} />
-                </View>
+                        </>
+                        :
+                        <View></View>
+                }
             </View>
         </TouchableWithoutFeedback>
     );
