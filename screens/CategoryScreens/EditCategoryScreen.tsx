@@ -8,25 +8,29 @@ import { RootStackScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useLazyQuery } from '@apollo/client';
-import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../../components/generated';
-import { getAuth } from '../../components/GetAuth';
+import { useMutation, useQuery } from '@apollo/client';
+import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, GetCategoriesDocument } from '../../components/generated';
+import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 
-export default function EditCategoryScreen({ navigation }: RootStackScreenProps<'EditCategory'>) {
+export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 
-  const [name, setName] = useState("")
-  const [details, setDetails] = useState("")
-  const [color, setColor] = useState("")
   const [check, setCheck] = useState(false)
-  const [selectedColor, setSelectedColor] = useState("")
-  const [passwordHash, setPasswordHash] = useState("")
-  const [nameCheck, setNameCheck] = useState(false)
-  const [colorCheck, setColorCheck] = useState(false)
+  const { id, name, color, details } = route.params
+  const [newName, setNewName] = useState(name)
+  const [newColor, setNewColor] = useState(color)
+  const [newDetails, setNewDetails] = useState(details)
+  const passwordHash = useAuth();
 
-  // Create user graphql query
+  const {data: categoriesData} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+    variables: { passwordHash },
+    onError: (error => {
+      Alert.alert(error.message);
+    })
+  });
+
   const [updateCategory, { loading, data }] = useMutation<UpdateCategoryMutation>(UpdateCategoryDocument, {
-    variables: { passwordHash, name, color, details },
+    variables: { passwordHash, id, name: newName, color: newColor, details: newDetails },
     onError: (error => {
       Alert.alert(error.message);
     }),
@@ -35,48 +39,35 @@ export default function EditCategoryScreen({ navigation }: RootStackScreenProps<
         navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root");
       }
     })
-  })
+  });
 
-  const [getCategories] = useLazyQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-    variables: { passwordHash },
-    onError: (error => {
-      Alert.alert(error.message);
-    }),
-    onCompleted: (data => {
-      if (data.categories.__typename === 'CategoriesSuccess') {
-        data.categories.categories.forEach((item) => {
-          if (item.name.toLowerCase === name.toLowerCase) {
-            setNameCheck(true)
-          }
-          if (item.colourHex === color) {
-            setColorCheck(true)
-          }
-        })
-        if (color && name && !colorCheck && !nameCheck) {
-          updateCategory();
-        }
-      }
-    })
-  })
+  const categoryTaken = () => {
+    if (categoriesData?.categories.__typename === 'CategoriesSuccess') {
+      return categoriesData.categories.categories.find((cat) => {
+        return cat.id !== id && cat.name.toLowerCase() === newName.toLowerCase()
+      });
+    } else {
+      return false;
+    }
+  };
 
-  getAuth((value: React.SetStateAction<string>) => setPasswordHash(value));
+  const colorTaken = () => {
+    if (categoriesData?.categories.__typename === 'CategoriesSuccess') {
+      return categoriesData.categories.categories.find((cat) => {
+        return cat.id !== id && cat.colourHex.toLowerCase() === newColor.toLowerCase()
+      });
+    } else {
+      return false;
+    }
+  }
 
-  useEffect(() => {
-    let newColor = selectedColor.substring(1);
-    setColor(newColor);
-  }, [selectedColor]);
-
-  const saveCategory = () => {
+  function onSubmit() {
     setCheck(true);
-    if (color || name) {
-    getCategories();
-  }}
+    if (newColor && newName && !categoryTaken() && !colorTaken()) updateCategory();
+  }
 
   return (
-    <>
-      <StatusBar/>
       <View style={Styles.container}>
-        <Text style={Styles.title}>Edit Category</Text>
         {loading ? (
           <ActivityIndicator size={'large'}/>
         ) : (
@@ -87,40 +78,39 @@ export default function EditCategoryScreen({ navigation }: RootStackScreenProps<
           )
         )}
         <TextInput
-          onChangeText={(name) => {setName(name); setNameCheck(false)}}
-          value={name}
+          onChangeText={(name) => setNewName(name)}
+          value={newName}
           placeholder="Name"
         />
-        {nameCheck? (
+        { categoryTaken() ? (
           <Text style={Styles.alert}>This category already exists</Text>
         ) : (
           <></>
         )}
-        <RequiredField check={check} input={name} />
+        <RequiredField check={check} input={newName} />
         <View style={style.palette}>
         <ColorPalette 
-          onChange={(colour: React.SetStateAction<string>) => {setSelectedColor(colour); setColorCheck(false)}}
-          value={selectedColor}
+          onChange={(color: string) => setNewColor(color.substring(1))}
+          value={'#' + newColor}
           colors={colorsList}
           titleStyles={style.colorTitle}
           title={"Select Category Color:"}
           icon={<Ionicons name="checkmark-circle-outline" style={style.icon} size={38} color="black" />}
         />
         </View>
-        {colorCheck? (
+        { colorTaken() ? (
           <Text style={Styles.alert}>There is already a category with this color</Text>
         ) : (
           <></>
         )}
-        <RequiredField check={check} input={color} />
+        <RequiredField check={check} input={newColor} />
         <TextInput
-          onChangeText={(details) => setDetails(details)}
-          value={details}
+          onChangeText={(details) => setNewDetails(details)}
+          value={newDetails ||  ""}
           placeholder="Details"
         />
-        <Button text="Save Category" onPress={() => saveCategory()} accessibilityLabel={'Save Category Button'}></Button>
+        <Button text="Save Category" onPress={onSubmit} accessibilityLabel={'Save Category Button'}/>
       </View>
-    </>
   );
 }
 
