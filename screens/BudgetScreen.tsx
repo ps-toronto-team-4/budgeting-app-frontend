@@ -239,13 +239,13 @@ export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'
         <>
             <StatusBar />
             <SafeAreaView style={styles.container}>
-                <View style={{ flexBasis: 50, flexDirection: 'row', justifyContent: "space-between" }}>
-                    <AntDesign onPress={backAMonth} style={{ flex: 1 }} name="left" size={24} color="black" />
+                <View style={{ flexBasis: 80, flexDirection: 'row', justifyContent: "space-between" }}>
+                    <AntDesign onPress={backAMonth} style={{ flex: 1 }} name="left" size={32} color="black" />
                     <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
                         Budget of {year} {month}
                     </Text>
                     <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                        <AntDesign onPress={forwardAMonth} style={{ flex: 1 }} name="right" size={24} color="black" />
+                        <AntDesign onPress={forwardAMonth} style={{ flex: 1 }} name="right" size={32} color="black" />
                     </View>
 
                 </View>
