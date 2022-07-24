@@ -8,7 +8,6 @@ import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import { Row } from "../components/Row";
-import { TouchableRow } from "../components/TouchableRow";
 import { BudgetCategory } from "../components/BudgetCategory";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 

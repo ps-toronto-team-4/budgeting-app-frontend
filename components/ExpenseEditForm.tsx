@@ -13,6 +13,7 @@ import { DropdownRow } from "../components/DropdownRow";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 import { useNavigation } from "@react-navigation/native";
+import { InputRow } from "./InputRow";
 
 export type FormValues = {
     amount: number;
@@ -171,30 +172,20 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                     !merchantExpanded && !categoryExpanded &&
                         <>
                             <View>
-                                <TouchableHighlight
-                                    style={calendarShown ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
-                                    underlayColor="rgba(0,0,0,0.1)"
-                                    onPress={() => setCalendarShown(true)}>
-                                    <View style={styles.fieldContainer}>
-                                        <View style={styles.fieldLabelAndInputContainer}>
-                                            <Text style={styles.fieldLabel}>Date:</Text>
-                                            <TextInput
-                                                style={styles.fieldInput}
-                                                placeholder="Select Date"
-                                                value={
-                                                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
-                                                    " " + moment(date).date() + " " + moment(date).year()
-                                                }
-                                                editable={false}>
-                                            </TextInput>
-                                        </View>
-                                    </View>
-                                </TouchableHighlight>
+                                <InputRow
+                                    onPress={() => setCalendarShown(true)}
+                                    label="Date:"
+                                    value={
+                                        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
+                                        " " + moment(date).date() + " " + moment(date).year()
+                                    }
+                                    topBorder
+                                    disabled />
                                 {
                                     calendarShown &&
                                         <View style={styles.calendarContainer}>
                                             <CalendarPicker
-                                                onDateChange={(date, type) => { setDate(date.toString()); setCalendarShown(false); }}
+                                                onDateChange={(date, type) => { setDate(date.toISOString()); setCalendarShown(false); }}
                                                 width={300} />
                                         </View>
                                 }

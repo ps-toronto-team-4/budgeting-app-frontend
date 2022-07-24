@@ -2,15 +2,15 @@ import { useState, useRef, useEffect } from "react";
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard } from 'react-native';
 import Colors from "../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
-import { TouchableRow } from "./TouchableRow";
+import { Row } from "./Row";
 
 export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name: string) => void }) {
     return ( // todo fix below
-        <TouchableRow onPress={() => onSelect(name)} topBorder={true}>
+        <Row onPress={() => onSelect(name)} topBorder={true}>
             {/* <View style={[styles.fieldContainer, { paddingLeft: 70 }]}> */}
             <Text style={styles.listItem}>{name}</Text>
             {/* </View> */}
-        </TouchableRow>
+        </Row>
     );
 };
 
@@ -91,9 +91,10 @@ export function DropdownRow({
 
     return (
         <View style={{display: visible === false ? 'none' : 'flex'}}>
-            <TouchableRow
+            <Row
                 topBorder={true}
-                onPress={() => handleRowPress()}>
+                onPress={() => handleRowPress()}
+                >
                 <View style={styles.fieldLabelAndInputContainer}>
                     <Text style={styles.fieldLabel}>{label}:</Text>
                     <TextInput
@@ -110,7 +111,7 @@ export function DropdownRow({
                     size={20}
                     color="black"
                     onPress={handleIconPress} />
-            </TouchableRow>
+            </Row>
             {
                 (expanded) ?
                     <FlatList

@@ -1,24 +1,28 @@
 import { StyleSheet, TextInput } from "react-native";
-import { Row } from "./Row";
+import { Row, RowProps } from "./Row";
 import { View, Text } from "./Themed";
 
-export interface InputRowProps {
+export type InputRowProps = Omit<RowProps, 'children'> & {
     label: string;
     placeholder?: string;
-    topBorder?: boolean;
-    bottomBorder?: boolean;
     value?: string;
     onChangeText?: (text: string) => void;
-}
+    disabled?: boolean;
+};
 
-export function InputRow({ label, placeholder, topBorder, bottomBorder, value, onChangeText }: InputRowProps) {
+export function InputRow({ label, placeholder, value, onChangeText, disabled, ...otherProps }: InputRowProps) {
     return (
-        <Row topBorder={topBorder} bottomBorder={bottomBorder}>
+        <Row {...otherProps}>
             <View style={styles.labelAndInput}>
                 <Text style={styles.label}>
                     {label}
                 </Text>
-                <TextInput style={styles.input} placeholder={placeholder} value={value} onChangeText={onChangeText} />
+                <TextInput
+                    style={styles.input}
+                    placeholder={placeholder}
+                    value={value}
+                    onChangeText={onChangeText}
+                    editable={disabled !== true} />
             </View>
         </Row>
     );
@@ -30,6 +34,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         width: 280,
+        backgroundColor: 'rgba(0,0,0,0)'
     },
     label: {
         fontWeight: 'bold',
