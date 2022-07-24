@@ -16,7 +16,6 @@ const linking: LinkingOptions<RootStackParamList> = {
       Welcome: '',
       SignIn: 'login',
       SignUp: 'register',
-      CreateCategory: 'create-category',
       Root: {
         screens: {
           Expenses: 'expenses-list',
@@ -24,6 +23,8 @@ const linking: LinkingOptions<RootStackParamList> = {
           Budget: 'budget',
         }
       },
+      CreateCategory: 'create-category',
+      EditCategory: 'edit-category',
       ExpenseDetails: 'expense-details',
       CreateExpense: 'create-expense',
       UpdateExpense: 'update-expense',

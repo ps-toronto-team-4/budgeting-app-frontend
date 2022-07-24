@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight } from 'react-native';
+import { useState, useRef, useEffect } from "react";
+import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard } from 'react-native';
 import Colors from "../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
 import { TouchableRow } from "./TouchableRow";
@@ -35,26 +35,36 @@ export function DropdownRow({
     defaultValue,
     onCreateNew,
 }: DropdownRowProps) {
-    const inputRef = useRef<TextInput>(null);
+    const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
-    const [expandedState, setExpandedState] = useState(expandedProp || false);
-    // recalculates on each render (prop or state change).
-    const expanded = expandedProp || (expandedProp === undefined && expandedState);
+    // this state is only used when expanded prop is undefined
+    const [expandedState, setExpandedState] = useState(false);
+    const expanded = expandedProp === undefined ? expandedState : expandedProp
+
+    useEffect(() => {
+        if (expanded) {
+            setValue('');
+            inputRef.current?.focus();
+        } else {
+            inputRef.current?.blur();
+        }
+    }, [expanded]);
 
     const collapse = () => {
         if (expanded) {
-            setExpandedState(false);
-            inputRef.current?.blur();
             onCollapse && onCollapse();
+            if (expandedProp === undefined) {
+                setExpandedState(false);
+            }
         }
     };
 
     const handleRowPress = () => {
         if (!expanded) {
-            setValue('');
-            setExpandedState(true);
-            inputRef.current?.focus();
             onExpand && onExpand();
+            if (expandedProp === undefined) {
+                setExpandedState(true);
+            }
         }
     };
 
@@ -137,6 +147,7 @@ const styles = StyleSheet.create({
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         width: 280,
     },
     fieldLabel: {
