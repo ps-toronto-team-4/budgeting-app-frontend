@@ -191,14 +191,12 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                     </View>
                                 </TouchableHighlight>
                                 {
-                                    calendarShown ?
+                                    calendarShown &&
                                         <View style={styles.calendarContainer}>
                                             <CalendarPicker
                                                 onDateChange={(date, type) => { setDate(date.toString()); setCalendarShown(false); }}
                                                 width={300} />
                                         </View>
-                                        :
-                                        <View></View>
                                 }
                             </View>
                             <View style={styles.detailsRow}>
