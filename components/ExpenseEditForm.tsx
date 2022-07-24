@@ -168,7 +168,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         onCollapse={() => setCategoryExpanded(false)}
                         visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded} />
                 {
-                    !merchantExpanded && !categoryExpanded ?
+                    !merchantExpanded && !categoryExpanded &&
                         <>
                             <View>
                                 <TouchableHighlight
@@ -224,8 +224,6 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                     onPress={handleSubmit} />
                             </View>
                         </>
-                        :
-                        <View></View>
                 }
             </View>
         </TouchableWithoutFeedback>

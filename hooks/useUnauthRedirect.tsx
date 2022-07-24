@@ -14,7 +14,7 @@ export function useUnauthRedirect() {
         },
         onCompleted: (data) => {
             if (passwordHash && data.categories.__typename === 'FailurePayload' && data.categories.exceptionName === 'NotAuthorizedException') {
-                AsyncStorage.removeItem('passwordHash').then((_) => {
+                AsyncStorage.setItem('passwordHash', '').then((_) => {
                     nav.navigate('Welcome');
                 }).catch((e) => {
                     console.log('Error occurred while trying to clear the invalid locally stored passwordHash.');
