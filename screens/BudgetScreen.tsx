@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from "../hooks/useAuth";
 import { Row } from "../components/Row";
 import { TouchableRow } from "../components/TouchableRow";
+import { BudgetCategory } from "../components/BudgetCategory";
 
 export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'>) {
     const passwordHash = useAuth();
@@ -18,10 +19,7 @@ export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'
         <View style={styles.screen}>
             <Text>Hello from BudgetScreen!</Text>
             <Text>The locally stored password hash is: {passwordHash}</Text>
-            <Row topBorder={true} bottomBorder={true}>
-                <Text>HI!</Text>
-                <Text>HELLO</Text>
-            </Row>
+            <BudgetCategory color="red" category="Groceries" planned={500} actual={100} onPressDots={() => console.log('dots pressed')} />
         </View>
     );
 }
