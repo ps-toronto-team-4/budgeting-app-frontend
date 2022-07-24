@@ -16,7 +16,7 @@ export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name
 
 export type DropdownRowProps = {
     label: string;
-    data: string[];
+    data: {id: string, name: string}[];
     onSelect: (name: string) => void;
     expanded?: boolean;
     onExpand?: () => void;
@@ -77,7 +77,7 @@ export function DropdownRow({
         collapse();
     };
 
-    function renderDropdownItem({ item }: { item: { name: string, onSelect: (name: string) => void } }) {
+    function renderDropdownItem({ item }: { item: { id: string, name: string, onSelect: (name: string) => void } }) {
         return (
             <DropdownItem name={item.name} onSelect={item.onSelect}></DropdownItem>
         );
@@ -115,14 +115,14 @@ export function DropdownRow({
                 (expanded) ?
                     <FlatList
                         data={
-                            data.filter(name => {
-                                return name.toLowerCase().startsWith(value.toLowerCase())
-                            }).map(name => {
-                                return { name: name, onSelect: handleSelect }
+                            data.filter(item => {
+                                return item.name.toLowerCase().startsWith(value.toLowerCase())
+                            }).map(item => {
+                                return { id: item.id, name: item.name, onSelect: handleSelect }
                             })
                         }
                         renderItem={renderDropdownItem}
-                        keyExtractor={item => item.name}
+                        keyExtractor={item => item.id}
                         ListFooterComponent={
                             onCreateNew &&
                                 <DropdownItem

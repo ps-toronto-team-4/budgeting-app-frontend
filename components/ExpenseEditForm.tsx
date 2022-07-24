@@ -137,7 +137,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         label="Merchant"
                         data={
                             merchantData?.merchants.__typename === 'MerchantsSuccess' ?
-                                merchantData.merchants.merchants.map(x => x.name) : []
+                                merchantData.merchants.merchants.map(x => { return { id: x.id.toString(), name: x.name} }) : []
                         }
                         onSelect={selectMerchant}
                         defaultValue={
@@ -154,7 +154,7 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         label="Category"
                         data={
                             categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                                categoryData.categories.categories.map(x => x.name) : []
+                                categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
                         }
                         onSelect={selectCategory}
                         defaultValue={

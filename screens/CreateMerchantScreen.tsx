@@ -144,7 +144,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     label="Category"
                     data={
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => x.name) : []
+                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
                     }
                     onSelect={handleCategorySelect}
                     expanded={categoryOpen}
