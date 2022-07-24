@@ -124,11 +124,10 @@ export function DropdownRow({
                         renderItem={renderDropdownItem}
                         keyExtractor={item => item.name}
                         ListFooterComponent={
-                            onCreateNew ?
+                            onCreateNew &&
                                 <DropdownItem
                                     name={'Create new ' + label.toLowerCase()}
                                     onSelect={(_) => onCreateNew()} />
-                                : <View></View>
                         }>
                     </FlatList>
                     :
