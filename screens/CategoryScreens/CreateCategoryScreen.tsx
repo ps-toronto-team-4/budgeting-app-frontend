@@ -12,6 +12,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
+import { useUnauthRedirect } from '../../hooks/useUnauthRedirect';
 
 export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
   const [name, setName] = useState('')
@@ -19,6 +20,8 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
   const [details, setDetails] = useState('')
   const [check, setCheck] = useState(false) // true if need to check required fields
   const passwordHash = useAuth();
+
+  useUnauthRedirect();
 
   // Create category graphql query
   const [createCategory, { loading, data }] = useMutation<CreateCategoryMutation>(CreateCategoryDocument, {

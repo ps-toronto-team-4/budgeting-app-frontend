@@ -12,6 +12,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, GetCategoriesDocument, DeleteCategoryMutation, DeleteCategoryDocument } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
+import { useUnauthRedirect } from '../../hooks/useUnauthRedirect';
 
 export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 
@@ -23,6 +24,8 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
   const [newDetails, setNewDetails] = useState(details)
 
   const passwordHash = useAuth();
+
+  useUnauthRedirect();
 
   const {data: categoriesData} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
     variables: { passwordHash },

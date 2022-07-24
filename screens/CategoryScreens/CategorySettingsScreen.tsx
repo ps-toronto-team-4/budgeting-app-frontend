@@ -9,10 +9,13 @@ import Button from "../../components/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList, ScrollView } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 
 export default function CategorySettingsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     
     const passwordHash = useAuth();
+
+    useUnauthRedirect();
 
     const {data, loading, refetch} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
         variables: { passwordHash },

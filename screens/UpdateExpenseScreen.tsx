@@ -8,6 +8,7 @@ import { AntDesign, Feather } from '@expo/vector-icons';
 import moment from "moment";
 import { useAuth } from "../hooks/useAuth";
 import { StyleSheet, TouchableOpacity } from "react-native";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 
 const DeleteButton = ({ onPress }: { onPress: () => void }) => {
     return (
@@ -26,6 +27,8 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
             id: route.params?.id,
         }
     });
+
+    useUnauthRedirect();
 
     useEffect(() => {
         navigation.setOptions({

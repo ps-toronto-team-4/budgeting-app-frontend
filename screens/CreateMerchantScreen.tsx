@@ -11,6 +11,7 @@ import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, 
 import { DropdownRow } from "../components/DropdownRow";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "../hooks/useAuth";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
     const passwordHash = useAuth();
@@ -21,6 +22,8 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [categoryOpen, setCategoryOpen] = React.useState(false);
     const [categoryId, setCategoryId] = React.useState<number | null>(null);
     const [disabledButton, setDisabledButton] = React.useState(false);
+
+    useUnauthRedirect();
 
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: categoryId },

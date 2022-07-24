@@ -11,6 +11,7 @@ import { RootStackScreenProps } from "../types";
 import { Feather } from "@expo/vector-icons";
 import moment from "moment";
 import { useAuth } from "../hooks/useAuth";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 
 const EditButton = (onPress: () => void) => (
     <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
@@ -24,6 +25,8 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
     const { loading, error, data, refetch } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
         variables: { passwordHash: passwordHash, expenseId: expenseId }
     });
+
+    useUnauthRedirect();
 
     useEffect(() => {
         if (route.params.refresh) {

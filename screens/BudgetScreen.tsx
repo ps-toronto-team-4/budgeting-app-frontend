@@ -6,14 +6,16 @@ import { ColorValue } from "react-native"
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from "../hooks/useAuth";
 import { Row } from "../components/Row";
 import { TouchableRow } from "../components/TouchableRow";
 import { BudgetCategory } from "../components/BudgetCategory";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 
 export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'>) {
     const passwordHash = useAuth();
+    
+    useUnauthRedirect();
 
     return (
         <View style={styles.screen}>

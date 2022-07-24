@@ -8,9 +8,12 @@ import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from "../hooks/useAuth";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const passwordHash = useAuth();
+
+    useUnauthRedirect();
 
     return (
         <View>

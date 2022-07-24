@@ -7,10 +7,12 @@ import { RootTabScreenProps } from "../types";
 import Button from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 
 export default function ProfileScreen({ navigation }: RootTabScreenProps<'Reports'>) {
-    
     const passwordHash = useAuth();
+
+    useUnauthRedirect();
 
     const navigate = () => {
         navigation.navigate('CategorySettings');
