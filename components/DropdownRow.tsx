@@ -23,6 +23,7 @@ export type DropdownRowProps = {
     onCollapse?: () => void;
     defaultValue?: string;
     onCreateNew?: () => void;
+    visible?: boolean;
 };
 
 export function DropdownRow({
@@ -34,6 +35,7 @@ export function DropdownRow({
     onCollapse,
     defaultValue,
     onCreateNew,
+    visible,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
@@ -88,7 +90,7 @@ export function DropdownRow({
     }
 
     return (
-        <>
+        <View style={{display: visible === false ? 'none' : 'flex'}}>
             <TouchableRow
                 topBorder={true}
                 onPress={() => handleRowPress()}>
@@ -132,7 +134,7 @@ export function DropdownRow({
                     :
                     <View></View>
             }
-        </>
+        </View>
     );
 };
 

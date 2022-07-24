@@ -44,15 +44,13 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
             variables: {
                 passwordHash: passwordHash
             }
-        }
-        );
+        });
     const { data: categoryData, refetch: refetchCategories } =
         useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
             variables: {
                 passwordHash: passwordHash
             }
-        }
-        );
+        });
     const [amountText, setAmountText] = useState(initVals?.amount.toString() || '0.00');
     const [merchantId, setMerchantId] = useState(initVals?.merchantId);
     const [categoryId, setCategoryId] = useState(initVals?.categoryId);
@@ -135,30 +133,23 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         </AdaptiveTextInput>
                     </View>
                 </View>
-                { // This is bad because it hides fields that are waiting on data that is loading
-                    // without giving any loading screen indication to the user.
-                    merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded ?
-                        <DropdownRow
-                            label="Merchant"
-                            data={
-                                merchantData?.merchants.__typename === 'MerchantsSuccess' ?
-                                    merchantData.merchants.merchants.map(x => x.name) : []
-                            }
-                            onSelect={selectMerchant}
-                            defaultValue={
-                                initVals ?
-                                    merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
-                                    : undefined
-                            }
-                            onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
-                            expanded={merchantExpanded}
-                            onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
-                            onCollapse={() => setMerchantExpanded(false)} />
-                        :
-                        <View></View>
-                }
-                {
-                    categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded ?
+                    <DropdownRow
+                        label="Merchant"
+                        data={
+                            merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                                merchantData.merchants.merchants.map(x => x.name) : []
+                        }
+                        onSelect={selectMerchant}
+                        defaultValue={
+                            initVals && merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                                merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
+                                : undefined
+                        }
+                        onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
+                        expanded={merchantExpanded}
+                        onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
+                        onCollapse={() => setMerchantExpanded(false)}
+                        visible={merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded} />
                         <DropdownRow
                             label="Category"
                             data={
@@ -167,17 +158,15 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                             }
                             onSelect={selectCategory}
                             defaultValue={
-                                initVals ?
+                                initVals && categoryData?.categories.__typename === 'CategoriesSuccess' ?
                                     categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
                                     : undefined
                             }
                             onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
                             expanded={categoryExpanded}
                             onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
-                            onCollapse={() => setCategoryExpanded(false)} />
-                        :
-                        <View></View>
-                }
+                            onCollapse={() => setCategoryExpanded(false)}
+                            visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded} />
                 {
                     !merchantExpanded && !categoryExpanded ?
                         <>
