@@ -77,16 +77,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     };
 
-    function HandleExisting() {
-        if (!check || !validMerchant) {
-            return (
-                <Text style={styles.alert}>This merchant already exists.</Text>
-            );
-        } else {
-            return (<></>);
-        }
-    }
-
     function handleCategorySelect(categoryName: String) {
         if (categoryData?.categories.__typename == "CategoriesSuccess") {
             const foundCategory = categoryData.categories.categories.find(x => x.name == categoryName);
@@ -97,21 +87,19 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     }
 
-
-    function RequiredField({ input }: { input: string }) {
-        return (
-            (!check || input) ? (
-                <></>
-            ) : (
-                <Text style={styles.alert}>This field is required</Text>
-            ))
-    }
-
     function onChangeMerchant(text: string) {
         setMerchantName(text);
         setDisabledButton(false);
         setValidMerchant(true);
     }
+
+    const merchantError = (() => {
+        if (check && !merchantName) {
+            return 'Field is required';
+        } else if (check && !validMerchant) {
+            return 'Name already taken';
+        }
+    })();
 
     return (
         <Screen>
@@ -120,11 +108,9 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     label="Merchant:"
                     placeholder="Enter merchant name*"
                     value={merchantName}
-                    onChangeText={onChangeMerchant} />
-                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <RequiredField input={merchantName} />
-                    {validMerchant ? (<></>) : (<HandleExisting />)}
-                </View>
+                    onChangeText={onChangeMerchant}
+                    error={merchantError}
+                    topBorder />
                 <InputRow
                     label="Details:"
                     placeholder="Enter details"
@@ -145,7 +131,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     bottomBorder />
                 <View style={styles.buttonContainer}>
                     <Button text="Save Merchant"
-                        accessibilityLabel={"Save Merchant"}
+                        accessibilityLabel="Save Merchant"
                         onPress={() => handleMerchant()}
                         disabled={disabledButton}
                     />
@@ -185,14 +171,4 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         top: '30%',
     },
-    fieldLabel: {
-        fontWeight: 'bold',
-        fontSize: 15,
-        paddingLeft: 5,
-    },
-    fieldInput: {
-        fontSize: 15,
-        width: 180
-    },
-
 });

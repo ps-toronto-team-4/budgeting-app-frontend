@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { StyleSheet, TouchableHighlight } from "react-native";
+import { ColorValue, StyleSheet, TouchableHighlight } from "react-native";
 import { View, Text } from "./Themed";
 
 export interface RowProps {
@@ -10,9 +10,10 @@ export interface RowProps {
     topBorder?: boolean;
     bottomBorder?: boolean;
     children?: ReactElement<any, any> | ReactElement<any, any>[];
+    backgroundColor?: ColorValue;
 }
 
-export function Row({ onPress, topBorder, bottomBorder, children }: RowProps) {
+export function Row({ onPress, topBorder, bottomBorder, children, backgroundColor }: RowProps) {
     const dynamicStyles = StyleSheet.create({
         row: {
             alignItems: 'center',
@@ -21,7 +22,7 @@ export function Row({ onPress, topBorder, bottomBorder, children }: RowProps) {
             borderTopWidth: topBorder ? 1 : 0,
             borderBottomWidth: bottomBorder ? 1 : 0,
             paddingVertical: 10,
-            backgroundColor: 'white',
+            backgroundColor: backgroundColor || 'white',
         },
     });
 
