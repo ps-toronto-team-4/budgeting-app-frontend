@@ -202,20 +202,22 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                 }
                             </View>
                             <View style={styles.detailsRow}>
-                                <View style={styles.detailsIconAndLabel}>
-                                    <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
-                                    <Text style={styles.fieldLabel}>Details:</Text>
+                                <View style={styles.detailsLabelAndInputContainer}>
+                                    <View style={styles.detailsIconAndLabel}>
+                                        <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
+                                        <Text style={styles.fieldLabel}>Details:</Text>
+                                    </View>
+                                    <TextInput
+                                        style={[styles.detailsInput, { height: detailsHeight }]}
+                                        placeholder="Enter Details"
+                                        multiline={true}
+                                        textAlignVertical="top"
+                                        scrollEnabled={false}
+                                        onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}
+                                        onChangeText={setDesc}
+                                        value={desc}>
+                                    </TextInput>
                                 </View>
-                                <TextInput
-                                    style={[styles.detailsInput, { height: detailsHeight }]}
-                                    placeholder="Enter Details"
-                                    multiline={true}
-                                    textAlignVertical="top"
-                                    scrollEnabled={false}
-                                    onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}
-                                    onChangeText={setDesc}
-                                    value={desc}>
-                                </TextInput>
                             </View>
                             <View style={styles.buttonContainer}>
                                 <Button
@@ -284,8 +286,7 @@ const styles = StyleSheet.create({
     },
     detailsRow: {
         flexDirection: 'row',
-        paddingHorizontal: 27,
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         alignItems: 'center',
         paddingVertical: 10,
         borderTopWidth: 1,
@@ -294,6 +295,11 @@ const styles = StyleSheet.create({
         borderBottomColor: 'rgba(0,0,0,0.3)',
         zIndex: -1,
         elevation: -1,
+    },
+    detailsLabelAndInputContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: 320,
     },
     detailsIconAndLabel: {
         flexDirection: 'row',
