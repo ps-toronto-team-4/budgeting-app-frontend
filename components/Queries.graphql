@@ -256,3 +256,22 @@ mutation createBudgetCategory($passwordHash: String!, $budgetId:Int!, $categoryI
         }
     }
 }
+
+query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
+    monthBreakdown(passwordHash:$passwordHash,month:$month,year:$year){
+        ... on MonthBreakdown {
+            byCategory{
+                amountSpent
+                category{
+                    colourHex
+                    name
+                }
+            }
+            totalSpent
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
