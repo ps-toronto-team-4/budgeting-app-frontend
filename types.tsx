@@ -19,7 +19,7 @@ export type RootStackParamList = {
   Welcome: undefined;
   SignIn: undefined;
   SignUp: undefined;
-  ExpenseDetails: { expenseId: number, refresh: boolean };
+  ExpenseDetails: { expenseId: number };
   UpdateExpense: { id: number, amount: number, merchant?: { id?: number, name?: string }, category?: { id?: number, name?: string }, date: string, desc?: string } | undefined,
   ForgotPasswordModal: undefined;
   CreateExpense: undefined;

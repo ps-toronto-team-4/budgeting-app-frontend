@@ -45,7 +45,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 desc: vals.desc || null
             }
         });
-        navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0, refresh: true });
+        navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0 });
     }
 
     function handleDelete() {
