@@ -8,6 +8,7 @@ import Button from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
+import { Screen } from "../components/Screen";
 
 export default function ProfileScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const passwordHash = useAuth();
@@ -25,11 +26,11 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Report
     };
 
     return (
-        <View>
+        <Screen>
             <Text>Hello from ProfileScreen!</Text>
             <Text>The locally stored password hash is: {passwordHash}</Text>
             <Button text="Category Settings" accessibilityLabel="Category Settings Link" onPress={navigate}/>
             <Button text="Logout" onPress={logout} accessibilityLabel="Logout Button" />
-        </View>
+        </Screen>
     );
 }

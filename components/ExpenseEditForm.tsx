@@ -14,6 +14,7 @@ import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 import { useNavigation } from "@react-navigation/native";
 import { InputRow } from "./InputRow";
+import { Screen } from "./Screen";
 
 export type FormValues = {
     amount: number;
@@ -119,57 +120,57 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
     }
 
     return (
-        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); setCalendarShown(false); }}>
-            <View style={styles.screen}>
-                <View style={styles.amountInputContainer}>
-                    <View style={styles.dollarSignAndAmountInput}>
-                        <Text style={styles.dollarSign}>$</Text>
-                        <AdaptiveTextInput
-                            keyboardType="numeric"
-                            style={{ fontSize: 50 }}
-                            charWidth={30}
-                            value={amountText}
-                            onChangeText={setAmountText}
-                            onBlur={handleAmountBlur}>
-                        </AdaptiveTextInput>
-                    </View>
+        <Screen onDismissKeyboard={() => setCalendarShown(false)}>
+            <View style={styles.amountInputContainer}>
+                <View style={styles.dollarSignAndAmountInput}>
+                    <Text style={styles.dollarSign}>$</Text>
+                    <AdaptiveTextInput
+                        keyboardType="numeric"
+                        style={{ fontSize: 50 }}
+                        charWidth={30}
+                        value={amountText}
+                        onChangeText={setAmountText}
+                        onBlur={handleAmountBlur}>
+                    </AdaptiveTextInput>
                 </View>
-                    <DropdownRow
-                        label="Merchant"
-                        data={
-                            merchantData?.merchants.__typename === 'MerchantsSuccess' ?
-                                merchantData.merchants.merchants.map(x => { return { id: x.id.toString(), name: x.name} }) : []
-                        }
-                        onSelect={selectMerchant}
-                        defaultValue={
-                            initVals && merchantData?.merchants.__typename === 'MerchantsSuccess' ?
-                                merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
-                                : undefined
-                        }
-                        onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
-                        expanded={merchantExpanded}
-                        onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
-                        onCollapse={() => setMerchantExpanded(false)}
-                        visible={merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded}
-                        topBorder />
-                    <DropdownRow
-                        label="Category"
-                        data={
-                            categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                                categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
-                        }
-                        onSelect={selectCategory}
-                        defaultValue={
-                            initVals && categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                                categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
-                                : undefined
-                        }
-                        onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
-                        expanded={categoryExpanded}
-                        onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
-                        onCollapse={() => setCategoryExpanded(false)}
-                        visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded}
-                        topBorder />
+            </View>
+                <DropdownRow
+                    label="Merchant"
+                    data={
+                        merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                            merchantData.merchants.merchants.map(x => { return { id: x.id.toString(), name: x.name} }) : []
+                    }
+                    onSelect={selectMerchant}
+                    defaultValue={
+                        initVals && merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                            merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
+                            : undefined
+                    }
+                    onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
+                    expanded={merchantExpanded}
+                    onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
+                    onCollapse={() => setMerchantExpanded(false)}
+                    visible={merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded}
+                    topBorder />
+                <DropdownRow
+                    label="Category"
+                    data={
+                        categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
+                    }
+                    onSelect={selectCategory}
+                    defaultValue={
+                        initVals && categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                            categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
+                            : undefined
+                    }
+                    onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
+                    expanded={categoryExpanded}
+                    onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
+                    onCollapse={() => setCategoryExpanded(false)}
+                    visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded}
+                    topBorder />
+            <>
                 {
                     !merchantExpanded && !categoryExpanded &&
                         <>
@@ -210,16 +211,12 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                             </View>
                         </>
                 }
-            </View>
-        </TouchableWithoutFeedback>
+            </>
+        </Screen>
     );
 }
 
 const styles = StyleSheet.create({
-    screen: {
-        flex: 1,
-        backgroundColor: 'white',
-    },
     amountInputContainer: {
         height: 200,
         alignItems: 'center',
