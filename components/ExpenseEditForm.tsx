@@ -150,7 +150,8 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         expanded={merchantExpanded}
                         onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
                         onCollapse={() => setMerchantExpanded(false)}
-                        visible={merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded} />
+                        visible={merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded}
+                        topBorder />
                     <DropdownRow
                         label="Category"
                         data={
@@ -167,7 +168,8 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         expanded={categoryExpanded}
                         onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
                         onCollapse={() => setCategoryExpanded(false)}
-                        visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded} />
+                        visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded}
+                        topBorder />
                 {
                     !merchantExpanded && !categoryExpanded &&
                         <>

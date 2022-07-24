@@ -122,7 +122,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     }
 
     return (
-        <SafeAreaView style={styles.screen}>
+        <View style={styles.screen}>
             <InputRow
                 label="Merchant:"
                 placeholder="Enter merchant name*"
@@ -138,19 +138,19 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                 placeholder="Enter details"
                 value={details}
                 onChangeText={setDetails}
-                topBorder={true} />
-            <View style={{}}>
-                <DropdownRow
-                    label="Category"
-                    data={
-                        categoryData?.categories.__typename == "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
-                    }
-                    onSelect={handleCategorySelect}
-                    expanded={categoryOpen}
-                    onExpand={() => { setCategoryOpen(true); }}
-                    onCollapse={() => setCategoryOpen(false)} />
-            </View>
+                topBorder
+                bottomBorder />
+            <DropdownRow
+                label="Category"
+                data={
+                    categoryData?.categories.__typename == "CategoriesSuccess" ?
+                        categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
+                }
+                onSelect={handleCategorySelect}
+                expanded={categoryOpen}
+                onExpand={() => { setCategoryOpen(true); }}
+                onCollapse={() => setCategoryOpen(false)}
+                bottomBorder />
 
             <View style={styles.buttonContainer}>
                 <Button text="Save Merchant"
@@ -167,7 +167,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                 )) : (
                 <ActivityIndicator size='large' />
             )}
-        </SafeAreaView>
+        </View>
     );
 }
 

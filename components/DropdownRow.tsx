@@ -6,7 +6,7 @@ import { Row } from "./Row";
 
 export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name: string) => void }) {
     return ( // todo fix below
-        <Row onPress={() => onSelect(name)} topBorder={true}>
+        <Row onPress={() => onSelect(name)} topBorder>
             {/* <View style={[styles.fieldContainer, { paddingLeft: 70 }]}> */}
             <Text style={styles.listItem}>{name}</Text>
             {/* </View> */}
@@ -24,6 +24,8 @@ export type DropdownRowProps = {
     defaultValue?: string;
     onCreateNew?: () => void;
     visible?: boolean;
+    topBorder?: boolean;
+    bottomBorder?: boolean;
 };
 
 export function DropdownRow({
@@ -36,6 +38,8 @@ export function DropdownRow({
     defaultValue,
     onCreateNew,
     visible,
+    topBorder,
+    bottomBorder,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
@@ -92,7 +96,8 @@ export function DropdownRow({
     return (
         <View style={{display: visible === false ? 'none' : 'flex'}}>
             <Row
-                topBorder={true}
+                topBorder={topBorder}
+                bottomBorder={bottomBorder}
                 onPress={() => handleRowPress()}
                 >
                 <View style={styles.fieldLabelAndInputContainer}>
