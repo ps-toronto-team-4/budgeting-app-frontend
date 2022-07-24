@@ -12,6 +12,7 @@ import { DropdownRow } from "../components/DropdownRow";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "../hooks/useAuth";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
+import { InputRow } from "../components/InputRow";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
     const passwordHash = useAuth();
@@ -114,45 +115,33 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             ))
     }
 
-    function updatedText() {
+    function onChangeMerchant(text: string) {
+        setMerchantName(text);
         setDisabledButton(false);
         setValidMerchant(true);
     }
 
     return (
         <SafeAreaView style={styles.screen}>
-            <View style={styles.row}>
-                <View>
-                    <Text style={styles.fieldLabel}>Merchant:</Text>
-
-                </View>
-                <TextInput
-                    style={styles.fieldInput}
-                    placeholder='(mandatory)'
-                    onChangeText={(merchantName) => setMerchantName(merchantName)}
-                    value={merchantName}
-                    onChange={() => updatedText()}
-                />
-
-
-            </View>
+            <InputRow
+                label="Merchant:"
+                placeholder="Enter merchant name*"
+                value={merchantName}
+                onChangeText={onChangeMerchant} />
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <RequiredField input={merchantName} />
                 {validMerchant ? (<></>) : (<HandleExisting />)}
-
             </View>
 
-            <View style={styles.row}>
-                <Text style={styles.fieldLabel}>Details:</Text>
-                <TextInput
-                    style={[styles.fieldInput]}
-                    placeholder='(optional)'
-                    onChangeText={(details) => setDetails(details)}
-                    value={details} />
-            </View>
+            <InputRow
+                label="Details:"
+                placeholder="Enter details"
+                value={details}
+                onChangeText={setDetails}
+                topBorder={true} />
             <View style={{}}>
                 <DropdownRow
-                    label="Categories"
+                    label="Category"
                     data={
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
                             categoryData.categories.categories.map(x => x.name) : []

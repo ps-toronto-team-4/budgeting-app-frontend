@@ -138,13 +138,6 @@ export function DropdownRow({
 };
 
 const styles = StyleSheet.create({
-    row: {
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        paddingVertical: 10,
-        paddingHorizontal: 30,
-    },
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -161,5 +154,6 @@ const styles = StyleSheet.create({
     },
     listItem: {
         fontSize: 15,
+        paddingLeft: 40,
     },
 });
