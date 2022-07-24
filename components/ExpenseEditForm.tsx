@@ -192,14 +192,16 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                         </View>
                                 }
                             </View>
-                            <InputRow
-                                label="Details:"
-                                placeholder="Enter Details"
-                                value={desc}
-                                onChangeText={setDesc}
-                                wrap
-                                topBorder
-                                bottomBorder />
+                            <View style={styles.detailsRow}>
+                                <InputRow
+                                    label="Details:"
+                                    placeholder="Enter Details"
+                                    value={desc}
+                                    onChangeText={setDesc}
+                                    wrap
+                                    topBorder
+                                    bottomBorder />
+                            </View>
                             <View style={styles.buttonContainer}>
                                 <Button
                                     text="Save Expense"
@@ -238,63 +240,9 @@ const styles = StyleSheet.create({
         width: 100,
         padding: 0,
     },
-    row: {
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        paddingVertical: 10,
-        paddingHorizontal: 30,
-    },
-    fieldContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: 320,
-    },
-    fieldLabelAndInputContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: 280,
-    },
-    fieldLabel: {
-        fontWeight: 'bold',
-        fontSize: 15,
-    },
-    fieldInput: {
-        fontSize: 15,
-        width: 180
-    },
     detailsRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 10,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
         zIndex: -1,
         elevation: -1,
-    },
-    detailsLabelAndInputContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: 320,
-    },
-    detailsIconAndLabel: {
-        flexDirection: 'row',
-        paddingHorizontal: 0,
-        marginRight: 27,
-        alignItems: 'center',
-    },
-    detailsIcon: {
-        transform: [{ rotateZ: '90deg' }, { rotateY: '180deg' }],
-        marginRight: 5,
-    },
-    detailsInput: {
-        fontSize: 15,
-        width: 250,
     },
     buttonContainer: {
         flex: 1,
@@ -303,9 +251,6 @@ const styles = StyleSheet.create({
         paddingTop: 60,
         zIndex: -1,
         elevation: -1,
-    },
-    listItem: {
-        fontSize: 15,
     },
     calendarContainer: {
         alignSelf: 'center',
