@@ -13,6 +13,8 @@ import { DropdownRow } from "../components/DropdownRow";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 import { useNavigation } from "@react-navigation/native";
+import { useRefresh } from "../hooks/useRefresh";
+import { useAuth } from "../hooks/useAuth";
 
 export type FormValues = {
     amount: number;
@@ -27,17 +29,11 @@ export interface ExpenseEditFormProps {
      * Values to initial the form fields with.
      */
     initVals?: FormValues;
-    /**
-     * If this prop is not undefined and it's state change, this component will refetch
-     * data from the backend. You can use this like a refresh counter and increment
-     * it when you want this component's data to be refetched.
-     */
-    refreshOnStateChange?: number;
     onSubmit: (vals: FormValues) => void;
 }
 
-export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSubmit }: ExpenseEditFormProps) {
-    const [passwordHash, setpasswordHash] = useState(''); // TODO change this to useAuth()
+export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
+    const passwordHash = useAuth();
     const nav = useNavigation();
     const { data: merchantData, refetch: refetchMerchants } =
         useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
@@ -63,31 +59,10 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
     const [date, setDate] = useState(initVals?.date || moment().toISOString());
     const [desc, setDesc] = useState(initVals?.desc || '');
 
-    useEffect(() => {
-        if (refresh !== undefined) {
-            refetchMerchants({
-                passwordHash: passwordHash,
-            });
-            refetchCategories({
-                passwordHash: passwordHash,
-            });
-        }
-    }, [refresh]);
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-    }
+    useRefresh(() => {
+        refetchMerchants();
+        refetchCategories();
+    }, [passwordHash]);
 
     function handleAmountBlur() {
         if (amountText === '') {

@@ -18,6 +18,8 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RootTabScreenProps } from "../types";
 import AddButton from "../components/AddButton";
 import { useAuth } from "../hooks/useAuth";
+import { useIsFocused } from "@react-navigation/native";
+import { useRefresh } from "../hooks/useRefresh";
 
 //TODO
 // - *IMPORTANT* fix virtualization issue
@@ -100,12 +102,7 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
   const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
   });
-  useEffect(() => {
-    if (route.params?.refresh === true) {
-      console.log('refetching');
-      refetch();
-    }
-  });
+  useRefresh(refetch, [passwordHash]);
   const navigateCallBack = (id: number | null | undefined) => {
     if (id === undefined || id == null) {
       alert("Transaction could not be found!")
@@ -116,7 +113,7 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
   }
   const dailyGrouping = splitTransationsOnDate(data, amountToRender)
   function handleAddExpense() {
-    navigation.navigate('CreateExpense', { refresh: false });
+    navigation.navigate('CreateExpense');
   }
 
   const FakeFlatList = (

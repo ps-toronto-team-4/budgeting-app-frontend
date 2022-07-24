@@ -22,7 +22,7 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
                 desc: vals.desc || null,
             }
         });
-        navigation.navigate("Root", { screen: "Expenses", params: { refresh: true } });
+        navigation.navigate("Root");
     }
 
     return (
