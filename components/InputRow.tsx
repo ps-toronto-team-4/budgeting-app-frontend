@@ -12,6 +12,9 @@ export type InputRowProps = Omit<RowProps, 'children'> & {
     wrap?: boolean;
 };
 
+/**
+ * Not tested for the case where the `wrap` prop changes over component lifecycle. So keep `wrap` static to be safe.
+ */
 export function InputRow({ label, placeholder, value, onChangeText, disabled, wrap, ...otherProps }: InputRowProps) {
     const [ inputHeight, setInputHeight ] = useState(20);
 
