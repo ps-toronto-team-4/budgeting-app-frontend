@@ -150,23 +150,23 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                         onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
                         onCollapse={() => setMerchantExpanded(false)}
                         visible={merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded} />
-                        <DropdownRow
-                            label="Category"
-                            data={
-                                categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                                    categoryData.categories.categories.map(x => x.name) : []
-                            }
-                            onSelect={selectCategory}
-                            defaultValue={
-                                initVals && categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                                    categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
-                                    : undefined
-                            }
-                            onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
-                            expanded={categoryExpanded}
-                            onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
-                            onCollapse={() => setCategoryExpanded(false)}
-                            visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded} />
+                    <DropdownRow
+                        label="Category"
+                        data={
+                            categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                                categoryData.categories.categories.map(x => x.name) : []
+                        }
+                        onSelect={selectCategory}
+                        defaultValue={
+                            initVals && categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                                categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
+                                : undefined
+                        }
+                        onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
+                        expanded={categoryExpanded}
+                        onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
+                        onCollapse={() => setCategoryExpanded(false)}
+                        visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded} />
                 {
                     !merchantExpanded && !categoryExpanded ?
                         <>
