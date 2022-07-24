@@ -257,6 +257,34 @@ mutation createBudgetCategory($passwordHash: String!, $budgetId:Int!, $categoryI
     }
 }
 
+mutation updateBudgetCategory($passwordHash: String!, $id:Int!, $amount: Float!){
+    updateBudgetCategory(passwordHash: $passwordHash, id: $id, amount: $amount){
+        __typename
+        ... on BudgetCategorySuccess{
+            budgetCategory{
+                id
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+mutation deleteBudgetCategory($passwordHash: String!, $id:Int!){
+    deleteBudgetCategory(passwordHash: $passwordHash, id: $id){
+        __typename
+        ... on DeleteSuccess{
+            successMessage
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
 query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
     monthBreakdown(passwordHash:$passwordHash,month:$month,year:$year){
         ... on MonthBreakdown {

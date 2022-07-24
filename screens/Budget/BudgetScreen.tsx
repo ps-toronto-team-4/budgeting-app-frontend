@@ -56,10 +56,15 @@ export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'
                         <ChartDisplay data={selectedBudget.budgetCategories as BudgetCategory[]} />
                         <Button
                             title="Add new Budget"
-                            onPress={() => navigation.navigate("CreateBudget")}
+                            onPress={() => navigation.navigate("CreateBudget", { budget: selectedBudget as Budget })}
                         />
                         <ScrollView>
-                            <ShowBudgets data={selectedBudget.budgetCategories as BudgetCategory[]} monthlyData={monthData} />
+                            <ShowBudgets
+                                data={selectedBudget.budgetCategories as BudgetCategory[]}
+                                monthlyData={monthData}
+                                updateCallback={(budCat: BudgetCategory) => {
+                                    navigation.navigate("UpdateBudget", { budgetCategory: budCat })
+                                }} />
                         </ScrollView>
                     </>)
                     || <MissingBudget

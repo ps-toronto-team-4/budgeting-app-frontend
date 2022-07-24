@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
 import { Swipeable } from 'react-native-gesture-handler';
 import FakeFlatList from '../../../components/FakeFlatList';
 import { BudgetCategory, GetMonthBreakdownQuery } from '../../../components/generated';
 
-const ShowBudgets = ({ data, monthlyData }: { data: Array<BudgetCategory> | undefined | null, monthlyData: GetMonthBreakdownQuery | undefined }) => {
+const ShowBudgets = ({
+    data,
+    monthlyData,
+    updateCallback
+}
+    : {
+        data: Array<BudgetCategory> | undefined | null,
+        monthlyData: GetMonthBreakdownQuery | undefined,
+        updateCallback: Function
+    }) => {
 
     const Separator = () => <View style={styles.itemSeparator} />;
     const RightSwipeOpen = () => {
@@ -33,9 +42,8 @@ const ShowBudgets = ({ data, monthlyData }: { data: Array<BudgetCategory> | unde
         const closeToBudget = !overBudget && spent > item.amount * 0.75
 
         return (
-            <Swipeable
-            // renderRightActions={RightSwipeOpen}
-            // onSwipeableRightOpen={() => alert("dlete me")}
+            <TouchableHighlight
+                onPress={() => updateCallback(item)}
             >
                 <View style={{
                     flex: 1,
@@ -92,7 +100,7 @@ const ShowBudgets = ({ data, monthlyData }: { data: Array<BudgetCategory> | unde
                     </View>
 
                 </View>
-            </Swipeable>
+            </TouchableHighlight>
         )
     }
 

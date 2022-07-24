@@ -28,6 +28,7 @@ import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
 import CreateMerchant from '../screens/CreateMerchantScreen';
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
 import CreateBudget from '../screens/Budget/CreateBudgetScreen';
+import UpdateBudget from '../screens/Budget/UpdateBudgetScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -62,6 +63,7 @@ function RootNavigator() {
       <Stack.Screen name="CreateMerchant" component={CreateMerchant} options={{ headerTitle: 'Create Merchant', headerTransparent: true, headerTitleAlign: 'center', }} />
       <Stack.Screen name='CreateExpense' component={CreateExpenseScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name='CreateBudget' component={CreateBudget} options={{ headerTitle: '', headerShadowVisible: false }} />
+      <Stack.Screen name='UpdateBudget' component={UpdateBudget} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{
         title: 'Expense Details', headerTitleAlign: "center", headerShadowVisible: false, headerTitleStyle: { fontWeight: "bold" }
       }} />
