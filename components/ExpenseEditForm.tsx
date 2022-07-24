@@ -190,24 +190,14 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                                         </View>
                                 }
                             </View>
-                            <View style={styles.detailsRow}>
-                                <View style={styles.detailsLabelAndInputContainer}>
-                                    <View style={styles.detailsIconAndLabel}>
-                                        <Feather style={styles.detailsIcon} name="bar-chart" size={16} color="black" />
-                                        <Text style={styles.fieldLabel}>Details:</Text>
-                                    </View>
-                                    <TextInput
-                                        style={[styles.detailsInput, { height: detailsHeight }]}
-                                        placeholder="Enter Details"
-                                        multiline={true}
-                                        textAlignVertical="top"
-                                        scrollEnabled={false}
-                                        onContentSizeChange={(e) => setDetailsHeight(e.nativeEvent.contentSize.height)}
-                                        onChangeText={setDesc}
-                                        value={desc}>
-                                    </TextInput>
-                                </View>
-                            </View>
+                            <InputRow
+                                label="Details:"
+                                placeholder="Enter Details"
+                                value={desc}
+                                onChangeText={setDesc}
+                                wrap
+                                topBorder
+                                bottomBorder />
                             <View style={styles.buttonContainer}>
                                 <Button
                                     text="Save Expense"

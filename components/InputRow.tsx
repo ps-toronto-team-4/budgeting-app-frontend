@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { Row, RowProps } from "./Row";
 import { View, Text } from "./Themed";
@@ -8,9 +9,12 @@ export type InputRowProps = Omit<RowProps, 'children'> & {
     value?: string;
     onChangeText?: (text: string) => void;
     disabled?: boolean;
+    wrap?: boolean;
 };
 
-export function InputRow({ label, placeholder, value, onChangeText, disabled, ...otherProps }: InputRowProps) {
+export function InputRow({ label, placeholder, value, onChangeText, disabled, wrap, ...otherProps }: InputRowProps) {
+    const [ inputHeight, setInputHeight ] = useState(20);
+
     return (
         <Row {...otherProps}>
             <View style={styles.labelAndInput}>
@@ -18,11 +22,15 @@ export function InputRow({ label, placeholder, value, onChangeText, disabled, ..
                     {label}
                 </Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { height: inputHeight }]}
                     placeholder={placeholder}
                     value={value}
                     onChangeText={onChangeText}
-                    editable={disabled !== true} />
+                    editable={disabled !== true}
+                    multiline={wrap}
+                    scrollEnabled={false}
+                    textAlignVertical="top"
+                    onContentSizeChange={(e) => setInputHeight(e.nativeEvent.contentSize.height)} />
             </View>
         </Row>
     );
