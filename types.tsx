@@ -28,7 +28,7 @@ export type RootStackParamList = {
   CategorySettings: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
-  UpdateMerchant: { id: number, name: string, description?: string | null, category?: { id?: number, name?: string } };
+  UpdateMerchant: { id: number, name: string, description?: string | null, category?: { id: number, name: string }};
   MerchantSettings: undefined;
 };
 

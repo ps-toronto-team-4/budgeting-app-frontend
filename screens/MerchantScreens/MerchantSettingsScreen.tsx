@@ -3,12 +3,13 @@ import { GetMerchantsDocument, GetMerchantsQuery, Merchant, } from "../../compon
 import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { RootStackScreenProps } from "../../types";
 import Button from "../../components/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import Styles from "../../constants/Styles";
 
 export default function MerchantSettingsScreen({ navigation }: RootStackScreenProps<'MerchantSettings'>) {
     
@@ -29,7 +30,7 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
 
       const renderMerchant = ({item}: {item: Merchant}) => {
         return (
-        <TouchableOpacity style={style.merchant} onPress={() => navigation.navigate("UpdateMerchant", {id: item.id, name: item.name, description: item.description})}>
+        <TouchableOpacity style={Styles.list} onPress={() => navigation.navigate("UpdateMerchant", {id: item.id, name: item.name, description: item.description, category: item.defaultCategory || undefined})}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ fontSize: 18, marginHorizontal: 5 }}>{item.name}</Text>
             </View>
@@ -56,15 +57,3 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
     );
 }
 
-const style = StyleSheet.create ({
-    merchant: {
-        flexDirection: "row",
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-        height: 50,
-        backgroundColor: 'white',
-        marginVertical: 5,
-        padding: 10
-    }
-});
