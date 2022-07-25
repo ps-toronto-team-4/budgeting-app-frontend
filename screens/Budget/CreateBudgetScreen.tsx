@@ -97,7 +97,7 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
                                 other => other.category.name == filterCat.name
                             )
                             return lookingForOverlap === undefined
-                        }).map(x => x.name) : []
+                        }).map(x => { return { name: x.name, id: x.id.toString() } }) : []
                 }
                 onSelect={selectCategory}
                 expanded={categoryExpanded}
