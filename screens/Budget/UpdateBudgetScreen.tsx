@@ -3,7 +3,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { RootStackScreenProps } from "../../types";
 import Colors from "../../constants/Colors";
-import moment, { Moment } from "moment";
 import { Budget, BudgetCategory, DeleteBudgetCategoryDocument, DeleteBudgetCategoryMutation, UpdateBudgetCategoryDocument, UpdateBudgetCategoryMutation } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../../components/Button";
@@ -24,8 +23,8 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
         }),
         onCompleted: ((response) => {
             if (response.updateBudgetCategory.__typename == 'BudgetCategorySuccess') {
-                // triggerRefetch()
-                navigation.goBack();
+                // navigation.goBack();
+                navigation.navigate("Root", { screen: "Budget", params: { refresh: (Math.random()) } });
             }
         })
     })
@@ -34,7 +33,9 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
         variables: { passwordHash, id: BudgetCategory?.id },
         onCompleted: ((response) => {
             if (response.deleteBudgetCategory.__typename == 'DeleteSuccess') {
-                navigation.goBack();
+                // navigation.goBack();
+                // navigation.navigate("Root", { screen: "Budget", params: { refresh: true } });
+                navigation.navigate("Root", { screen: "Budget", params: { refresh: (Math.random()) } });
             }
         })
     })

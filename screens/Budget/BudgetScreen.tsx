@@ -13,7 +13,7 @@ import MissingBudget from "./components/missingBudget";
 import TopBar from "./components/topBar";
 
 
-export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'>) {
+export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'Budget'>) {
     const [passwordHash, setpasswordHash] = React.useState("");
     const [month, setMonth] = useState("JULY")
     const [year, setYear] = useState(2022)
@@ -42,7 +42,15 @@ export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'
         } catch (e) {
             setpasswordHash('undefined');
         }
+        if (route.params?.refresh) {
+
+        }
     }
+
+    useEffect(() => {
+        budgetRefetch()
+        monthRefetch()
+    }, [route]);
 
     const selectedBudget = budgetData?.budgets.__typename == 'BudgetsSuccess' ? budgetData.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined
 

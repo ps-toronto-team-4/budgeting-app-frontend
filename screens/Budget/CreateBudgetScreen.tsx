@@ -33,7 +33,9 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
         onCompleted: ((response) => {
             if (response.createBudgetCategory.__typename == "BudgetCategorySuccess") {
                 // triggerRefetch()
-                navigation.goBack();
+                // navigation.goBack();
+                navigation.navigate("Root", { screen: "Budget", params: { refresh: (Math.random()) } });
+
             }
         })
     })
@@ -60,6 +62,19 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
             const found = categoryData?.categories.categories.find(cat => cat.name === name);
             if (found !== undefined) setCategoryId(found?.id);
         }
+    }
+
+    function handleBudgetCreation() {
+        if (amount == 0) {
+            alert("Budgeted amount can't be zero")
+        } else if (budget == null || budget.id == null) {
+            alert("Parent budget not found")
+        } else if (categoryId == null) {
+            alert("Please select a catgeory")
+        } else {
+            createBudget()
+        }
+
     }
 
     return (
@@ -101,7 +116,7 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
                 <Button
                     text="Create New Budget"
                     accessibilityLabel="Button to Create New Budget"
-                    onPress={() => createBudget()} />
+                    onPress={() => handleBudgetCreation()} />
             </View>
         </View >
     );
