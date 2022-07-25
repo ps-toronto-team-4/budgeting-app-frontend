@@ -86,8 +86,9 @@ export function DropdownRow({
                 style={expanded ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
                 onPress={handleRowPress}>
                 <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
+                    
                         <Text style={styles.fieldLabel}>{label}:</Text>
+                        <View style={styles.fieldLabelAndInputContainer}>
                         <TextInput
                             style={styles.fieldInput}
                             editable={expanded}
@@ -96,12 +97,13 @@ export function DropdownRow({
                             value={value}
                             onChangeText={setValue}>
                         </TextInput>
-                    </View>
+                        
                     <AntDesign
                         name={expanded ? 'up' : 'down'}
                         size={20}
                         color="black"
                         onPress={handleIconPress} />
+                        </View>
                 </View>
             </TouchableHighlight>
             {
@@ -122,8 +124,7 @@ export function DropdownRow({
                                     name={'Create new ' + label.toLowerCase()}
                                     onSelect={(_) => onCreateNew()} />
                                 : <View></View>
-                        }>
-                    </FlatList>
+                        }/>
                     :
                     <View></View>
             }
@@ -134,6 +135,8 @@ export function DropdownRow({
 const styles = StyleSheet.create({
     row: {
         alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         borderTopWidth: 1,
         borderTopColor: 'rgba(0,0,0,0.3)',
         paddingVertical: 10,
@@ -143,20 +146,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: 320,
+        width: '100%'
     },
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: 280,
+        justifyContent: 'flex-end'
     },
     fieldLabel: {
         fontWeight: 'bold',
         fontSize: 15,
+        paddingLeft: 5
     },
     fieldInput: {
         fontSize: 15,
-        width: 180
+        width: 160,
     },
     listItem: {
         fontSize: 15,

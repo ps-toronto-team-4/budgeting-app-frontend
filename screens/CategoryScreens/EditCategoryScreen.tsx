@@ -12,6 +12,8 @@ import { useMutation, useQuery } from '@apollo/client';
 import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, GetCategoriesDocument, DeleteCategoryMutation, DeleteCategoryDocument } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
+import modalStyle from '../../constants/Modal';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 
@@ -38,7 +40,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
     }),
     onCompleted: (data => {
       if (data.updateCategory.__typename === 'CategorySuccess') {
-        navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root");
+        navigation.canGoBack() ? navigation.goBack() : navigation.navigate("CategorySettings");
       }
     })
   });
@@ -50,7 +52,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
     }),
     onCompleted: (data => {
       if (data.deleteCategory.__typename === 'DeleteSuccess') {
-        navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root");
+        navigation.canGoBack() ? navigation.goBack() : navigation.navigate("CategorySettings");
       }
     })
   });
@@ -61,7 +63,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
         return cat.id !== id && cat.name.toLowerCase() === newName.toLowerCase()
       });
     } else {
-      return false;
+      return undefined;
     }
   };
 
@@ -81,7 +83,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
   }
 
   return (
-      <View style={[Styles.container, { backgroundColor: confirmDelete ? 'grey' : 'white' }]}>
+      <SafeAreaView style={[Styles.container, { backgroundColor: confirmDelete ? 'grey' : 'white' }]}>
         {loading ? (
           <ActivityIndicator size={'large'}/>
         ) : (
@@ -120,70 +122,29 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
         <RequiredField check={check} input={newColor} />
         <TextInput
           onChangeText={(details) => setNewDetails(details)}
-          value={newDetails ||  ""}
+          value={newDetails ||  undefined}
           placeholder="Details"
         />
         <Button text="Save Category" disabled={confirmDelete} onPress={onSubmit} accessibilityLabel={'Save Category Button'}/>
         <Button text="Delete Category" disabled={confirmDelete} backgroundColor='red' onPress={() => setConfirmDelete(true)} accessibilityLabel={'Delete Category Button'}/>
         <Modal
-        animationType="slide"
+
         transparent={true}
         visible={confirmDelete}
         onRequestClose={() => setConfirmDelete(false)}
         >
-          <View style={style.centeredView}>
-            <Text style={style.modalTitle}>Delete Category?</Text>
-            <Text style={style.modalText}>Are you sure you want to delete this category?</Text>
-            <Text style={style.modalWarn}>Warning: Budgets in this category will also be deleted.</Text>
-            <View style={style.buttonView}>
+          <View style={modalStyle.container}>
+            <Text style={modalStyle.title}>Delete Category?</Text>
+            <Text style={modalStyle.text}>Are you sure you want to delete this category?</Text>
+            <Text style={modalStyle.warning}>Warning: Budgets in this category will also be deleted.</Text>
+            <View style={modalStyle.buttonView}>
               <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button'/>
               <Button text="Delete" onPress={() => {deleteCategory()}} size='half' backgroundColor='red' accessibilityLabel='Delete Category button'/>
             </View>
           </View>
         </Modal>
-      </View>
+      </SafeAreaView>
   );
 }
 
-const style = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'space-between',
-    alignItems: "center",
-    marginVertical: '50%',
-    marginHorizontal: '10%',
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    paddingBottom: 40,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  buttonView: {
-    flexDirection: 'row',
-    width: 250,
-    justifyContent: 'space-between'
-  },
-  modalTitle: {
-    fontSize: 26,
-    // marginHorizontal: 25,
-    marginBottom: '10%',
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  modalText: {
-    fontSize: 16,
-    textAlign: 'center'
-  },
-  modalWarn: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 5
-  }
-});
+

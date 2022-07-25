@@ -3,12 +3,13 @@ import { Category, GetCategoriesDocument, GetCategoriesQuery } from "../../compo
 import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { RootStackScreenProps } from "../../types";
 import Button from "../../components/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import Styles from "../../constants/Styles";
 
 export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
     
@@ -29,7 +30,7 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
 
       const renderCategory = ({item}: {item: Category}) => {
         return (
-        <TouchableOpacity style={style.category} onPress={() => navigation.navigate("EditCategory", {id: item.id, name: item.name, color: item.colourHex, details: item.description})}>
+        <TouchableOpacity style={Styles.list} onPress={() => navigation.navigate("EditCategory", {id: item.id, name: item.name, color: item.colourHex, details: item.description})}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View style={{ width: 30, marginHorizontal: 15, height: 30, backgroundColor: "#" + item.colourHex, borderRadius: 90, borderWidth: 1 }} />
             <Text style={{ fontSize: 18, marginHorizontal: 5 }}>{item.name}</Text>
@@ -40,7 +41,6 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
 
     return (
         <View>
-            <Text>Hello from category settings!</Text>
             <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')}/>
                 { loading ? (<ActivityIndicator size='large'/>) : (
                     data?.categories.__typename === "CategoriesSuccess" ? (
@@ -57,16 +57,3 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
         </View>
     );
 }
-
-const style = StyleSheet.create ({
-    category: {
-        flexDirection: "row",
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-        height: 50,
-        backgroundColor: 'white',
-        marginVertical: 5,
-        padding: 10
-    }
-});
