@@ -1,0 +1,278 @@
+query getPasswordHash($username: String!, $password: String!) {
+    signIn(username: $username , password: $password) {
+        __typename
+        ...on SignInSuccess {
+            passwordHash
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query getCategory($passwordHash: String!, $id: Int!) {
+    category(passwordHash: $passwordHash, id: $id ) {
+        __typename
+        ...on CategorySuccess {
+            category {
+                id
+                name
+                colourHex
+                description
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query getGreetings {
+    greeting
+}
+
+
+query getCategories($passwordHash: String!) {
+    categories(passwordHash: $passwordHash) {
+        __typename
+        ...on CategoriesSuccess {
+            categories {
+                id
+                name
+                colourHex
+                description
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation createUser($fname: String!, $lname: String!, $username: String!, $email: String!, $password: String!, $phone: String) {
+    signUp(firstName: $fname, lastName: $lname, username: $username, email: $email, phoneNumber: $phone, password: $password) {
+        __typename
+        ...on CreateUserSuccess {
+            passwordHash
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation createCategory($passwordHash: String!, $name: String!, $color: String!, $details: String) {
+    createCategory(name: $name, colourHex: $color, description: $details, passwordHash: $passwordHash) {
+        __typename
+        ...on CategorySuccess {
+            category {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation updateCategory($passwordHash: String!, $id: Int!, $name: String!, $color: String!, $details: String) {
+    updateCategory(name: $name, colourHex: $color, description: $details, passwordHash: $passwordHash, id: $id) {
+        __typename
+        ...on CategorySuccess {
+            category {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation deleteCategory($passwordHash: String!, $id: Int!) {
+    deleteCategory(passwordHash: $passwordHash, id: $id) {
+        ...on DeleteSuccess {
+            successMessage
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query getExpenses ($passwordHash: String!) {
+    expenses(passwordHash: $passwordHash) {
+        ... on ExpensesSuccess {
+            expenses {
+                amount
+                id
+                date
+                description
+                category {
+                    colourHex
+                    name
+                }
+            }
+        }
+        
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+query getExpense($passwordHash: String!, $expenseId: Int!) {
+    expense(passwordHash: $passwordHash, id: $expenseId) {
+        ...on ExpenseSuccess {
+            expense {
+                id
+                amount
+                category {
+                    id
+                    name
+                    colourHex
+                }
+                merchant {
+                    id
+                    name
+                }
+                description
+                date
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation createExpense($passwordHash: String!, $amount: Float!, $epochDate: Int!, $merchantId: Int, $categoryId: Int, $desc: String) {
+    createExpense(passwordHash: $passwordHash, amount: $amount, epochDate: $epochDate, merchantId: $merchantId, categoryId: $categoryId, description: $desc) {
+        ...on ExpenseSuccess {
+            expense {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation updateExpense($passwordHash: String!, $id: Int!, $amount: Float!, $epochDate: Int!, $merchantId: Int, $categoryId: Int, $desc: String) {
+    updateExpense(passwordHash: $passwordHash, id: $id, amount: $amount, epochDate: $epochDate, merchantId: $merchantId, categoryId: $categoryId, description: $desc) {
+        ...on ExpenseSuccess {
+            expense {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation deleteExpense($passwordHash: String!, $id: Int!) {
+    deleteExpense(passwordHash: $passwordHash, id: $id) {
+        ...on DeleteSuccess {
+            successMessage
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query getMerchants($passwordHash: String!) {
+    merchants(passwordHash: $passwordHash) {
+        ...on MerchantsSuccess {
+            merchants {
+                id
+                name
+                description
+                defaultCategory {
+                    id
+                    name
+                    description
+                    colourHex
+                }
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation createMerchant($passwordHash: String!, $name: String!, $description: String, $defaultCategoryId: Int){
+  createMerchant(passwordHash:$passwordHash, name:$name, description:$description, defaultCategoryId:$defaultCategoryId){
+    __typename
+    ...on MerchantSuccess{
+      merchant{
+        id
+        name
+        description
+        defaultCategory{
+          id
+          name
+          colourHex
+          description
+        }
+      }
+    }
+    
+    ...on FailurePayload{
+      exceptionName
+      errorMessage
+    }
+  }
+}
+query getMerchant ($passwordHash: String!, $id: Int!){
+    merchant(passwordHash: $passwordHash, id: $id){
+        __typename
+        ...on MerchantSuccess{
+            merchant {
+                id
+                name
+                description
+                defaultCategory {
+                    id
+                    name
+                    colourHex
+                    description
+                }
+            }
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
