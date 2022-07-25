@@ -13,3 +13,5 @@ web-build/
 
 # macOS
 .DS_Store
+
+node_modules.7z
