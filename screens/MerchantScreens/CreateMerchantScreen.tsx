@@ -11,7 +11,6 @@ import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 import { InputRow } from "../../components/InputRow";
 import { Screen } from "../../components/Screen";
 
-
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
     const passwordHash = useAuth();
     const [merchantName, setMerchantName] = React.useState("");
@@ -129,7 +128,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     label="Category"
                     data={
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
+                            categoryData.categories.categories.map(x => { return { id: x.id, name: x.name} }) : []
                     }
                     onSelect={handleCategorySelect}
                     expanded={categoryOpen}

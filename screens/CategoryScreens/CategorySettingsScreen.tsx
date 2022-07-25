@@ -45,7 +45,6 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
 
     return (
         <Screen>
-            <Text>Hello from category settings!</Text>
             <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')}/>
                 { loading ? (<ActivityIndicator size='large'/>) : (
                     data?.categories.__typename === "CategoriesSuccess" ? (

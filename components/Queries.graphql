@@ -208,6 +208,7 @@ mutation deleteExpense($passwordHash: String!, $id: Int!) {
 
 query getMerchants($passwordHash: String!) {
     merchants(passwordHash: $passwordHash) {
+        __typename
         ...on MerchantsSuccess {
             merchants {
                 id

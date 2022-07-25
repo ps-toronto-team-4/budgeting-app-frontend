@@ -12,7 +12,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { RequiredField } from "../../components/Themed";
 import modalStyle from "../../constants/Modal";
 import Styles from "../../constants/Styles";
-import { useFocusEffect } from "@react-navigation/native";
 
 export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
     
@@ -147,7 +146,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                     label="Categories"
                     data={
                         categoryData?.categories.__typename === "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => x.name) : []
+                            categoryData.categories.categories : []
                     }
                     onSelect={handleCategorySelect}
                     expanded={categoryOpen}

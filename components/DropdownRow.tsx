@@ -16,7 +16,7 @@ export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name
 
 export type DropdownRowProps = {
     label: string;
-    data: {id: string, name: string}[];
+    data: {id: number, name: string}[];
     onSelect: (name: string) => void;
     expanded?: boolean;
     onExpand?: () => void;
@@ -124,7 +124,7 @@ export function DropdownRow({
                             data.filter(item => {
                                 return item.name.toLowerCase().startsWith(value.toLowerCase())
                             }).map(item => {
-                                return { id: item.id, name: item.name, onSelect: handleSelect }
+                                return { id: item.id.toString(), name: item.name, onSelect: handleSelect }
                             })
                         }
                         renderItem={renderDropdownItem}

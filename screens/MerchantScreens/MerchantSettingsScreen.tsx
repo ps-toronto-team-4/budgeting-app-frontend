@@ -10,10 +10,13 @@ import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Styles from "../../constants/Styles";
+import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 
 export default function MerchantSettingsScreen({ navigation }: RootStackScreenProps<'MerchantSettings'>) {
     
     const passwordHash = useAuth();
+
+    useUnauthRedirect();
 
     const {data, loading, refetch} = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash },
@@ -40,8 +43,8 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
 
     return (
         <View>
-            <Button text="Create New Merchant" accessibilityLabel="Create Merchant Link" onPress={() => navigation.navigate('CreateMerchant')}/>
-                { loading ? (<ActivityIndicator size='large'/>) : (
+            <Button text="Create New Merchant" accessibilityLabel="Link to Create New" onPress={() => navigation.navigate('CreateMerchant')}/>
+            { loading ? (<ActivityIndicator size='large'/>) : (
                     data?.merchants.__typename === "MerchantsSuccess" ? (
                         <FlatList
                             data={data.merchants.merchants}
@@ -49,8 +52,8 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
                         />
                     ) : (
                     <View>
-                        {/* <Text>{data?.merchants.exceptionName}</Text>
-                        <Text>{data?.merchants.errorMessage}</Text> */}
+                        <Text>{data?.merchants.exceptionName}</Text>
+                        <Text>{data?.merchants.errorMessage}</Text>
                     </View>
                 ))}
         </View>

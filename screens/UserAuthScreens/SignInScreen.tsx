@@ -9,7 +9,7 @@ import { useLazyQuery } from '@apollo/client';
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../../components/generated";
 import Styles from "../../constants/Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAuthRedirect } from "../hooks/useAuthRedirect";
+import { useAuthRedirect } from "../../hooks/useAuthRedirect";
 
 export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");
