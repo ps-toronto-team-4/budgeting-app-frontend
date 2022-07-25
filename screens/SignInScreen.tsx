@@ -9,6 +9,7 @@ import { useLazyQuery, useQuery } from '@apollo/client';
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
 import Styles from "../constants/Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 
 export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");
@@ -16,6 +17,16 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
   const [usernamePayload, setUsernamePayload] = React.useState("");
   const [passwordPayload, setPasswordPayload] = React.useState("");
 
+  useAuthRedirect();
+
+  const setData = async () => {
+    try {
+      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash : '');
+      navigation.navigate('Root');
+    } catch (error) {
+      data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage : "undefined error";
+    }
+  }
   const [triggerLogin, { loading, error, data }] = useLazyQuery<GetPasswordHashQuery>(GetPasswordHashDocument, {
     variables: { username: usernamePayload, password: passwordPayload },
     onCompleted: (data) => {
@@ -29,14 +40,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
   });
 
 
-  const setData = async () => {
-    try {
-      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash : "undefined");
-      navigation.navigate('Root');
-    } catch (error) {
-      data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage : "undefined error";
-    }
-  }
+
 
   const handleLogin = () => {
 

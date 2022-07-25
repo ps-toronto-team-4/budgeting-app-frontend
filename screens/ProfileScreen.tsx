@@ -1,41 +1,36 @@
 import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
-import { ColorValue } from "react-native"
-
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Button from "../components/Button";
+import { useAuth } from "../hooks/useAuth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
+import { Screen } from "../components/Screen";
 
 export default function ProfileScreen({ navigation }: RootTabScreenProps<'Reports'>) {
-    const [passwordHash, setpasswordHash] = React.useState("");
+    const passwordHash = useAuth();
 
-    useEffect(() => {
-        getData();
-    }, []);
+    useUnauthRedirect();
 
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
+    const navigate = () => {
+        navigation.navigate('CategorySettings');
     }
 
+    const logout = () => {
+        AsyncStorage.removeItem('passwordHash').then(() => {
+            navigation.navigate('Welcome');
+        });
+    };
+
     return (
-        <View>
+        <Screen>
             <Text>Hello from ProfileScreen!</Text>
             <Text>The locally stored password hash is: {passwordHash}</Text>
-        </View>
+            <Button text="Category Settings" accessibilityLabel="Category Settings Link" onPress={navigate}/>
+            <Button text="Logout" onPress={logout} accessibilityLabel="Logout Button" />
+        </Screen>
     );
 }
-
-
-
-const styles = StyleSheet.create({
-
-});

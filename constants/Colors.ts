@@ -10,6 +10,7 @@ export default {
     tabIconSelected: tintColorLight,
     btnBackground: 'hsl(213,10%,18%)',
     btnText: 'hsl(0,0%,100%)',
+    uncategorizedColor: 'hsl(240,20%,80%)',
   },
   dark: { // unused in this app
     text: '#fff',
@@ -19,5 +20,6 @@ export default {
     tabIconSelected: tintColorDark,
     btnBackground: 'hsl(0,50%,50%)',
     btnText: 'hsl(0,0%,0%)', // TODO: test dark mode btn color scheme
+    uncategorizedColor: 'hsl(240,20%,80$)', // haven't checked for dark mode
   },
 };

@@ -23,9 +23,14 @@ const linking: LinkingOptions<RootStackParamList> = {
           Budget: 'budget',
         }
       },
+      CreateCategory: 'create-category',
+      EditCategory: 'edit-category',
       ExpenseDetails: 'expense-details',
+      CreateExpense: 'create-expense',
+      UpdateExpense: 'update-expense',
       ForgotPasswordModal: 'ForgotPassword',
       NotFound: '*',
+      CreateMerchant: 'create-merchant',
     },
   },
 };

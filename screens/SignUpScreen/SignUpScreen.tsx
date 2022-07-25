@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { Text, View } from '../../components/Themed';
+import { Text, View, RequiredField } from '../../components/Themed';
 import { RootStackScreenProps, RootTabScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
@@ -11,6 +11,7 @@ import { styles, eyeIconSize } from './SignUpScreen.styles';
 import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
 import PhoneInput from 'react-native-phone-number-input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignUp'>) {
 
@@ -29,7 +30,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   const [emailCheck, setEmailCheck] = useState(false)
   const [phoneCheck, setPhoneCheck] = useState(false)
   const [hidePword, setHidePword] = useState(true)
- 
+
   const [lengthCheck, setLengthCheck] = useState(true)
   const [lettersCheck, setLettersCheck] = useState(true)
   const [numberCheck, setNumberCheck] = useState(true)
@@ -39,6 +40,8 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   const [formatCheck, setFormatCheck] = useState(true)
   const [emailRegex, setEmailRegex] = useState(true)
   const [minPhone, setMinPhone] = useState(true)
+
+  useAuthRedirect();
 
   // Create user graphql query
   const [createUser, { loading, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {
@@ -92,15 +95,6 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
     }
   }
 
-  function RequiredField({ input }: { input: string }) {
-    return (
-      (!check || input) ? (
-        <></>
-      ) : (
-        <Text style={styles.alert}>This field is required</Text>
-      ))
-  }
-
   function PasswordRules() {
     if (lettersCheck && lengthCheck && numberCheck && specialCheck) {
       return (<></>);
@@ -125,7 +119,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
   }
 
   function FormatPhone(newPhone: string) {
-    setPhone(newPhone.replace(/[^0-9]/g, "").substring(0,15));
+    setPhone(newPhone.replace(/[^0-9]/g, "").substring(0, 15));
     setPhoneCheck(false);
   }
 
@@ -148,7 +142,8 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
       return (<Text style={styles.alert}>Username can only include letters, numbers, underscore (_) and dot (.)</Text>)
     } else {
       return (<></>);
-  }}
+    }
+  }
 
   return (
     <View style={Styles.container}>
@@ -168,23 +163,23 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           value={fname}
           placeholder="First Name*"
         />
-        <RequiredField input={fname} />
+        <RequiredField check={check} input={fname} />
         <TextInput
           style={styles.formField}
           onChangeText={(lname) => setLname(lname)}
           value={lname}
           placeholder="Last Name*"
         />
-        <RequiredField input={lname} />
+        <RequiredField check={check} input={lname} />
         <TextInput
           style={styles.formField}
-          onChangeText={(user) => {setUsername(user.substring(0,16)); setUserCheck(false)}}
+          onChangeText={(user) => { setUsername(user.substring(0, 16)); setUserCheck(false) }}
           onBlur={() => setUserCheck(true)}
           value={username}
           placeholder="Username*"
         />
-        <RequiredField input={username} />
-        <UsernameRules/>
+        <RequiredField check={check} input={username} />
+        <UsernameRules />
         <TextInput
           style={styles.formField}
           onChangeText={(email) => { setEmail(email.replace(/\s+/g, "")); setEmailCheck(false) }}
@@ -193,7 +188,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           placeholder="Email*"
         />
         <CheckEmail />
-        <RequiredField input={email} />
+        <RequiredField check={check} input={email} />
         <View style={styles.formField}>
           <TextInput
             style={styles.pwordinput}
@@ -206,7 +201,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           />
           <FontAwesome style={styles.icon} name={hidePword ? ("eye") : ("eye-slash")} size={eyeIconSize} onPress={() => setHidePword(!hidePword)} />
         </View>
-        <RequiredField input={password} />
+        <RequiredField check={check} input={password} />
         {pwordRules ? (<PasswordRules />) : (<></>)}
         <TextInput
           style={styles.formField}
@@ -218,9 +213,9 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
         />
         {
           (!pwordCheck || (pwordConfirm === password)) ? (
-            <RequiredField input={pwordConfirm} />
+            <RequiredField check={check} input={pwordConfirm} />
           ) : (
-            (<Text style={styles.alert}>Password fields need to match</Text>)
+            (<Text style={Styles.alert}>Password fields need to match</Text>)
           )
         }
         <PhoneInput
@@ -230,7 +225,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
           codeTextStyle={styles.codeText}
           disableArrowIcon={true}
           defaultCode='CA'
-          textInputProps={{onChangeText: (phone) => {FormatPhone(phone); setPhoneCheck(false)}, onBlur: () => setPhoneCheck(true), value: phone, style: styles.phoneInput}}
+          textInputProps={{ onChangeText: (phone) => { FormatPhone(phone); setPhoneCheck(false) }, onBlur: () => setPhoneCheck(true), value: phone, style: styles.phoneInput }}
           placeholder="Phone Number (optional)"
         />
         <CheckPhone />

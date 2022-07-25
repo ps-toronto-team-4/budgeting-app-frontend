@@ -1,7 +1,8 @@
 import { StyleSheet } from "react-native";
+import Colors from "./Colors";
 
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
@@ -28,6 +29,15 @@ const styles = StyleSheet.create( {
         height: 1,
         width: '80%',
     },
+    colorTitle: {
+        textAlign: 'center',
+        fontSize: 20,
+        marginTop: 25
+    },
+    palette: {
+        width: '75%',
+        marginBottom: 25
+    }
 });
 
 export default styles;
