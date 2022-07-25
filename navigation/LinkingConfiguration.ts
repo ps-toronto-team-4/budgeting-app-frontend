@@ -25,7 +25,7 @@ const linking: LinkingOptions<RootStackParamList> = {
         }
       },
       CreateCategory: 'create-category',
-      EditCategory: 'edit-category',
+      EditCategory: 'update-category',
       ExpenseDetails: 'expense-details',
       CreateExpense: 'create-expense',
       UpdateExpense: 'update-expense',

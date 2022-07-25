@@ -2,7 +2,7 @@ import { StyleSheet, Alert, ActivityIndicator, Modal } from 'react-native';
 
 import { Text, View, RequiredField } from '../../components/Themed';
 import Button from '../../components/Button';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';

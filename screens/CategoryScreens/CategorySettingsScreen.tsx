@@ -2,15 +2,15 @@ import { useQuery } from "@apollo/client";
 import { Category, GetCategoriesDocument, GetCategoriesQuery } from "../../components/generated";
 import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { RootTabScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types";
 import Button from "../../components/Button";
 import { useAuth } from "../../hooks/useAuth";
-import { FlatList, ScrollView } from "react-native";
+import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
-export default function CategorySettingsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
+export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
     
     const passwordHash = useAuth();
 

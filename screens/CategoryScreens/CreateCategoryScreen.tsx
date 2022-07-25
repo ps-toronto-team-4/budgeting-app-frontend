@@ -1,5 +1,4 @@
-import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
-
+import { Alert, ActivityIndicator } from 'react-native';
 import { Text, View, RequiredField } from '../../components/Themed';
 import Button from '../../components/Button';
 import React, { useState } from 'react';
