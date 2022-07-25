@@ -7,6 +7,7 @@ import { Budget, BudgetCategory, DeleteBudgetCategoryDocument, DeleteBudgetCateg
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../../components/Button";
 import { ControlledInputDecimal, InputDecimal } from "../../components/InputDecimal";
+import { Row } from "../../components/Row";
 
 
 
@@ -24,7 +25,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
         onCompleted: ((response) => {
             if (response.updateBudgetCategory.__typename == 'BudgetCategorySuccess') {
                 // navigation.goBack();
-                navigation.navigate("Root", { screen: "Budget", params: { refresh: (Math.random()) } });
+                navigation.navigate("Root", { screen: "Budget" });
             }
         })
     })
@@ -35,7 +36,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
             if (response.deleteBudgetCategory.__typename == 'DeleteSuccess') {
                 // navigation.goBack();
                 // navigation.navigate("Root", { screen: "Budget", params: { refresh: true } });
-                navigation.navigate("Root", { screen: "Budget", params: { refresh: (Math.random()) } });
+                navigation.navigate("Root", { screen: "Budget" });
             }
         })
     })
@@ -74,11 +75,12 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
 
                 </View>
             </View>
-            <View style={styles.detailsRow}>
+            <Row>
                 <View style={styles.detailsIconAndLabel}>
-                    <Text style={styles.fieldLabel}>For Budget:</Text>
+                    <Text style={styles.fieldLabel}>For Category: {BudgetCategory?.category.name}</Text>
                 </View>
-            </View>
+            </Row>
+
             <View style={styles.buttonContainer}>
                 <Button
                     text="Update Budget"

@@ -34,7 +34,7 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
             if (response.createBudgetCategory.__typename == "BudgetCategorySuccess") {
                 // triggerRefetch()
                 // navigation.goBack();
-                navigation.navigate("Root", { screen: "Budget", params: { refresh: (Math.random()) } });
+                navigation.navigate("Root", { screen: "Budget" });
 
             }
         })

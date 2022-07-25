@@ -39,7 +39,7 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> = Nati
 
 export type RootTabParamList = {
   Expenses: undefined;
-  Budget: { refresh: number };
+  Budget: undefined;
   Reports: undefined;
   Profile: undefined;
 };

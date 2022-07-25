@@ -1,20 +1,21 @@
 import { useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
-import { Budget, BudgetCategory, Category, GetBudgetsDocument, GetBudgetsQuery, GetExpensesDocument, GetExpensesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery } from "../../components/generated";
-import { Button, Modal, Pressable, SafeAreaView, StatusBar } from "react-native"
+import { useState } from "react";
+import { Budget, BudgetCategory, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery } from "../../components/generated";
+import { Button, SafeAreaView, StatusBar } from "react-native"
 
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../../types";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import ChartDisplay from "./components/chartDisplay";
 import ShowBudgets from "./components/budgetList";
 import MissingBudget from "./components/missingBudget";
 import TopBar from "./components/topBar";
+import { useRefresh } from "../../hooks/useRefresh";
+import { useAuth } from "../../hooks/useAuth";
 
 
 export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'Budget'>) {
-    const [passwordHash, setpasswordHash] = React.useState("");
+    const passwordHash = useAuth();
     const [month, setMonth] = useState("JULY")
     const [year, setYear] = useState(2022)
 
@@ -29,28 +30,12 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
         }
     })
 
-    useEffect(() => {
-        getData();
-    }, []);
 
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-        if (route.params?.refresh) {
-
-        }
-    }
-
-    useEffect(() => {
+    useRefresh(() => {
         budgetRefetch()
         monthRefetch()
-    }, [route]);
+    }, [passwordHash])
+
 
     const selectedBudget = budgetData?.budgets.__typename == 'BudgetsSuccess' ? budgetData.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined
     const plannedAmount = selectedBudget === undefined ? 0 :
