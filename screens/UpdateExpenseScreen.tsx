@@ -1,18 +1,18 @@
 import { useMutation } from "@apollo/client";
-import { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { DeleteExpenseDocument, DeleteExpenseMutation, UpdateExpenseDocument, UpdateExpenseMutation } from "../components/generated";
 
 import { RootStackScreenProps } from "../types";
 import { ExpenseEditForm, FormValues } from "../components/ExpenseEditForm";
 import { AntDesign, Feather } from '@expo/vector-icons';
 import moment from "moment";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { useAuth } from "../hooks/useAuth";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 
 const DeleteButton = ({ onPress }: { onPress: () => void }) => {
     return (
-        <TouchableOpacity onPress={onPress} style={styles.deleteButton}>
+        <TouchableOpacity style={{ paddingRight: 30 }} onPress={onPress} >
             <AntDesign name="delete" size={24} color="black" />
         </TouchableOpacity>
     );
@@ -27,6 +27,8 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
             id: route.params?.id,
         }
     });
+
+    useUnauthRedirect();
 
     useEffect(() => {
         navigation.setOptions({
@@ -50,6 +52,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
     }
 
     function handleDelete() {
+        console.log('delete pressed');
         deleteExpense();
         navigation.navigate('Root', { screen: 'Expenses', params: { refresh: true } });
     }
@@ -64,9 +67,3 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         }} />
     );
 }
-
-const styles = StyleSheet.create({
-    deleteButton: {
-        paddingRight: 30,
-    },
-});

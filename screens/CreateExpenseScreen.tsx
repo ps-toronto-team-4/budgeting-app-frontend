@@ -6,10 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ExpenseEditForm, FormValues } from "../components/ExpenseEditForm";
 import { useAuth } from "../hooks/useAuth";
 import moment from "moment";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 
 export default function CreateExpenseScreen({ navigation, route }: RootStackScreenProps<'CreateExpense'>) {
     const passwordHash = useAuth();
     const [submit, _] = useMutation<CreateExpenseMutation>(CreateExpenseDocument);
+    
+    useUnauthRedirect();
 
     function handleSubmit(vals: FormValues) {
         submit({

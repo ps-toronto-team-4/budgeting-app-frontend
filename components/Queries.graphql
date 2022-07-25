@@ -85,6 +85,34 @@ mutation createCategory($passwordHash: String!, $name: String!, $color: String!,
     }
 }
 
+mutation updateCategory($passwordHash: String!, $id: Int!, $name: String!, $color: String!, $details: String) {
+    updateCategory(name: $name, colourHex: $color, description: $details, passwordHash: $passwordHash, id: $id) {
+        __typename
+        ...on CategorySuccess {
+            category {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation deleteCategory($passwordHash: String!, $id: Int!) {
+    deleteCategory(passwordHash: $passwordHash, id: $id) {
+        ...on DeleteSuccess {
+            successMessage
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
 
 query getExpenses ($passwordHash: String!) {
     expenses(passwordHash: $passwordHash) {

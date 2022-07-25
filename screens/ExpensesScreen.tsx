@@ -18,6 +18,8 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RootTabScreenProps } from "../types";
 import AddButton from "../components/AddButton";
 import { useAuth } from "../hooks/useAuth";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
+import { Screen } from "../components/Screen";
 
 //TODO
 // - *IMPORTANT* fix virtualization issue
@@ -96,6 +98,7 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
 
 export default function ExpensesScreen({ navigation, route }: RootTabScreenProps<'Expenses'>) {
   const passwordHash = useAuth();
+  useUnauthRedirect();
   const [amountToRender, setAmountToRender] = useState(20);
   const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
@@ -150,12 +153,7 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
 
 
   return (
-    <>
-      <StatusBar />
-      <SafeAreaView style={styles.container}>
-        <Text style={{ textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
-          Expenses
-        </Text>
+    <Screen>
         <ScrollView>
           {dailyGrouping && (
             <View>
@@ -176,10 +174,10 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
             <Text>{data.expenses.exceptionName}</Text>
           </View>}
         </ScrollView>
-      </SafeAreaView>
-      <AddButton style={styles.addExpenseBtn} accessibilityLabel="Button to Add Expense" size={100} onPress={handleAddExpense}></AddButton>
-
-    </>
+      <View style={styles.addExpenseBtn}>
+        <AddButton size={100} onPress={handleAddExpense} />
+      </View>
+    </Screen>
   );
 }
 
@@ -233,9 +231,6 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRend
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   itemSeparator: {
     flex: 1,
     flexBasis: 2,
