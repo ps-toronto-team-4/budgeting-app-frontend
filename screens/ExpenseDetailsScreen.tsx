@@ -13,6 +13,7 @@ import moment from "moment";
 import { useAuth } from "../hooks/useAuth";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
+import { useRefresh } from "../hooks/useRefresh";
 
 const EditButton = (onPress: () => void) => (
     <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
@@ -28,12 +29,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
     });
 
     useUnauthRedirect();
-
-    useEffect(() => {
-        if (route.params.refresh) {
-            refetch();
-        }
-    });
+    useRefresh(refetch, [passwordHash]);
 
     useEffect(() => {
         if (data) {

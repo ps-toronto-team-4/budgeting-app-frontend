@@ -48,13 +48,13 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 desc: vals.desc || null
             }
         });
-        navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0, refresh: true });
+        navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0 });
     }
 
     function handleDelete() {
         console.log('delete pressed');
         deleteExpense();
-        navigation.navigate('Root', { screen: 'Expenses', params: { refresh: true } });
+        navigation.navigate('Root');
     }
 
     return (

@@ -15,6 +15,8 @@ import moment, { Moment } from "moment";
 import { useNavigation } from "@react-navigation/native";
 import { InputRow } from "./InputRow";
 import { Screen } from "./Screen";
+import { useRefresh } from "../hooks/useRefresh";
+import { useAuth } from "../hooks/useAuth";
 
 export type FormValues = {
     amount: number;
@@ -29,17 +31,11 @@ export interface ExpenseEditFormProps {
      * Values to initial the form fields with.
      */
     initVals?: FormValues;
-    /**
-     * If this prop is not undefined and it's state change, this component will refetch
-     * data from the backend. You can use this like a refresh counter and increment
-     * it when you want this component's data to be refetched.
-     */
-    refreshOnStateChange?: number;
     onSubmit: (vals: FormValues) => void;
 }
 
-export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSubmit }: ExpenseEditFormProps) {
-    const [passwordHash, setpasswordHash] = useState(''); // TODO change this to useAuth()
+export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
+    const passwordHash = useAuth();
     const nav = useNavigation();
     const { data: merchantData, refetch: refetchMerchants } =
         useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
@@ -63,31 +59,10 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
     const [date, setDate] = useState(initVals?.date || moment().toISOString());
     const [desc, setDesc] = useState(initVals?.desc || '');
 
-    useEffect(() => {
-        if (refresh !== undefined) {
-            refetchMerchants({
-                passwordHash: passwordHash,
-            });
-            refetchCategories({
-                passwordHash: passwordHash,
-            });
-        }
-    }, [refresh]);
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-    }
+    useRefresh(() => {
+        refetchMerchants();
+        refetchCategories();
+    }, [passwordHash]);
 
     function handleAmountBlur() {
         if (amountText === '') {
@@ -134,82 +109,82 @@ export function ExpenseEditForm({ initVals, refreshOnStateChange: refresh, onSub
                     </AdaptiveTextInput>
                 </View>
             </View>
-                <DropdownRow
-                    label="Merchant"
-                    data={
-                        merchantData?.merchants.__typename === 'MerchantsSuccess' ?
-                            merchantData.merchants.merchants.map(x => { return { id: x.id.toString(), name: x.name} }) : []
-                    }
-                    onSelect={selectMerchant}
-                    defaultValue={
-                        initVals && merchantData?.merchants.__typename === 'MerchantsSuccess' ?
-                            merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
-                            : undefined
-                    }
-                    onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
-                    expanded={merchantExpanded}
-                    onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
-                    onCollapse={() => setMerchantExpanded(false)}
-                    visible={merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded}
-                    topBorder />
-                <DropdownRow
-                    label="Category"
-                    data={
-                        categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
-                    }
-                    onSelect={selectCategory}
-                    defaultValue={
-                        initVals && categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                            categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
-                            : undefined
-                    }
-                    onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
-                    expanded={categoryExpanded}
-                    onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
-                    onCollapse={() => setCategoryExpanded(false)}
-                    visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded}
-                    topBorder />
+            <DropdownRow
+                label="Merchant"
+                data={
+                    merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                        merchantData.merchants.merchants.map(x => { return { id: x.id.toString(), name: x.name } }) : []
+                }
+                onSelect={selectMerchant}
+                defaultValue={
+                    initVals && merchantData?.merchants.__typename === 'MerchantsSuccess' ?
+                        merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
+                        : undefined
+                }
+                onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
+                expanded={merchantExpanded}
+                onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
+                onCollapse={() => setMerchantExpanded(false)}
+                visible={merchantData?.merchants.__typename === 'MerchantsSuccess' && !categoryExpanded}
+                topBorder />
+            <DropdownRow
+                label="Category"
+                data={
+                    categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                        categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name } }) : []
+                }
+                onSelect={selectCategory}
+                defaultValue={
+                    initVals && categoryData?.categories.__typename === 'CategoriesSuccess' ?
+                        categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
+                        : undefined
+                }
+                onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
+                expanded={categoryExpanded}
+                onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
+                onCollapse={() => setCategoryExpanded(false)}
+                visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded}
+                topBorder />
             <>
                 {
                     !merchantExpanded && !categoryExpanded &&
-                        <>
-                            <View>
-                                <InputRow
-                                    onPress={() => setCalendarShown(true)}
-                                    label="Date:"
-                                    value={
-                                        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
-                                        " " + moment(date).date() + " " + moment(date).year()
-                                    }
-                                    topBorder
-                                    disabled />
-                                {
-                                    calendarShown &&
-                                        <View style={styles.calendarContainer}>
-                                            <CalendarPicker
-                                                onDateChange={(date, type) => { setDate(date.toISOString()); setCalendarShown(false); }}
-                                                width={300} />
-                                        </View>
+                    <>
+                        <View>
+                            <InputRow
+                                onPress={() => setCalendarShown(true)}
+                                label="Date:"
+                                value={
+                                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
+                                    " " + moment(date).date() + " " + moment(date).year()
                                 }
-                            </View>
-                            <View style={styles.detailsRow}>
-                                <InputRow
-                                    label="Details:"
-                                    placeholder="Enter Details"
-                                    value={desc}
-                                    onChangeText={setDesc}
-                                    wrap
-                                    topBorder
-                                    bottomBorder />
-                            </View>
-                            <View style={styles.buttonContainer}>
-                                <Button
-                                    text="Save Expense"
-                                    accessibilityLabel="Button to Save Expense"
-                                    onPress={handleSubmit} />
-                            </View>
-                        </>
+                                topBorder
+                                disabled />
+                            {
+                                calendarShown &&
+                                <View style={styles.calendarContainer}>
+                                    <CalendarPicker
+                                        onDateChange={(date, type) => { setDate(date.toISOString()); setCalendarShown(false); }}
+                                        width={300} />
+                                </View>
+                            }
+                        </View>
+                        <View style={styles.detailsRow}>
+                            <InputRow
+                                label="Details:"
+                                placeholder="Enter Details"
+                                value={desc}
+                                onChangeText={setDesc}
+                                wrap
+                                topBorder
+                                bottomBorder />
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <Button
+                                text="Save Expense"
+                                accessibilityLabel="Button to Save Expense"
+                                onPress={handleSubmit} />
+                        </View>
+                    </>
                 }
             </>
         </Screen>

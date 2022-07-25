@@ -20,6 +20,7 @@ import AddButton from "../components/AddButton";
 import { useAuth } from "../hooks/useAuth";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
+import { useRefresh } from "../hooks/useRefresh";
 
 //TODO
 // - *IMPORTANT* fix virtualization issue
@@ -103,23 +104,18 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
   const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
   });
-  useEffect(() => {
-    if (route.params?.refresh === true) {
-      console.log('refetching');
-      refetch();
-    }
-  });
+  useRefresh(refetch, [passwordHash]);
   const navigateCallBack = (id: number | null | undefined) => {
     if (id === undefined || id == null) {
       alert("Transaction could not be found!")
     } else {
-      navigation.navigate('ExpenseDetails', { expenseId: id, refresh: false })
+      navigation.navigate('ExpenseDetails', { expenseId: id })
     }
 
   }
   const dailyGrouping = splitTransationsOnDate(data, amountToRender)
   function handleAddExpense() {
-    navigation.navigate('CreateExpense', { refresh: false });
+    navigation.navigate('CreateExpense');
   }
 
   const FakeFlatList = (
@@ -154,26 +150,26 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
 
   return (
     <Screen>
-        <ScrollView>
-          {dailyGrouping && (
-            <View>
-              {dailyGrouping.map((gItem, index) => {
-                return (<FakeFlatList
-                  data={gItem.item}
-                  title={gItem.key}
-                  key={index}
-                  renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
-                  ItemSeparatorComponent={() => <Separator />}
-                />)
-              })}
-              <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
-            </View>)
-          }
-          {data?.expenses.__typename == 'FailurePayload' && <View>
-            <Text>{data.expenses.errorMessage}</Text>
-            <Text>{data.expenses.exceptionName}</Text>
-          </View>}
-        </ScrollView>
+      <ScrollView>
+        {dailyGrouping && (
+          <View>
+            {dailyGrouping.map((gItem, index) => {
+              return (<FakeFlatList
+                data={gItem.item}
+                title={gItem.key}
+                key={index}
+                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
+                ItemSeparatorComponent={() => <Separator />}
+              />)
+            })}
+            <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
+          </View>)
+        }
+        {data?.expenses.__typename == 'FailurePayload' && <View>
+          <Text>{data.expenses.errorMessage}</Text>
+          <Text>{data.expenses.exceptionName}</Text>
+        </View>}
+      </ScrollView>
       <View style={styles.addExpenseBtn}>
         <AddButton size={100} onPress={handleAddExpense} />
       </View>
