@@ -12,7 +12,7 @@ export default {
     btnText: 'hsl(0,0%,100%)',
     uncategorizedColor: 'hsl(240,20%,80%)',
   },
-  dark: {
+  dark: { // unused in this app
     text: '#fff',
     background: '#000',
     tint: tintColorDark,

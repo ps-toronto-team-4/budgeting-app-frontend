@@ -69,6 +69,51 @@ mutation createUser($fname: String!, $lname: String!, $username: String!, $email
     }
 }
 
+mutation createCategory($passwordHash: String!, $name: String!, $color: String!, $details: String) {
+    createCategory(name: $name, colourHex: $color, description: $details, passwordHash: $passwordHash) {
+        __typename
+        ...on CategorySuccess {
+            category {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation updateCategory($passwordHash: String!, $id: Int!, $name: String!, $color: String!, $details: String) {
+    updateCategory(name: $name, colourHex: $color, description: $details, passwordHash: $passwordHash, id: $id) {
+        __typename
+        ...on CategorySuccess {
+            category {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation deleteCategory($passwordHash: String!, $id: Int!) {
+    deleteCategory(passwordHash: $passwordHash, id: $id) {
+        ...on DeleteSuccess {
+            successMessage
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
 query getExpenses ($passwordHash: String!) {
     expenses(passwordHash: $passwordHash) {
         ... on ExpensesSuccess {
@@ -95,12 +140,15 @@ query getExpense($passwordHash: String!, $expenseId: Int!) {
     expense(passwordHash: $passwordHash, id: $expenseId) {
         ...on ExpenseSuccess {
             expense {
+                id
                 amount
                 category {
+                    id
                     name
                     colourHex
                 }
                 merchant {
+                    id
                     name
                 }
                 description
@@ -121,6 +169,34 @@ mutation createExpense($passwordHash: String!, $amount: Float!, $epochDate: Int!
             expense {
                 id
             }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation updateExpense($passwordHash: String!, $id: Int!, $amount: Float!, $epochDate: Int!, $merchantId: Int, $categoryId: Int, $desc: String) {
+    updateExpense(passwordHash: $passwordHash, id: $id, amount: $amount, epochDate: $epochDate, merchantId: $merchantId, categoryId: $categoryId, description: $desc) {
+        ...on ExpenseSuccess {
+            expense {
+                id
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation deleteExpense($passwordHash: String!, $id: Int!) {
+    deleteExpense(passwordHash: $passwordHash, id: $id) {
+        ...on DeleteSuccess {
+            successMessage
         }
 
         ...on FailurePayload {

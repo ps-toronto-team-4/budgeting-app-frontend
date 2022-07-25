@@ -6,6 +6,7 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Moment } from 'moment';
 
 declare global {
   namespace ReactNavigation {
@@ -19,9 +20,12 @@ export type RootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
   ExpenseDetails: { expenseId: number };
+  UpdateExpense: { id: number, amount: number, merchant?: { id?: number, name?: string }, category?: { id?: number, name?: string }, date: string, desc?: string } | undefined,
   ForgotPasswordModal: undefined;
-  Expenses: undefined;
   CreateExpense: undefined;
+  CreateCategory: undefined;
+  EditCategory: { id: number, name: string, color: string, details?: string | null };
+  CategorySettings: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
   CreateBudget: undefined;

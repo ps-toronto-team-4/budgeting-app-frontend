@@ -3,12 +3,12 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { FontAwesome } from '@expo/vector-icons';
+import { Feather, FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable } from 'react-native';
+import { ColorSchemeName, Pressable, TouchableOpacity } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -25,9 +25,15 @@ import BudgetScreen from '../screens/Budget/BudgetScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
+import CreateCategoryScreen from '../screens/CategoryScreens/CreateCategoryScreen';
 import CreateMerchant from '../screens/CreateMerchantScreen';
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
 import CreateBudget from '../screens/Budget/CreateBudgetScreen';
+
+import { View } from '../components/Themed';
+import UpdateExpenseScreen from '../screens/UpdateExpenseScreen';
+import EditCategoryScreen from '../screens/CategoryScreens/EditCategoryScreen';
+import CategorySettingsScreen from '../screens/CategoryScreens/CategorySettingsScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -57,17 +63,22 @@ function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
-      <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
-      <Stack.Screen name="CreateMerchant" component={CreateMerchant} options={{ headerTitle: 'Create Merchant', headerTransparent: true, headerTitleAlign: 'center', }} />
-      <Stack.Screen name='CreateExpense' component={CreateExpenseScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
-      <Stack.Screen name='CreateBudget' component={CreateBudget} options={{ headerTitle: '', headerShadowVisible: false }} />
-      <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{
-        title: 'Expense Details', headerTitleAlign: "center", headerShadowVisible: false, headerTitleStyle: { fontWeight: "bold" }
-      }} />
+      <Stack.Group screenOptions={{ headerTitle: '', headerShadowVisible: false }}>
+        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="SignIn" component={SignInScreen} />
+      </Stack.Group>
+      <Stack.Group screenOptions={{ headerShadowVisible: false, headerTitleAlign: 'center', headerTitleStyle: { fontWeight: 'bold' } }}>
+        <Stack.Screen name="CreateMerchant" component={CreateMerchant} options={{ title: 'Create Merchant' }} />
+        <Stack.Screen name="CreateExpense" component={CreateExpenseScreen} options={{ title: 'Create Expense' }} />
+        <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{ title: 'Expense Details' }} />
+        <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{ title: 'Category Settings' }} />
+        <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{ title: 'Edit Category' }} />
+        <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerTitle: 'Create Category' }} />
+        <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: 'Edit Expense' }} />
+      </Stack.Group>
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
+      <Stack.Group screenOptions={{ presentation: 'transparentModal' }}>
         <Stack.Screen name="ForgotPasswordModal" component={ForgotPasswordScreen} options={{ headerShown: false, title: 'Oops!' }} />
       </Stack.Group>
     </Stack.Navigator >
@@ -79,10 +90,12 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 function Root() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Expenses" component={ExpensesScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Budget" component={BudgetScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Reports" component={ReportsScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}></Tab.Screen>
+      <Tab.Group screenOptions={{ headerShadowVisible: false, headerTitleAlign: 'center', headerTitleStyle: { fontWeight: 'bold' } }}>
+        <Tab.Screen name="Expenses" component={ExpensesScreen} />
+        <Tab.Screen name="Budget" component={BudgetScreen} />
+        <Tab.Screen name="Reports" component={ReportsScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+      </Tab.Group>
     </Tab.Navigator>
   );
 }
