@@ -2,29 +2,30 @@ import { useState, useRef, useEffect } from "react";
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard } from 'react-native';
 import Colors from "../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
+import { Row } from "./Row";
 
 export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name: string) => void }) {
-    return (
-        <TouchableHighlight
-            style={styles.row}
-            underlayColor="rgba(0,0,0,0.1)"
-            onPress={() => onSelect(name)}>
-            <View style={[styles.fieldContainer, { paddingLeft: 70 }]}>
-                <Text style={styles.listItem}>{name}</Text>
-            </View>
-        </TouchableHighlight>
+    return ( // todo fix below
+        <Row onPress={() => onSelect(name)} topBorder>
+            {/* <View style={[styles.fieldContainer, { paddingLeft: 70 }]}> */}
+            <Text style={styles.listItem}>{name}</Text>
+            {/* </View> */}
+        </Row>
     );
 };
 
 export type DropdownRowProps = {
     label: string;
-    data: string[];
+    data: {id: string, name: string}[];
     onSelect: (name: string) => void;
     expanded?: boolean;
     onExpand?: () => void;
     onCollapse?: () => void;
     defaultValue?: string;
     onCreateNew?: () => void;
+    visible?: boolean;
+    topBorder?: boolean;
+    bottomBorder?: boolean;
 };
 
 export function DropdownRow({
@@ -36,6 +37,9 @@ export function DropdownRow({
     onCollapse,
     defaultValue,
     onCreateNew,
+    visible,
+    topBorder,
+    bottomBorder,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
@@ -77,7 +81,7 @@ export function DropdownRow({
         collapse();
     };
 
-    function renderDropdownItem({ item }: { item: { name: string, onSelect: (name: string) => void } }) {
+    function renderDropdownItem({ item }: { item: { id: string, name: string, onSelect: (name: string) => void } }) {
         return (
             <DropdownItem name={item.name} onSelect={item.onSelect}></DropdownItem>
         );
@@ -90,71 +94,56 @@ export function DropdownRow({
     }
 
     return (
-        <>
-            <TouchableHighlight
-                underlayColor="rgba(0,0,0,0.1)"
-                style={expanded ? [styles.row, { backgroundColor: 'rgba(0,0,0,0.1)' }] : styles.row}
-                onPress={handleRowPress}>
-                <View style={styles.fieldContainer}>
-                    <View style={styles.fieldLabelAndInputContainer}>
-                        <Text style={styles.fieldLabel}>{label}:</Text>
-                        <TextInput
-                            style={styles.fieldInput}
-                            editable={expanded}
-                            placeholder={"Select " + label}
-                            ref={inputRef}
-                            value={value}
-                            onChangeText={setValue}>
-                        </TextInput>
-                    </View>
-                    <AntDesign
-                        name={expanded ? 'up' : 'down'}
-                        size={20}
-                        color="black"
-                        onPress={handleIconPress} />
+        <View style={{display: visible === false ? 'none' : 'flex'}}>
+            <Row
+                topBorder={topBorder}
+                bottomBorder={bottomBorder}
+                onPress={() => handleRowPress()}
+                >
+                <View style={styles.fieldLabelAndInputContainer}>
+                    <Text style={styles.fieldLabel}>{label}:</Text>
+                    <TextInput
+                        style={styles.fieldInput}
+                        editable={expanded}
+                        placeholder={"Select " + label}
+                        ref={inputRef}
+                        value={value}
+                        onChangeText={setValue}>
+                    </TextInput>
                 </View>
-            </TouchableHighlight>
+                <AntDesign
+                    name={expanded ? 'up' : 'down'}
+                    size={20}
+                    color="black"
+                    onPress={handleIconPress} />
+            </Row>
             {
                 (expanded) ?
                     <FlatList
                         data={
-                            data.filter(name => {
-                                return name.toLowerCase().startsWith(value.toLowerCase())
-                            }).map(name => {
-                                return { name: name, onSelect: handleSelect }
+                            data.filter(item => {
+                                return item.name.toLowerCase().startsWith(value.toLowerCase())
+                            }).map(item => {
+                                return { id: item.id, name: item.name, onSelect: handleSelect }
                             })
                         }
                         renderItem={renderDropdownItem}
-                        keyExtractor={item => item.name}
+                        keyExtractor={item => item.id}
                         ListFooterComponent={
-                            onCreateNew ?
+                            onCreateNew &&
                                 <DropdownItem
                                     name={'Create new ' + label.toLowerCase()}
                                     onSelect={(_) => onCreateNew()} />
-                                : <View></View>
                         }>
                     </FlatList>
                     :
                     <View></View>
             }
-        </>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    row: {
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        paddingVertical: 10,
-        paddingHorizontal: 30,
-    },
-    fieldContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: 320,
-    },
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -171,5 +160,6 @@ const styles = StyleSheet.create({
     },
     listItem: {
         fontSize: 15,
+        paddingLeft: 40,
     },
 });

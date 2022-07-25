@@ -18,7 +18,8 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RootTabScreenProps } from "../types";
 import AddButton from "../components/AddButton";
 import { useAuth } from "../hooks/useAuth";
-import { useIsFocused } from "@react-navigation/native";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
+import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 
 //TODO
@@ -98,6 +99,7 @@ const ListItem = ({ id, title, amount, description, category, navigateCallBack }
 
 export default function ExpensesScreen({ navigation, route }: RootTabScreenProps<'Expenses'>) {
   const passwordHash = useAuth();
+  useUnauthRedirect();
   const [amountToRender, setAmountToRender] = useState(20);
   const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
     variables: { passwordHash }
@@ -147,37 +149,31 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
 
 
   return (
-    <>
-      <StatusBar />
-      <SafeAreaView style={styles.container}>
-        <Text style={{ textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
-          Expenses
-        </Text>
-        <ScrollView>
-          {dailyGrouping && (
-            <View>
-              {dailyGrouping.map((gItem, index) => {
-                return (<FakeFlatList
-                  data={gItem.item}
-                  title={gItem.key}
-                  key={index}
-                  renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
-                  ItemSeparatorComponent={() => <Separator />}
-                />)
-              })}
-              <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
-            </View>)
-          }
-          {data?.expenses.__typename == 'FailurePayload' && <View>
-            <Text>{data.expenses.errorMessage}</Text>
-            <Text>{data.expenses.exceptionName}</Text>
-          </View>}
-        </ScrollView>
-      </SafeAreaView>
+    <Screen>
+      <ScrollView>
+        {dailyGrouping && (
+          <View>
+            {dailyGrouping.map((gItem, index) => {
+              return (<FakeFlatList
+                data={gItem.item}
+                title={gItem.key}
+                key={index}
+                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
+                ItemSeparatorComponent={() => <Separator />}
+              />)
+            })}
+            <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
+          </View>)
+        }
+        {data?.expenses.__typename == 'FailurePayload' && <View>
+          <Text>{data.expenses.errorMessage}</Text>
+          <Text>{data.expenses.exceptionName}</Text>
+        </View>}
+      </ScrollView>
       <View style={styles.addExpenseBtn}>
         <AddButton size={100} onPress={handleAddExpense} />
       </View>
-    </>
+    </Screen>
   );
 }
 
@@ -231,9 +227,6 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRend
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   itemSeparator: {
     flex: 1,
     flexBasis: 2,

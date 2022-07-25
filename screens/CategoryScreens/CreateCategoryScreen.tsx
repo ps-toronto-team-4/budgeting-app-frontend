@@ -12,6 +12,8 @@ import { useMutation, useQuery } from '@apollo/client';
 import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
+import { useUnauthRedirect } from '../../hooks/useUnauthRedirect';
+import { Screen } from '../../components/Screen';
 
 export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
   const [name, setName] = useState('')
@@ -19,6 +21,8 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
   const [details, setDetails] = useState('')
   const [check, setCheck] = useState(false) // true if need to check required fields
   const passwordHash = useAuth();
+
+  useUnauthRedirect();
 
   // Create category graphql query
   const [createCategory, { loading, data }] = useMutation<CreateCategoryMutation>(CreateCategoryDocument, {
@@ -66,39 +70,41 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
   }
 
   return (
-    <View style={Styles.container}>
-      {
-        loading ?
-          <ActivityIndicator size="large" />
-          :
-          data?.createCategory.__typename === 'CategorySuccess' ?
-            <Text>Category created successfully! Redirecting...</Text> : <Text>{data?.createCategory.errorMessage}</Text>
-      }
-      <TextInput
-        onChangeText={setName}
-        value={name}
-        placeholder="Name"
-      />
-      {check && categoryTaken() ? <Text style={Styles.alert}>This category already exists</Text> : <></>}
-      <RequiredField check={check} input={name} />
-      <View style={Styles.palette}>
-        <ColorPalette
-          onChange={(color: string) => setColor(color.substring(1))}
-          value={'#' + color}
-          colors={colorsList}
-          titleStyles={Styles.colorTitle}
-          title={"Select Category Color:"}
-          icon={<Ionicons name="checkmark-circle-outline" size={30} color="black" />}
+    <Screen>
+      <View style={Styles.container}>
+        {
+          loading ?
+            <ActivityIndicator size="large" />
+            :
+            data?.createCategory.__typename === 'CategorySuccess' ?
+              <Text>Category created successfully! Redirecting...</Text> : <Text>{data?.createCategory.errorMessage}</Text>
+        }
+        <TextInput
+          onChangeText={setName}
+          value={name}
+          placeholder="Name"
         />
+        {check && categoryTaken() ? <Text style={Styles.alert}>This category already exists</Text> : <></>}
+        <RequiredField check={check} input={name} />
+        <View style={Styles.palette}>
+          <ColorPalette
+            onChange={(color: string) => setColor(color.substring(1))}
+            value={'#' + color}
+            colors={colorsList}
+            titleStyles={Styles.colorTitle}
+            title={"Select Category Color:"}
+            icon={<Ionicons name="checkmark-circle-outline" size={30} color="black" />}
+          />
+        </View>
+        {check && colorTaken() ? <Text style={Styles.alert}>There is already a category with this color</Text> : <></>}
+        <RequiredField check={check} input={color} />
+        <TextInput
+          onChangeText={(details) => setDetails(details)}
+          value={details}
+          placeholder="Details"
+        />
+        <Button text="Save Category" onPress={onSubmit} accessibilityLabel={'Save Category Button'}></Button>
       </View>
-      {check && colorTaken() ? <Text style={Styles.alert}>There is already a category with this color</Text> : <></>}
-      <RequiredField check={check} input={color} />
-      <TextInput
-        onChangeText={(details) => setDetails(details)}
-        value={details}
-        placeholder="Details"
-      />
-      <Button text="Save Category" onPress={onSubmit} accessibilityLabel={'Save Category Button'}></Button>
-    </View>
+    </Screen>
   );
 }

@@ -9,10 +9,14 @@ import Button from "../../components/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList, ScrollView } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
+import { Screen } from "../../components/Screen";
 
 export default function CategorySettingsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     
     const passwordHash = useAuth();
+
+    useUnauthRedirect();
 
     const {data, loading, refetch} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
         variables: { passwordHash },
@@ -39,7 +43,7 @@ export default function CategorySettingsScreen({ navigation }: RootTabScreenProp
       )}
 
     return (
-        <View>
+        <Screen>
             <Text>Hello from category settings!</Text>
             <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')}/>
                 { loading ? (<ActivityIndicator size='large'/>) : (
@@ -54,7 +58,7 @@ export default function CategorySettingsScreen({ navigation }: RootTabScreenProp
                         <Text>{data?.categories.errorMessage}</Text>
                     </View>
                 ))}
-        </View>
+        </Screen>
     );
 }
 
