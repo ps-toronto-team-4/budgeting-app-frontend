@@ -30,6 +30,7 @@ import EditCategoryScreen from '../screens/CategoryScreens/EditCategoryScreen';
 import CategorySettingsScreen from '../screens/CategoryScreens/CategorySettingsScreen';
 import UpdateMerchantScreen from '../screens/MerchantScreens/UpdateMerchantScreen';
 import CreateMerchant from '../screens/MerchantScreens/CreateMerchantScreen';
+import MerchantSettingsScreen from '../screens/MerchantScreens/MerchantSettingsScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -70,7 +71,7 @@ function RootNavigator() {
         headerTitleStyle: { fontWeight: "bold" },
       }} />
       <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{
-        headerTitle: 'Edit Category',
+        headerTitle: 'Category Settings',
         headerTitleAlign: 'center',
         headerShadowVisible: false,
         headerTitleStyle: { fontWeight: 'bold' }
@@ -86,6 +87,12 @@ function RootNavigator() {
         headerTitleAlign: 'center',
         headerShadowVisible: false,
         headerTitleStyle: { fontWeight: 'bold' },
+      }} />
+      <Stack.Screen name="MerchantSettings" component={MerchantSettingsScreen} options={{
+        headerTitle: 'Merchant Settings',
+        headerTitleAlign: 'center',
+        headerShadowVisible: false,
+        headerTitleStyle: { fontWeight: 'bold' }
       }} />
       <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: '', headerShadowVisible: false }} />
       <Stack.Screen name="UpdateMerchant" component={UpdateMerchantScreen} options={{ headerTitle: 'Update Merchant', headerTransparent: true, headerTitleAlign: 'center', }} />

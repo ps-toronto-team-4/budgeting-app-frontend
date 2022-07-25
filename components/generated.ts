@@ -176,6 +176,22 @@ export type MerchantsSuccess = {
   merchants: Array<Merchant>;
 };
 
+export type MonthBreakdown = {
+  __typename?: 'MonthBreakdown';
+  byCategory: Array<MonthBreakdownCategory>;
+  month: MonthType;
+  totalSpent: Scalars['Float'];
+  year: Scalars['Int'];
+};
+
+export type MonthBreakdownCategory = {
+  __typename?: 'MonthBreakdownCategory';
+  amountSpent: Scalars['Float'];
+  category?: Maybe<Category>;
+};
+
+export type MonthBreakdownPayload = FailurePayload | MonthBreakdown;
+
 export enum MonthType {
   April = 'APRIL',
   August = 'AUGUST',
@@ -349,6 +365,7 @@ export type Query = {
   greeting: Scalars['String'];
   merchant: MerchantPayload;
   merchants: MerchantsPayload;
+  monthBreakdown: MonthBreakdownPayload;
   /** # Helper for testing. */
   signIn: SignInPayload;
   user?: Maybe<User>;
@@ -427,6 +444,13 @@ export type QueryMerchantArgs = {
 
 export type QueryMerchantsArgs = {
   passwordHash: Scalars['String'];
+};
+
+
+export type QueryMonthBreakdownArgs = {
+  month: MonthType;
+  passwordHash: Scalars['String'];
+  year: Scalars['Int'];
 };
 
 

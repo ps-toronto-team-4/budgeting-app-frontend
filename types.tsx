@@ -28,7 +28,8 @@ export type RootStackParamList = {
   CategorySettings: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
-  UpdateMerchant: { id: number, name: string, description?: string | null, category?: { id?: number, name?: string } } | undefined,
+  UpdateMerchant: { id: number, name: string, description?: string | null, category?: { id?: number, name?: string } };
+  MerchantSettings: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
