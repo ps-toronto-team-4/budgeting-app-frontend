@@ -5,9 +5,11 @@ import Button from '../../components/Button';
 import React from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 
 export default function WelcomeScreen({ navigation }: RootStackScreenProps<'Welcome'>) {
+  useAuthRedirect();
 
   function onPressSignIn(_: GestureResponderEvent) {
     navigation.navigate('SignIn');

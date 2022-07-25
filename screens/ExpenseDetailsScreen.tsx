@@ -11,6 +11,9 @@ import { RootStackScreenProps } from "../types";
 import { Feather } from "@expo/vector-icons";
 import moment from "moment";
 import { useAuth } from "../hooks/useAuth";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
+import { Screen } from "../components/Screen";
+import { useRefresh } from "../hooks/useRefresh";
 
 const EditButton = (onPress: () => void) => (
     <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
@@ -25,11 +28,8 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
         variables: { passwordHash: passwordHash, expenseId: expenseId }
     });
 
-    useEffect(() => {
-        if (route.params.refresh) {
-            refetch();
-        }
-    });
+    useUnauthRedirect();
+    useRefresh(refetch, [passwordHash]);
 
     useEffect(() => {
         if (data) {
@@ -70,7 +70,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
     const expenseTypename = data?.expense.__typename;
 
     return (
-        <View style={styles.screen}>
+        <Screen>
             {
                 expenseTypename === "ExpenseSuccess" ?
                     <View>
@@ -101,15 +101,11 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                     :
                     <Text>{expenseTypename === "FailurePayload" ? data?.expense.exceptionName : ""}</Text>
             }
-        </View>
+        </Screen>
     );
 }
 
 const styles = StyleSheet.create({
-    screen: {
-        backgroundColor: "hsl(0,0%,100%)",
-        flex: 1,
-    },
     colHeader: {
         paddingHorizontal: 40,
         alignItems: "flex-end",

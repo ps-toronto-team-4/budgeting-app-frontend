@@ -14,6 +14,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 import modalStyle from '../../constants/Modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useUnauthRedirect } from '../../hooks/useUnauthRedirect';
+import { Screen } from "../../components/Screen";
 
 export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 
@@ -25,6 +27,8 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
   const [newDetails, setNewDetails] = useState(details)
 
   const passwordHash = useAuth();
+
+  useUnauthRedirect();
 
   const {data: categoriesData} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
     variables: { passwordHash },
@@ -83,7 +87,8 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
   }
 
   return (
-      <SafeAreaView style={[Styles.container, { backgroundColor: confirmDelete ? 'grey' : 'white' }]}>
+      <Screen >
+        <View style={{ backgroundColor: confirmDelete ? 'grey' : 'white' }}>
         {loading ? (
           <ActivityIndicator size={'large'}/>
         ) : (
@@ -143,7 +148,8 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
             </View>
           </View>
         </Modal>
-      </SafeAreaView>
+      </View>
+      </Screen>
   );
 }
 

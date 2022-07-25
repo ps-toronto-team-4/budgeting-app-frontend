@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import Button from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
+import { Screen } from "../components/Screen";
 import { MaterialIcons } from "@expo/vector-icons";
 import Styles from '../constants/Styles';
 
@@ -10,8 +13,16 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
     
     const passwordHash = useAuth();
 
+    const logout = () => {
+        AsyncStorage.removeItem('passwordHash').then(() => {
+            navigation.navigate('Welcome');
+        });
+    };
+
+    useUnauthRedirect();
+
     return (
-        <SafeAreaView style={Styles.container}>
+        <Screen>
             <Text>Hello from ProfileScreen!</Text>
             <Text>The locally stored password hash is: {passwordHash}</Text>
             <TouchableOpacity accessibilityLabel="Link to Category Settings" onPress={() => navigation.navigate('CategorySettings')}>
@@ -26,6 +37,7 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
                     <MaterialIcons name="navigate-next" size={24} color="black" />
                 </View>
             </TouchableOpacity>
-        </SafeAreaView>
+            <Button text="Logout" onPress={logout} accessibilityLabel="Logout Button" />
+        </Screen>
     );
 }

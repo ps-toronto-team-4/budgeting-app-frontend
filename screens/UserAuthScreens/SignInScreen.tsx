@@ -9,6 +9,7 @@ import { useLazyQuery } from '@apollo/client';
 import { GetPasswordHashDocument, GetPasswordHashQuery } from "../../components/generated";
 import Styles from "../../constants/Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 
 export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");
@@ -16,10 +17,11 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
   const [usernamePayload, setUsernamePayload] = React.useState("");
   const [passwordPayload, setPasswordPayload] = React.useState("");
 
+  useAuthRedirect();
 
   const setData = async () => {
     try {
-      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash : "undefined");
+      await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == "SignInSuccess" ? data.signIn.passwordHash : '');
       navigation.navigate('Root');
     } catch (error) {
       data?.signIn.__typename == "FailurePayload" ? data.signIn.errorMessage : "undefined error";

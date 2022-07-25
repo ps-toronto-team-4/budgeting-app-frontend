@@ -1,13 +1,16 @@
 import React from "react"
-import { StyleSheet, SafeAreaView, Alert, ActivityIndicator, TextInput } from 'react-native';
+import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import Button from "../../components/Button";
-import Colors from '../../constants/Colors';
 import { Text, View } from '../../components/Themed';
 import { RootStackScreenProps } from "../../types";
 import { useMutation, useQuery } from "@apollo/client";
 import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery } from "../../components/generated";
 import { DropdownRow } from "../../components/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
+import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
+import { InputRow } from "../../components/InputRow";
+import { Screen } from "../../components/Screen";
+
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
     const passwordHash = useAuth();
@@ -21,25 +24,25 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [disabledButton, setDisabledButton] = React.useState(false);
     const [merchantId, setMerchantId] = React.useState<number | undefined>();
 
+    useUnauthRedirect();
+
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: categoryId },
         onError: (error => {
             Alert.alert(error.message);
         }),
-        onCompleted: (data) => {
-            setMerchantId(data?.createMerchant.__typename === "MerchantSuccess" ? data.createMerchant.merchant.id : undefined)
-            navigation.canGoBack() ? navigation.goBack() : navigation.navigate("MerchantSettings");
+        onCompleted: () => {
+            console.log('Completed Mutation.');
+            navigation.canGoBack() ? navigation.goBack() : navigation.navigate('MerchantSettings');
         }
-    })
+    });
 
-    const { loading: categoryLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument,
-        {
-            variables: { passwordHash: passwordHash },
-            onError: (error => {
-                Alert.alert(error.message);
-            })
-        }
-    )
+    const { loading: categoryLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+        variables: { passwordHash: passwordHash },
+        onError: (error => {
+            Alert.alert(error.message);
+        }),
+    });
 
     const { loading: manyMerchantsLoading, data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash }
@@ -55,7 +58,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const handleMerchant = () => {
         setCheck(true);
         merchantsQuery();
-    }
+    };
 
     const merchantsQuery = () => {
         if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName.length != 0) {
@@ -72,30 +75,13 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                 console.log(merchantName);
                 setValidMerchant(true);
                 createMerchant();
-
             }
-
-
         } else {
             console.log("Something went wrong within the Lazy Query.");
             setValidMerchant(false);
             setDisabledButton(true);
         }
-
-
-
-    }
-
-    function HandleExisting() {
-
-        if (!check || !validMerchant) {
-            return (
-                <Text style={styles.alert}>This merchant already exists.</Text>
-            );
-        } else {
-            return (<></>);
-        }
-    }
+    };
 
     function handleCategorySelect(categoryName: String) {
         if (categoryData?.categories.__typename == "CategoriesSuccess") {
@@ -108,89 +94,72 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     }
 
-
-    function RequiredField({ input }: { input: string }) {
-        return (
-            (!check || input) ? (
-                <></>
-            ) : (
-                <Text style={styles.alert}>This field is required</Text>
-            ))
-    }
-
-    function updatedText() {
+    function onChangeMerchant(text: string) {
+        setMerchantName(text);
         setDisabledButton(false);
         setValidMerchant(true);
     }
 
+    const merchantError = (() => {
+        if (check && !merchantName) {
+            return 'Field is required';
+        } else if (check && !validMerchant) {
+            return 'Name already taken';
+        }
+    })();
+
     return (
-        <SafeAreaView style={styles.screen}>
-            <View style={styles.row}>
-                <View>
-                    <Text style={styles.fieldLabel}>Merchant:</Text>
-
-                </View>
-                <TextInput
-                    style={styles.fieldInput}
-                    placeholder='(mandatory)'
-                    onChangeText={(merchantName) => setMerchantName(merchantName)}
+        <Screen>
+            <View style={styles.container}>
+                <InputRow
+                    label="Merchant:"
+                    placeholder="Enter merchant name*"
                     value={merchantName}
-                    onChange={() => updatedText()}
-                />
-
-
-            </View>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <RequiredField input={merchantName} />
-                {validMerchant ? (<></>) : (<HandleExisting />)}
-
-            </View>
-
-            <View style={styles.row}>
-                <Text style={styles.fieldLabel}>Details:</Text>
-                <TextInput
-                    style={[styles.fieldInput]}
-                    placeholder='(optional)'
-                    onChangeText={(details) => setDetails(details)}
-                    value={details} />
-            </View>
-            <View style={{}}>
+                    onChangeText={onChangeMerchant}
+                    error={merchantError}
+                    topBorder />
+                <InputRow
+                    label="Details:"
+                    placeholder="Enter details"
+                    value={details}
+                    onChangeText={setDetails}
+                    topBorder
+                    bottomBorder />
                 <DropdownRow
-                    label="Categories"
+                    label="Category"
                     data={
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => x.name) : []
+                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
                     }
                     onSelect={handleCategorySelect}
                     expanded={categoryOpen}
                     onExpand={() => { setCategoryOpen(true); }}
-                    onCollapse={() => setCategoryOpen(false)} />
+                    onCollapse={() => setCategoryOpen(false)}
+                    bottomBorder />
+                <View style={styles.buttonContainer}>
+                    <Button text="Save Merchant"
+                        accessibilityLabel="Save Merchant"
+                        onPress={() => handleMerchant()}
+                        disabled={disabledButton}
+                    />
+                </View>
+                {!merchantLoading ? (
+                    merchantData?.createMerchant.__typename === "MerchantSuccess" ? (
+                        <Text>Merchant created successfully!</Text>
+                    ) : (
+                        <Text style={styles.alert}>{merchantData?.createMerchant.errorMessage}</Text>
+                    )) : (
+                    <ActivityIndicator size='large' />
+                )}
             </View>
-
-            <View style={styles.buttonContainer}>
-                <Button text="Save Merchant"
-                    accessibilityLabel={"Save Merchant"}
-                    onPress={() => handleMerchant()}
-                    disabled={disabledButton}
-                />
-            </View>
-            {!merchantLoading ? (
-                merchantData?.createMerchant.__typename === "MerchantSuccess" ? (
-                    <Text>Merchant created successfully!</Text>
-                ) : (
-                    <Text style={styles.alert}>{merchantData?.createMerchant.errorMessage}</Text>
-                )) : (
-                <ActivityIndicator size='large' />
-            )}
-        </SafeAreaView>
+        </Screen>
     );
 }
 
 
 const styles = StyleSheet.create({
-    screen: {
+    container: {
         flex: 1,
-        backgroundColor: Colors.light.background,
         justifyContent: 'center',
     },
     alert: {
@@ -209,14 +178,4 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         top: '30%',
     },
-    fieldLabel: {
-        fontWeight: 'bold',
-        fontSize: 15,
-        paddingLeft: 5,
-    },
-    fieldInput: {
-        fontSize: 15,
-        width: 180
-    },
-
 });
