@@ -1,60 +1,76 @@
 import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { Category, GetExpenseDocument, GetExpenseQuery } from "../components/generated";
-import { ColorValue } from "react-native"
+import { ColorValue, TouchableOpacity } from "react-native"
 import Colors from "../constants/Colors";
 
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackScreenProps } from "../types";
+import { Feather } from "@expo/vector-icons";
+import moment from "moment";
+import { useAuth } from "../hooks/useAuth";
+import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
+import { Screen } from "../components/Screen";
+import { useRefresh } from "../hooks/useRefresh";
+
+const EditButton = (onPress: () => void) => (
+    <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
+        <Feather name="edit-2" size={15} color="black" />
+    </TouchableOpacity>
+);
 
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
-    const [ passwordHash, setPasswordHash ] = React.useState("");
+    const passwordHash = useAuth();
     const { expenseId, ...otherParams } = route.params;
-    const { loading, error, data } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
+    const { loading, error, data, refetch } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
         variables: { passwordHash: passwordHash, expenseId: expenseId }
     });
 
-    useEffect(() => {
-        getData();
-    }, []);
+    useUnauthRedirect();
+    useRefresh(refetch, [passwordHash]);
 
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setPasswordHash(value);
-            }
-        } catch (e) {
-            setPasswordHash('undefined');
+    useEffect(() => {
+        if (data) {
+            navigation.setOptions({
+                headerRight: () => EditButton(() => navigation.navigate('UpdateExpense',
+                    data.expense.__typename === 'ExpenseSuccess' ? {
+                        id: data.expense.expense.id,
+                        amount: data.expense.expense.amount,
+                        date: data.expense.expense.date,
+                        desc: data.expense.expense.description || '',
+                        merchant: { id: data.expense.expense.merchant?.id, name: data.expense.expense.merchant?.name },
+                        category: { id: data.expense.expense.category?.id, name: data.expense.expense.category?.name },
+                    } : undefined
+                ))
+            });
         }
-    }
+    }, [data]);
 
     function formatAmount(amount: number | null | undefined): string {
         if (!amount) {
-            return '';
+            return '0.00';
         }
-        const numFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-        return numFormatter.format(amount);
+        return Number(amount).toFixed(2);
     }
 
     function formatDate(date: string | null | undefined): string {
         if (!date) {
             return 'undefined';
         }
-        const jsDate = new Date(date);
+        const momentDate = moment(date);
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const day = jsDate.getDate().toString(); // eg: 31
+        const day = momentDate.date().toString(); // eg: 31
         // Surely there is an easier way to do this. Not worth importing a new npm package though b/c that's unnecessary package bloat.
         const dayWithPostfix = day.endsWith('1') ? day + 'st' : (day.endsWith('2') ? day + 'nd' : (day.endsWith('3') ? day + 'rd' : day + 'th'));
-        return months[jsDate.getMonth()-1] + ' ' + dayWithPostfix + ', ' + jsDate.getFullYear();
+        return `${months[momentDate.month() - 1]} ${dayWithPostfix}, ${momentDate.year()}`;
     }
 
     const expenseTypename = data?.expense.__typename;
 
     return (
-        <View style={styles.screen}>
+        <Screen>
             {
                 expenseTypename === "ExpenseSuccess" ?
                     <View>
@@ -63,8 +79,8 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                         </View>
                         <View style={styles.catAndAmount}>
                             <View style={styles.catColorAndName}>
-                                <View style={[styles.catColor, {backgroundColor: data?.expense.expense.category ? "#" + data.expense.expense.category.colourHex : Colors.light.uncategorizedColor}]}></View>
-                                <Text style={styles.catName}>{data?.expense.expense.category?.name ? data?.expense.expense.category?.name : "Uncategorized"}</Text>                                
+                                <View style={[styles.catColor, { backgroundColor: data?.expense.expense.category ? "#" + data.expense.expense.category.colourHex : Colors.light.uncategorizedColor }]}></View>
+                                <Text style={styles.catName}>{data?.expense.expense.category?.name ? data?.expense.expense.category?.name : "Uncategorized"}</Text>
                             </View>
                             <Text style={styles.amount}>${formatAmount(data?.expense.expense.amount)}</Text>
                         </View>
@@ -82,18 +98,14 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                         </View>
                         <View style={styles.separator}></View>
                     </View>
-                :
+                    :
                     <Text>{expenseTypename === "FailurePayload" ? data?.expense.exceptionName : ""}</Text>
             }
-        </View>
+        </Screen>
     );
 }
 
 const styles = StyleSheet.create({
-    screen: {
-        backgroundColor: "hsl(0,0%,100%)",
-        flex: 1,
-    },
     colHeader: {
         paddingHorizontal: 40,
         alignItems: "flex-end",
