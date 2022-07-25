@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
 import { Swipeable } from 'react-native-gesture-handler';
 import FakeFlatList from '../../../components/FakeFlatList';
-import { BudgetCategory } from '../../../components/generated';
+import { BudgetCategory, GetMonthBreakdownQuery } from '../../../components/generated';
 
-const ShowBudgets = ({ data }: { data: Array<BudgetCategory> | undefined | null }) => {
+const ShowBudgets = ({
+    data,
+    monthlyData,
+    updateCallback
+}
+    : {
+        data: Array<BudgetCategory> | undefined | null,
+        monthlyData: GetMonthBreakdownQuery | undefined,
+        updateCallback: Function
+    }) => {
 
     const Separator = () => <View style={styles.itemSeparator} />;
     const RightSwipeOpen = () => {
@@ -26,10 +35,15 @@ const ShowBudgets = ({ data }: { data: Array<BudgetCategory> | undefined | null 
         );
     }
     const RowItem = (item: BudgetCategory) => {
+        const applicableMonthlyData = monthlyData?.monthBreakdown.__typename == "MonthBreakdown" ?
+            monthlyData.monthBreakdown.byCategory.find(x => x.category?.name == item.category.name) : undefined
+        const spent = applicableMonthlyData ? applicableMonthlyData.amountSpent : 0
+        const overBudget = spent > item.amount
+        const closeToBudget = !overBudget && spent > item.amount * 0.75
+
         return (
-            <Swipeable
-                renderRightActions={RightSwipeOpen}
-                onSwipeableRightOpen={() => alert("dlete me")}
+            <TouchableHighlight
+                onPress={() => updateCallback(item)}
             >
                 <View style={{
                     flex: 1,
@@ -49,10 +63,16 @@ const ShowBudgets = ({ data }: { data: Array<BudgetCategory> | undefined | null 
                                 paddingVertical: 20,
                             }}
                         >
+                            <View style={{ flex: 2, alignContent: "flex-start", flexDirection: 'row' }}>
+                                <Text style={{ flex: 1, fontSize: 24 }}>
+                                    {item.category.name}
+                                </Text>
+                                <Text style={{ flex: 1 }}>
+                                    {(closeToBudget && "Close to Budget")
+                                        || (overBudget && "Over Budget")}
+                                </Text>
+                            </View>
 
-                            <Text style={{ flex: 1, fontSize: 24 }}>
-                                {item.category.name}
-                            </Text>
                             <Text style={{ fontSize: 24 }}>
                                 ...
                             </Text>
@@ -67,20 +87,20 @@ const ShowBudgets = ({ data }: { data: Array<BudgetCategory> | undefined | null 
                             <View style={{ flex: 1 }}>
                                 <Text>Planed</Text>
                                 <View style={{ borderColor: 'black', borderWidth: 2, minHeight: 50, justifyContent: 'center', alignItems: "center", }}>
-                                    <Text>$10,00</Text>
+                                    <Text>$ {item.amount.toFixed(2)}</Text>
                                 </View>
                             </View>
                             <View style={{ flex: 1 }}>
                                 <Text>Actual</Text>
                                 <View style={{ borderColor: 'black', borderWidth: 2, minHeight: 50, justifyContent: 'center', alignItems: "center", }}>
-                                    <Text>$10,00</Text>
+                                    <Text>$ {spent.toFixed(2)}</Text>
                                 </View>
                             </View>
                         </View>
                     </View>
 
                 </View>
-            </Swipeable>
+            </TouchableHighlight>
         )
     }
 

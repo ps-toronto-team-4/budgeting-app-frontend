@@ -6,7 +6,7 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Moment } from 'moment';
+import { Budget, BudgetCategory } from './components/generated';
 
 declare global {
   namespace ReactNavigation {
@@ -28,7 +28,8 @@ export type RootStackParamList = {
   CategorySettings: undefined;
   NotFound: undefined;
   CreateMerchant: undefined;
-  CreateBudget: undefined;
+  CreateBudget: { budget: Budget };
+  UpdateBudget: { budgetCategory: BudgetCategory };
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<

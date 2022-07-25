@@ -3,39 +3,40 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { RootStackScreenProps } from "../../types";
 import Colors from "../../constants/Colors";
-import moment, { Moment } from "moment";
-import { Budget, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from "../../components/generated";
+import { Budget, BudgetCategory, DeleteBudgetCategoryDocument, DeleteBudgetCategoryMutation, UpdateBudgetCategoryDocument, UpdateBudgetCategoryMutation } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../../components/Button";
-import AdaptiveTextInput from "../../components/AdaptiveTextInput";
-import { DropdownRow } from "../../components/DropdownRow";
-import { InputDecimal } from "../../components/InputDecimal";
+import { ControlledInputDecimal, InputDecimal } from "../../components/InputDecimal";
+import { Row } from "../../components/Row";
 
 
 
-export default function CreateExpenseScreen({ navigation, route }: RootStackScreenProps<'CreateBudget'>) {
+export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'UpdateBudget'>) {
     const [passwordHash, setpasswordHash] = useState('');
-    const { loading: categoryDataLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-        variables: {
-            passwordHash: passwordHash
-        }
-    });
     const [amount, setAmount] = useState(0);
-    const [categoryId, setCategoryId] = useState<number | null>(null);
-    const [budget, setBudget] = useState<Budget | null>(null);
-    const [categoryExpanded, setCategoryExpanded] = useState(false);
+    const [amountLable, setAmountLabel] = useState('')
+    const [BudgetCategory, setBudgetCategory] = useState<BudgetCategory | null>(null);
 
-    const [createBudget] = useMutation<CreateBudgetCategoryMutation>(CreateBudgetCategoryDocument, {
-        variables: { passwordHash, budgetId: budget?.id, categoryId, amount },
+    const [updateBudget] = useMutation<UpdateBudgetCategoryMutation>(UpdateBudgetCategoryDocument, {
+        variables: { passwordHash, id: BudgetCategory?.id, amount },
         onError: (error => {
             alert(error.message);
         }),
         onCompleted: ((response) => {
-            if (response.createBudgetCategory.__typename == "BudgetCategorySuccess") {
-                // triggerRefetch()
+            if (response.updateBudgetCategory.__typename == 'BudgetCategorySuccess') {
                 // navigation.goBack();
                 navigation.navigate("Root", { screen: "Budget" });
+            }
+        })
+    })
 
+    const [deleteBudget] = useMutation<DeleteBudgetCategoryMutation>(DeleteBudgetCategoryDocument, {
+        variables: { passwordHash, id: BudgetCategory?.id },
+        onCompleted: ((response) => {
+            if (response.deleteBudgetCategory.__typename == 'DeleteSuccess') {
+                // navigation.goBack();
+                // navigation.navigate("Root", { screen: "Budget", params: { refresh: true } });
+                navigation.navigate("Root", { screen: "Budget" });
             }
         })
     })
@@ -53,28 +54,9 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
         } catch (e) {
             setpasswordHash('undefined');
         }
-        setBudget(route.params.budget)
-    }
-
-
-    function selectCategory(name: string) {
-        if (categoryData?.categories.__typename === 'CategoriesSuccess') {
-            const found = categoryData?.categories.categories.find(cat => cat.name === name);
-            if (found !== undefined) setCategoryId(found?.id);
-        }
-    }
-
-    function handleBudgetCreation() {
-        if (amount == 0) {
-            alert("Budgeted amount can't be zero")
-        } else if (budget == null || budget.id == null) {
-            alert("Parent budget not found")
-        } else if (categoryId == null) {
-            alert("Please select a catgeory")
-        } else {
-            createBudget()
-        }
-
+        setBudgetCategory(route.params.budgetCategory)
+        setAmount(route.params.budgetCategory.amount)
+        setAmountLabel(route.params.budgetCategory.amount.toFixed(2))
     }
 
     return (
@@ -82,41 +64,34 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
             <View style={styles.amountInputContainer}>
                 <View style={styles.dollarSignAndAmountInput}>
                     <Text style={styles.dollarSign}>$</Text>
-                    <InputDecimal callback={setAmount} type="text" placeholder='amount' />
+                    <ControlledInputDecimal
+                        callbackNumber={setAmount}
+                        label={amountLable}
+                        callbackLable={setAmountLabel}
+                        placeholder='Enter Amount'
+                    />
                 </View>
                 <View>
 
                 </View>
             </View>
-            <DropdownRow
-                label="Categories"
-                data={
-                    categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                        categoryData.categories.categories.filter(filterCat => {
-                            const lookingForOverlap = budget?.budgetCategories?.find(
-                                other => other.category.name == filterCat.name
-                            )
-                            return lookingForOverlap === undefined
-                        }).map(x => { return { name: x.name, id: x.id.toString() } }) : []
-                }
-                onSelect={selectCategory}
-                expanded={categoryExpanded}
-                onExpand={() => setCategoryExpanded(true)}
-                onCollapse={() => setCategoryExpanded(false)} />
-
-            <View style={styles.detailsRow}>
+            <Row>
                 <View style={styles.detailsIconAndLabel}>
-                    <Text style={styles.fieldLabel}>For Budget:</Text>
+                    <Text style={styles.fieldLabel}>For Category: {BudgetCategory?.category.name}</Text>
                 </View>
-                <View>
-                    <Text>{budget?.year} - {budget?.month}</Text>
-                </View>
+            </Row>
+
+            <View style={styles.buttonContainer}>
+                <Button
+                    text="Update Budget"
+                    accessibilityLabel="Button to Update Budget"
+                    onPress={() => updateBudget()} />
             </View>
             <View style={styles.buttonContainer}>
                 <Button
-                    text="Create New Budget"
-                    accessibilityLabel="Button to Create New Budget"
-                    onPress={() => handleBudgetCreation()} />
+                    text="Delete Budget"
+                    accessibilityLabel="Button to Delete Budget"
+                    onPress={() => deleteBudget()} />
             </View>
         </View >
     );

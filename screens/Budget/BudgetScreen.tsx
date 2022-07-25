@@ -1,44 +1,45 @@
 import { useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
-import { Budget, BudgetCategory, Category, GetBudgetsDocument, GetBudgetsQuery, GetExpensesDocument, GetExpensesQuery } from "../../components/generated";
-import { Button, Modal, Pressable, SafeAreaView, StatusBar } from "react-native"
+import { useState } from "react";
+import { Budget, BudgetCategory, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery } from "../../components/generated";
+import { Button, SafeAreaView, StatusBar } from "react-native"
 
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../../types";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import ChartDisplay from "./components/chartDisplay";
 import ShowBudgets from "./components/budgetList";
 import MissingBudget from "./components/missingBudget";
 import TopBar from "./components/topBar";
+import { useRefresh } from "../../hooks/useRefresh";
+import { useAuth } from "../../hooks/useAuth";
 
 
-export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'>) {
-    const [passwordHash, setpasswordHash] = React.useState("");
-    const [currentSeasonCreatedBudget, setCurrentSeasonCreatedBudget] = useState<Array<Budget>>([])
+export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'Budget'>) {
+    const passwordHash = useAuth();
     const [month, setMonth] = useState("JULY")
     const [year, setYear] = useState(2022)
 
-    const { data, loading, refetch } = useQuery<GetBudgetsQuery>(GetBudgetsDocument, {
+    const { data: budgetData, loading: budgetLoading, refetch: budgetRefetch } = useQuery<GetBudgetsQuery>(GetBudgetsDocument, {
         variables: { passwordHash }
     })
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
+    const { data: monthData, loading: monthLoading, refetch: monthRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument, {
+        variables: {
+            passwordHash,
+            month,
+            year
         }
-    }
+    })
 
-    const selectedBudget = data?.budgets.__typename == 'BudgetsSuccess' ? data.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined
+
+    useRefresh(() => {
+        budgetRefetch()
+        monthRefetch()
+    }, [passwordHash])
+
+
+    const selectedBudget = budgetData?.budgets.__typename == 'BudgetsSuccess' ? budgetData.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined
+    const plannedAmount = selectedBudget === undefined ? 0 :
+        selectedBudget.budgetCategories?.reduce((previousValue, currentValue) => previousValue + currentValue.amount, 0)
 
     return (
         <>
@@ -47,16 +48,28 @@ export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'
                 <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
                 {(selectedBudget &&
                     <>
-                        <ChartDisplay planned={5} actual={7} />
+                        <ChartDisplay
+                            planned={plannedAmount ? plannedAmount : 0}
+                            actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0} />
                         <Button
                             title="Add new Budget"
-                            onPress={() => navigation.navigate("CreateBudget")}
+                            onPress={() => navigation.navigate("CreateBudget", { budget: selectedBudget as Budget })}
                         />
                         <ScrollView>
-                            <ShowBudgets data={selectedBudget.budgetCategories as BudgetCategory[]} />
+                            <ShowBudgets
+                                data={selectedBudget.budgetCategories as BudgetCategory[]}
+                                monthlyData={monthData}
+                                updateCallback={(budCat: BudgetCategory) => {
+                                    navigation.navigate("UpdateBudget", { budgetCategory: budCat })
+                                }} />
                         </ScrollView>
                     </>)
-                    || <MissingBudget />
+                    || <MissingBudget
+                        otherBudgets={budgetData}
+                        passwordHash={passwordHash}
+                        triggerRefetch={() => { budgetRefetch(); monthRefetch(); }}
+                        year={year}
+                        month={month} />
 
                 }
             </SafeAreaView>

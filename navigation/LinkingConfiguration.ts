@@ -32,6 +32,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       NotFound: '*',
       CreateMerchant: 'create-merchant',
       CreateBudget: 'create-budget',
+      UpdateBudget: 'update-budget',
     },
   },
 };

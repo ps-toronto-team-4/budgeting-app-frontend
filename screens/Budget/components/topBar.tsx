@@ -1,22 +1,11 @@
 import { View, Text } from "react-native"
 import { AntDesign } from "@expo/vector-icons";
+import { MONTHS_ORDER } from "../../../constants/Months"
+
 
 const TopBar = ({ month, year, setMonth, setYear }: { month: string, year: number, setMonth: Function, setYear: Function }) => {
 
-    const months = [
-        "JANUARY",
-        "FEBRUARY",
-        "MARCH",
-        "APRIL",
-        "MAY",
-        "JUNE",
-        "JULY",
-        "AUGUST",
-        "SEPTEMBER",
-        "OCTOBER",
-        "NOVEMBER",
-        "DECEMBER",
-    ]
+    const months = MONTHS_ORDER
 
     const backAMonth = () => {
         const curIndex = months.indexOf(month)
