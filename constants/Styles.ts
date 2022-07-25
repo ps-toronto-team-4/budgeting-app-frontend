@@ -37,6 +37,10 @@ const styles = StyleSheet.create({
     palette: {
         width: '75%',
         marginBottom: 25
+    },
+    center: {
+        justifyContent: "center",
+        alignItems: "center",
     }
 });
 
