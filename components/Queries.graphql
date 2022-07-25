@@ -379,3 +379,20 @@ query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
         }
     }
 }
+
+
+mutation copyBudget($passwordHash: String!, $month:MonthType!, $year:Int!, $id:Int!){
+    copyBudget(passwordHash: $passwordHash,month: $month,year: $year, id:$id){
+        __typename
+        ... on BudgetSuccess{
+            budget{
+                id
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+
+}
