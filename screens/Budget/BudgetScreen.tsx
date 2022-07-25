@@ -47,7 +47,7 @@ export default function BudgetScreen({ navigation }: RootTabScreenProps<'Budget'
                 <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
                 {(selectedBudget &&
                     <>
-                        <ChartDisplay data={selectedBudget.budgetCategories as BudgetCategory[]} />
+                        <ChartDisplay planned={5} actual={7} />
                         <Button
                             title="Add new Budget"
                             onPress={() => navigation.navigate("CreateBudget")}
