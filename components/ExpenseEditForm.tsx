@@ -99,14 +99,15 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
             <View style={styles.amountInputContainer}>
                 <View style={styles.dollarSignAndAmountInput}>
                     <Text style={styles.dollarSign}>$</Text>
-                    <AdaptiveTextInput
-                        keyboardType="numeric"
-                        style={{ fontSize: 50 }}
-                        charWidth={30}
-                        value={amountText}
-                        onChangeText={setAmountText}
-                        onBlur={handleAmountBlur}>
-                    </AdaptiveTextInput>
+                    <TouchableHighlight>
+                        <AdaptiveTextInput
+                            keyboardType="numeric"
+                            style={{ fontSize: 50 }}
+                            charWidth={30}
+                            value={amountText}
+                            onChangeText={setAmountText}
+                            onBlur={handleAmountBlur} />
+                    </TouchableHighlight>
                 </View>
             </View>
             <DropdownRow
