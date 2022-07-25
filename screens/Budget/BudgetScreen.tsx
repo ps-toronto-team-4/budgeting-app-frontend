@@ -53,6 +53,8 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
     }, [route]);
 
     const selectedBudget = budgetData?.budgets.__typename == 'BudgetsSuccess' ? budgetData.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined
+    const plannedAmount = selectedBudget === undefined ? 0 :
+        selectedBudget.budgetCategories?.reduce((previousValue, currentValue) => previousValue + currentValue.amount, 0)
 
     return (
         <>
@@ -61,7 +63,9 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                 <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
                 {(selectedBudget &&
                     <>
-                        <ChartDisplay planned={5} actual={7} />
+                        <ChartDisplay
+                            planned={plannedAmount ? plannedAmount : 0}
+                            actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0} />
                         <Button
                             title="Add new Budget"
                             onPress={() => navigation.navigate("CreateBudget", { budget: selectedBudget as Budget })}
