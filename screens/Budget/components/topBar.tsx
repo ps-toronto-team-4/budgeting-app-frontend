@@ -27,7 +27,7 @@ const TopBar = ({ month, year, setMonth, setYear }: { month: string, year: numbe
         }
     }
 
-    return <View style={{ flexBasis: 80, flexDirection: 'row', justifyContent: "space-between" }}>
+    return <View style={{ flexBasis: 80, flexDirection: 'row', justifyContent: "space-between", marginTop: -2 }}>
         <AntDesign onPress={backAMonth} style={{ flex: 1 }} name="left" size={32} color="black" />
         <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
             Budget of {year} {month}
