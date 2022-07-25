@@ -1,13 +1,13 @@
 import React from "react"
 import { StyleSheet, SafeAreaView, Alert, ActivityIndicator, TextInput } from 'react-native';
-import Button from "../components/Button";
-import Colors from '../constants/Colors';
-import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from "../types";
+import Button from "../../components/Button";
+import Colors from '../../constants/Colors';
+import { Text, View } from '../../components/Themed';
+import { RootStackScreenProps } from "../../types";
 import { useMutation, useQuery } from "@apollo/client";
-import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery } from "../components/generated";
-import { DropdownRow } from "../components/DropdownRow";
-import { useAuth } from "../hooks/useAuth";
+import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery } from "../../components/generated";
+import { DropdownRow } from "../../components/DropdownRow";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
     const passwordHash = useAuth();
@@ -27,9 +27,8 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             Alert.alert(error.message);
         }),
         onCompleted: (data) => {
-            console.log('Completed Mutation.');
-            setMerchantId(merchantData?.createMerchant.__typename === "MerchantSuccess" ? merchantData.createMerchant.merchant.id : undefined)
-            // navigation.navigate('CreateExpense', { refresh: true });
+            setMerchantId(data?.createMerchant.__typename === "MerchantSuccess" ? data.createMerchant.merchant.id : undefined)
+            navigation.canGoBack() ? navigation.goBack() : navigation.navigate("MerchantSettings");
         }
     })
 
@@ -124,20 +123,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         setValidMerchant(true);
     }
 
-
-    /**
-     *  TODO Implement the following commented function from the Settings tab.
-     */
-    function updateMerchant() {
-        navigation.navigate('UpdateMerchant', singleMerchantData?.merchant.__typename === "MerchantSuccess" ? {
-            id: singleMerchantData?.merchant.merchant.id,
-            name: singleMerchantData?.merchant.merchant.name,
-            description: singleMerchantData?.merchant.merchant.description,
-            category: { id: categoryId, name: categoryName },
-        } : undefined
-        )
-    }
-
     return (
         <SafeAreaView style={styles.screen}>
             <View style={styles.row}>
@@ -180,15 +165,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     expanded={categoryOpen}
                     onExpand={() => { setCategoryOpen(true); }}
                     onCollapse={() => setCategoryOpen(false)} />
-            </View>
-
-            {/* TODO REMOVE THIS COMMENT IN DEVELOP */}
-            <View style={styles.buttonContainer}>
-                <Button text="Update Merchant"
-                    accessibilityLabel={"Button to Update Merchant"}
-                    onPress={() => updateMerchant()}
-                    disabled={disabledButton}
-                />
             </View>
 
             <View style={styles.buttonContainer}>
