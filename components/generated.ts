@@ -38,8 +38,6 @@ export type BudgetCategory = {
   user: User;
 };
 
-<<<<<<< HEAD
-=======
 export type BudgetCategoryDetails = {
   __typename?: 'BudgetCategoryDetails';
   amountActual: Scalars['Float'];
@@ -47,7 +45,6 @@ export type BudgetCategoryDetails = {
   category: Category;
 };
 
->>>>>>> C19-Budget
 export type BudgetCategoryPayload = BudgetCategorySuccess | FailurePayload;
 
 export type BudgetCategorySuccess = {
@@ -55,8 +52,6 @@ export type BudgetCategorySuccess = {
   budgetCategory: BudgetCategory;
 };
 
-<<<<<<< HEAD
-=======
 export type BudgetDetails = {
   __typename?: 'BudgetDetails';
   budget: Budget;
@@ -68,7 +63,6 @@ export type BudgetDetails = {
 
 export type BudgetDetailsPayload = BudgetDetails | FailurePayload;
 
->>>>>>> C19-Budget
 export type BudgetPayload = BudgetSuccess | FailurePayload;
 
 export type BudgetSuccess = {
@@ -181,6 +175,22 @@ export type MerchantsSuccess = {
   __typename?: 'MerchantsSuccess';
   merchants: Array<Merchant>;
 };
+
+export type MonthBreakdown = {
+  __typename?: 'MonthBreakdown';
+  byCategory: Array<MonthBreakdownCategory>;
+  month: MonthType;
+  totalSpent: Scalars['Float'];
+  year: Scalars['Int'];
+};
+
+export type MonthBreakdownCategory = {
+  __typename?: 'MonthBreakdownCategory';
+  amountSpent: Scalars['Float'];
+  category?: Maybe<Category>;
+};
+
+export type MonthBreakdownPayload = FailurePayload | MonthBreakdown;
 
 export enum MonthType {
   April = 'APRIL',
@@ -345,10 +355,7 @@ export type Query = {
   budgetByDate: BudgetPayload;
   budgetCategories: BudgetCategoriesPayload;
   budgetCategory: BudgetCategoryPayload;
-<<<<<<< HEAD
-=======
   budgetDetails: BudgetDetailsPayload;
->>>>>>> C19-Budget
   budgets: BudgetsPayload;
   categories: CategoriesPayload;
   category: CategoryPayload;
@@ -358,6 +365,7 @@ export type Query = {
   greeting: Scalars['String'];
   merchant: MerchantPayload;
   merchants: MerchantsPayload;
+  monthBreakdown: MonthBreakdownPayload;
   /** # Helper for testing. */
   signIn: SignInPayload;
   user?: Maybe<User>;
@@ -388,15 +396,12 @@ export type QueryBudgetCategoryArgs = {
 };
 
 
-<<<<<<< HEAD
-=======
 export type QueryBudgetDetailsArgs = {
   id: Scalars['Int'];
   passwordHash: Scalars['String'];
 };
 
 
->>>>>>> C19-Budget
 export type QueryBudgetsArgs = {
   passwordHash: Scalars['String'];
 };
@@ -439,6 +444,13 @@ export type QueryMerchantArgs = {
 
 export type QueryMerchantsArgs = {
   passwordHash: Scalars['String'];
+};
+
+
+export type QueryMonthBreakdownArgs = {
+  month: MonthType;
+  passwordHash: Scalars['String'];
+  year: Scalars['Int'];
 };
 
 
