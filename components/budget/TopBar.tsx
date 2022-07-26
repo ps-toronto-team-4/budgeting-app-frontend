@@ -1,6 +1,6 @@
 import { View, Text } from "react-native"
 import { AntDesign } from "@expo/vector-icons";
-import { MONTHS_ORDER } from "../../../constants/Months"
+import { MONTHS_ORDER } from "../../constants/Months"
 
 export interface TopBarProps {
     month: string,

@@ -1,9 +1,9 @@
 import { useMutation } from '@apollo/client';
 import { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
-import Button from '../../../components/Button';
-import { CreateBudgetDocument, CreateBudgetMutation, GetBudgetsQuery, MonthType, CopyBudgetMutation, CopyBudgetDocument } from '../../../components/generated';
-import { MONTHS_ORDER, MONTH_TO_NUM_STRING } from "../../../constants/Months";
+import Button from '../../components/Button';
+import { CreateBudgetDocument, CreateBudgetMutation, GetBudgetsQuery, MonthType, CopyBudgetMutation, CopyBudgetDocument } from '../generated';
+import { MONTHS_ORDER, MONTH_TO_NUM_STRING } from "../../constants/Months";
 
 export interface MissingBudgetProps {
     otherBudgets?: GetBudgetsQuery;

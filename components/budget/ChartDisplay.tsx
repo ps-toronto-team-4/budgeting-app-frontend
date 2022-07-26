@@ -1,4 +1,4 @@
-import { BudgetCategory } from "../../../components/generated";
+import { BudgetCategory } from "../generated";
 import { View, Text } from "react-native";
 import { VictoryBar, VictoryChart } from 'victory-native';
 
