@@ -8,6 +8,7 @@ import Styles from '../constants/Styles';
 import { VictoryChart, VictoryLegend, VictoryPie } from 'victory-native';
 import { useQuery } from '@apollo/client';
 import { GetCategoriesDocument, GetCategoriesQuery } from '../components/generated';
+import MonthlyExpenseGraph from '../components/GraphDisplays/monthlyExpenses';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const passwordHash = useAuth();
@@ -20,6 +21,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
 
     return (
         <Screen>
+            <MonthlyExpenseGraph />
             <View style={Styles.center}>
                 <VictoryPie
                     padAngle={({ datum }) => datum.y}
