@@ -6,10 +6,10 @@ import { Button, SafeAreaView, StatusBar } from "react-native"
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../../types";
-import { ChartDisplay } from "./components/ChartDisplay";
-import { BudgetList } from "./components/BudgetList";
-import { MissingBudget } from "./components/MissingBudget";
-import { TopBar } from "./components/TopBar";
+import { ChartDisplay } from "../../components/budget/ChartDisplay";
+import { BudgetList } from "../../components/budget/BudgetList";
+import { MissingBudget } from "../../components/budget/MissingBudget";
+import { TopBar } from "../../components/budget/TopBar";
 import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
 
