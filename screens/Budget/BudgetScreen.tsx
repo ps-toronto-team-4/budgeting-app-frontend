@@ -6,10 +6,10 @@ import { Button, SafeAreaView, StatusBar } from "react-native"
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../../types";
-import ChartDisplay from "./components/chartDisplay";
-import ShowBudgets from "./components/budgetList";
-import MissingBudget from "./components/missingBudget";
-import TopBar from "./components/topBar";
+import { ChartDisplay } from "./components/ChartDisplay";
+import { BudgetList } from "./components/BudgetList";
+import { MissingBudget } from "./components/MissingBudget";
+import { TopBar } from "./components/TopBar";
 import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -56,7 +56,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                             onPress={() => navigation.navigate("CreateBudget", { budget: selectedBudget as Budget })}
                         />
                         <ScrollView>
-                            <ShowBudgets
+                            <BudgetList
                                 data={selectedBudget.budgetCategories as BudgetCategory[]}
                                 monthlyData={monthData}
                                 updateCallback={(budCat: BudgetCategory) => {

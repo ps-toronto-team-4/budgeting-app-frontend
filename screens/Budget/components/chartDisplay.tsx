@@ -1,10 +1,14 @@
-import { BudgetCategory } from "../../../components/generated"
-import { View, Text } from "react-native"
-import { VictoryBar, VictoryChart } from 'victory-native'
+import { BudgetCategory } from "../../../components/generated";
+import { View, Text } from "react-native";
+import { VictoryBar, VictoryChart } from 'victory-native';
 
+export interface ChartDisplayProps {
+    planned: number;
+    actual: number;
+    height?: number;
+}
 
-
-const ChartDisplay = ({ planned, actual, height }: { planned: number, actual: number, height?: number }) => {
+export function ChartDisplay({ planned, actual, height }: ChartDisplayProps) {
     const chartHeight = height === undefined ? 250 : height
     return (
         <View style={{ justifyContent: "center", alignItems: "center", flexBasis: chartHeight }}>
@@ -32,5 +36,3 @@ const ChartDisplay = ({ planned, actual, height }: { planned: number, actual: nu
 
     );
 }
-
-export default ChartDisplay

@@ -1,39 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
-import { Swipeable } from 'react-native-gesture-handler';
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import FakeFlatList from '../../../components/FakeFlatList';
 import { BudgetCategory, GetMonthBreakdownQuery } from '../../../components/generated';
 
-const ShowBudgets = ({
-    data,
-    monthlyData,
-    updateCallback
+export interface BudgetListProps {
+    data: Array<BudgetCategory> | undefined | null;
+    monthlyData: GetMonthBreakdownQuery | undefined;
+    updateCallback: (budgetCategory: BudgetCategory) => void;
 }
-    : {
-        data: Array<BudgetCategory> | undefined | null,
-        monthlyData: GetMonthBreakdownQuery | undefined,
-        updateCallback: Function
-    }) => {
 
-    const Separator = () => <View style={styles.itemSeparator} />;
-    const RightSwipeOpen = () => {
-        return (
-            <View
-                style={{ flex: 1, backgroundColor: '#fc0303', justifyContent: 'center', alignItems: 'flex-end' }}
-            >
-                <Text
-                    style={{
-                        color: 'white',
-                        paddingHorizontal: 10,
-                        fontWeight: 'bold',
-                        paddingVertical: 20,
-                    }}
-                >
-                    Delete
-                </Text>
-            </View>
-        );
-    }
+export function BudgetList({ data, monthlyData, updateCallback }: BudgetListProps) {
+    // TODO move this component outside BudgetList component.
     const RowItem = (item: BudgetCategory) => {
         const applicableMonthlyData = monthlyData?.monthBreakdown.__typename == "MonthBreakdown" ?
             monthlyData.monthBreakdown.byCategory.find(x => x.category?.name == item.category.name) : undefined
@@ -42,37 +19,25 @@ const ShowBudgets = ({
         const closeToBudget = !overBudget && spent > item.amount * 0.75
 
         return (
-            <TouchableHighlight
-                onPress={() => updateCallback(item)}
-            >
-                <View style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    backgroundColor: 'white',
-                }}>
+            <TouchableHighlight onPress={() => updateCallback(item)}>
+                <View style={{ flex: 1, flexDirection: "row", backgroundColor: 'white', }}>
                     <View style={{ flexBasis: 10, width: 10, backgroundColor: "#" + item.category.colourHex }}></View>
                     <View style={{ flex: 1, flexDirection: 'column' }}>
-
-
-                        <View
-                            style={{
-                                flex: 1,
-                                flexDirection: "row",
-                                alignContent: "space-between",
-                                paddingHorizontal: 30,
-                                paddingVertical: 20,
-                            }}
-                        >
+                        <View style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            alignContent: "space-between",
+                            paddingHorizontal: 30,
+                            paddingVertical: 20,
+                        }}>
                             <View style={{ flex: 2, alignContent: "flex-start", flexDirection: 'row' }}>
                                 <Text style={{ flex: 1, fontSize: 24 }}>
                                     {item.category.name}
                                 </Text>
                                 <Text style={{ flex: 1 }}>
-                                    {(closeToBudget && "Close to Budget")
-                                        || (overBudget && "Over Budget")}
+                                    {(closeToBudget && "Close to Budget") || (overBudget && "Over Budget")}
                                 </Text>
                             </View>
-
                             <Text style={{ fontSize: 24 }}>
                                 ...
                             </Text>
@@ -108,7 +73,7 @@ const ShowBudgets = ({
         <FakeFlatList
             data={data ? data : []}
             renderItem={({ item }) => <RowItem {...item} />}
-            ItemSeparatorComponent={() => <Separator />}
+            ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
         />
     </View>
 }
@@ -125,6 +90,3 @@ const styles = StyleSheet.create({
         backgroundColor: '#969696',
     },
 });
-
-
-export default ShowBudgets
