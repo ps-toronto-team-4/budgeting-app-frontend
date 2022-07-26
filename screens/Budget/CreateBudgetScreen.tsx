@@ -7,22 +7,23 @@ import moment, { Moment } from "moment";
 import { Budget, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../../components/Button";
-import AdaptiveTextInput from "../../components/AdaptiveTextInput";
+import { AmountInput } from "../../components/AmountInput";
 import { DropdownRow } from "../../components/DropdownRow";
-import { InputDecimal } from "../../components/InputDecimal";
+import { useAuth } from "../../hooks/useAuth";
+import { Screen } from "../../components/Screen";
+import { InputRow } from "../../components/InputRow";
+import { useRefresh } from "../../hooks/useRefresh";
 
-
-
-export default function CreateExpenseScreen({ navigation, route }: RootStackScreenProps<'CreateBudget'>) {
-    const [passwordHash, setpasswordHash] = useState('');
-    const { loading: categoryDataLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+export default function CreateBudgetScreen({ navigation, route }: RootStackScreenProps<'CreateBudget'>) {
+    const passwordHash = useAuth();
+    const { loading: categoryDataLoading, data: categoryData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
         variables: {
             passwordHash: passwordHash
         }
     });
     const [amount, setAmount] = useState(0);
     const [categoryId, setCategoryId] = useState<number | null>(null);
-    const [budget, setBudget] = useState<Budget | null>(null);
+    const [budget, setBudget] = useState<Budget | null>(route.params.budget || null);
     const [categoryExpanded, setCategoryExpanded] = useState(false);
 
     const [createBudget] = useMutation<CreateBudgetCategoryMutation>(CreateBudgetCategoryDocument, {
@@ -32,30 +33,12 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
         }),
         onCompleted: ((response) => {
             if (response.createBudgetCategory.__typename == "BudgetCategorySuccess") {
-                // triggerRefetch()
-                // navigation.goBack();
-                navigation.navigate("Root", { screen: "Budget" });
-
+                navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root", { screen: "Budget" });
             }
         })
-    })
+    });
 
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-        setBudget(route.params.budget)
-    }
-
+    useRefresh(refetch, [passwordHash]);
 
     function selectCategory(name: string) {
         if (categoryData?.categories.__typename === 'CategoriesSuccess') {
@@ -78,18 +61,15 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
     }
 
     return (
-        <View style={styles.screen}>
+        <Screen onDismissKeyboard={() => setCategoryExpanded(false)}>
             <View style={styles.amountInputContainer}>
-                <View style={styles.dollarSignAndAmountInput}>
-                    <Text style={styles.dollarSign}>$</Text>
-                    <InputDecimal callback={setAmount} type="text" placeholder='amount' />
-                </View>
+                <AmountInput defaultAmount={0} onChangeAmount={setAmount} />
                 <View>
 
                 </View>
             </View>
             <DropdownRow
-                label="Categories"
+                label="Category"
                 data={
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.filter(filterCat => {
@@ -102,23 +82,18 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
                 onSelect={selectCategory}
                 expanded={categoryExpanded}
                 onExpand={() => setCategoryExpanded(true)}
-                onCollapse={() => setCategoryExpanded(false)} />
+                onCollapse={() => setCategoryExpanded(false)}
+                topBorder
+                bottomBorder />
 
-            <View style={styles.detailsRow}>
-                <View style={styles.detailsIconAndLabel}>
-                    <Text style={styles.fieldLabel}>For Budget:</Text>
-                </View>
-                <View>
-                    <Text>{budget?.year} - {budget?.month}</Text>
-                </View>
-            </View>
+            <InputRow label="Month:" disabled bottomBorder value={`${budget?.month} ${budget?.year}`} />
             <View style={styles.buttonContainer}>
                 <Button
                     text="Create New Budget"
                     accessibilityLabel="Button to Create New Budget"
                     onPress={() => handleBudgetCreation()} />
             </View>
-        </View >
+        </Screen>
     );
 }
 

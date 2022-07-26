@@ -12,7 +12,7 @@ export interface ChartDisplayProps {
 export function ChartDisplay({ planned, actual, height, width }: ChartDisplayProps) {
     return (
         <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <VictoryChart width={width || 360} height={height || 250} domainPadding={70} padding={{ top: 0, bottom: 30, left: 50, right: 50 }}>
+            <VictoryChart width={width || 360} height={height || 200} domainPadding={70} padding={{ top: 0, bottom: 30, left: 50, right: 50 }}>
                 <VictoryAxis crossAxis />
                 <VictoryBar
                     categories={{ x: ["Planned", "Actual"] }}

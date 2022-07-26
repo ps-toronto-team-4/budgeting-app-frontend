@@ -5,7 +5,7 @@ import { GetCategoriesDocument, GetCategoriesQuery } from "../components/generat
 import { StyleSheet, View, Text, TextInput, TouchableHighlight, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
-import AdaptiveTextInput from "../components/AdaptiveTextInput";
+import { AmountInput } from "./AmountInput";
 import { AntDesign, Feather } from '@expo/vector-icons';
 import Button from "../components/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
@@ -49,12 +49,11 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                 passwordHash: passwordHash
             }
         });
-    const [amountText, setAmountText] = useState(initVals?.amount.toString() || '0.00');
+    const [amount, setAmount] = useState(initVals?.amount || 0);
     const [merchantId, setMerchantId] = useState(initVals?.merchantId);
     const [categoryId, setCategoryId] = useState(initVals?.categoryId);
     const [merchantExpanded, setMerchantExpanded] = useState(false);
     const [categoryExpanded, setCategoryExpanded] = useState(false);
-    const [detailsHeight, setDetailsHeight] = useState(20);
     const [calendarShown, setCalendarShown] = useState(false);
     const [date, setDate] = useState(initVals?.date || moment().toISOString());
     const [desc, setDesc] = useState(initVals?.desc || '');
@@ -63,12 +62,6 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
         refetchMerchants();
         refetchCategories();
     }, [passwordHash]);
-
-    function handleAmountBlur() {
-        if (amountText === '') {
-            setAmountText('0.00');
-        }
-    }
 
     function selectMerchant(name: string) {
         if (merchantData?.merchants.__typename === 'MerchantsSuccess') {
@@ -86,7 +79,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
 
     function handleSubmit() {
         onSubmit({
-            amount: parseFloat(amountText),
+            amount: amount,
             merchantId: merchantId,
             categoryId: categoryId,
             date: date,
@@ -96,20 +89,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
 
     return (
         <Screen onDismissKeyboard={() => setCalendarShown(false)}>
-            <View style={styles.amountInputContainer}>
-                <View style={styles.dollarSignAndAmountInput}>
-                    <Text style={styles.dollarSign}>$</Text>
-                    <TouchableHighlight>
-                        <AdaptiveTextInput
-                            keyboardType="numeric"
-                            style={{ fontSize: 50 }}
-                            charWidth={30}
-                            value={amountText}
-                            onChangeText={setAmountText}
-                            onBlur={handleAmountBlur} />
-                    </TouchableHighlight>
-                </View>
-            </View>
+            <AmountInput onChangeAmount={setAmount} defaultAmount={initVals?.amount || 0} />
             <DropdownRow
                 label="Merchant"
                 data={
@@ -193,26 +173,6 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
 }
 
 const styles = StyleSheet.create({
-    amountInputContainer: {
-        height: 200,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    dollarSignAndAmountInput: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-    },
-    dollarSign: {
-        fontSize: 20,
-        marginRight: 5,
-        paddingBottom: 15,
-    },
-    amountInput: {
-        fontSize: 50,
-        height: 200,
-        width: 100,
-        padding: 0,
-    },
     detailsRow: {
         zIndex: -1,
         elevation: -1,

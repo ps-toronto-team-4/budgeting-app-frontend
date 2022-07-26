@@ -102,8 +102,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                 <>
                     <ChartDisplay
                         planned={plannedAmount ? plannedAmount : 0}
-                        actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0}
-                        height={200} />
+                        actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0} />
                     <View style={{ alignSelf: 'center', marginBottom: 10, }}>
                         <Button
                             text="Add Budget"

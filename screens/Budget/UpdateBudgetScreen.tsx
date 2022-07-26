@@ -6,19 +6,17 @@ import Colors from "../../constants/Colors";
 import { Budget, BudgetCategory, DeleteBudgetCategoryDocument, DeleteBudgetCategoryMutation, UpdateBudgetCategoryDocument, UpdateBudgetCategoryMutation } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../../components/Button";
-import { ControlledInputDecimal, InputDecimal } from "../../components/InputDecimal";
 import { Row } from "../../components/Row";
-
-
+import { AmountInput } from "../../components/AmountInput";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'UpdateBudget'>) {
-    const [passwordHash, setpasswordHash] = useState('');
-    const [amount, setAmount] = useState(0);
-    const [amountLable, setAmountLabel] = useState('')
-    const [BudgetCategory, setBudgetCategory] = useState<BudgetCategory | null>(null);
+    const passwordHash = useAuth();
+    const [amount, setAmount] = useState(route.params.budgetCategory.amount);
+    const [budgetCategory, setBudgetCategory] = useState<BudgetCategory>(route.params.budgetCategory);
 
     const [updateBudget] = useMutation<UpdateBudgetCategoryMutation>(UpdateBudgetCategoryDocument, {
-        variables: { passwordHash, id: BudgetCategory?.id, amount },
+        variables: { passwordHash, id: budgetCategory?.id, amount },
         onError: (error => {
             alert(error.message);
         }),
@@ -31,7 +29,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
     })
 
     const [deleteBudget] = useMutation<DeleteBudgetCategoryMutation>(DeleteBudgetCategoryDocument, {
-        variables: { passwordHash, id: BudgetCategory?.id },
+        variables: { passwordHash, id: budgetCategory?.id },
         onCompleted: ((response) => {
             if (response.deleteBudgetCategory.__typename == 'DeleteSuccess') {
                 // navigation.goBack();
@@ -41,43 +39,17 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
         })
     })
 
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        try {
-            const value = await AsyncStorage.getItem('passwordHash')
-            if (value != null) {
-                setpasswordHash(value);
-            }
-        } catch (e) {
-            setpasswordHash('undefined');
-        }
-        setBudgetCategory(route.params.budgetCategory)
-        setAmount(route.params.budgetCategory.amount)
-        setAmountLabel(route.params.budgetCategory.amount.toFixed(2))
-    }
-
     return (
         <View style={styles.screen}>
             <View style={styles.amountInputContainer}>
-                <View style={styles.dollarSignAndAmountInput}>
-                    <Text style={styles.dollarSign}>$</Text>
-                    <ControlledInputDecimal
-                        callbackNumber={setAmount}
-                        label={amountLable}
-                        callbackLable={setAmountLabel}
-                        placeholder='Enter Amount'
-                    />
-                </View>
+                <AmountInput defaultAmount={amount} onChangeAmount={setAmount} />
                 <View>
 
                 </View>
             </View>
             <Row>
                 <View style={styles.detailsIconAndLabel}>
-                    <Text style={styles.fieldLabel}>For Category: {BudgetCategory?.category.name}</Text>
+                    <Text style={styles.fieldLabel}>For Category: {budgetCategory?.category.name}</Text>
                 </View>
             </Row>
 
