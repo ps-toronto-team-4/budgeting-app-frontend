@@ -114,7 +114,6 @@ const staticStyles = StyleSheet.create({
     },
     warningRow: {
         alignItems: 'center',
-        marginBottom: 15,
     },
     warningText: {
         color: 'white',
@@ -126,6 +125,7 @@ const staticStyles = StyleSheet.create({
     body: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginTop: 15,
     },
     amntDisplayContainer: {
         width: 120,
