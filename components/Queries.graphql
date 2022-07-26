@@ -296,3 +296,28 @@ query getBudgetCategory($passwordHash: String!){
     }
 }
 
+query getMonthBreakdown($passwordHash: String!, $month: MonthType!, $year: Int!){
+    monthBreakdown(passwordHash:$passwordHash, month: $month, year: $year){
+        __typename
+        ...on MonthBreakdown{
+            month
+            year
+            totalSpent
+            byCategory{
+                category{
+                    name
+                    colourHex
+                    id
+                }
+                amountSpent
+            }
+        }
+
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
