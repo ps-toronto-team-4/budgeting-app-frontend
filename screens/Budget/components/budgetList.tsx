@@ -1,39 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import { BudgetCategory } from '../../../components/BudgetCategory';
 import FakeFlatList from '../../../components/FakeFlatList';
 import { BudgetCategory as BudgetCategoryType, GetMonthBreakdownQuery } from '../../../components/generated';
 
-const ShowBudgets = ({
-    data,
-    monthlyData,
-    updateCallback
+export interface BudgetListProps {
+    data: Array<BudgetCategoryType> | undefined | null;
+    monthlyData: GetMonthBreakdownQuery | undefined;
+    updateCallback: (budgetCategory: BudgetCategoryType) => void;
 }
-    : {
-        data: Array<BudgetCategoryType> | undefined | null,
-        monthlyData: GetMonthBreakdownQuery | undefined,
-        updateCallback: Function
-    }) => {
 
-    const Separator = () => <View style={styles.itemSeparator} />;
-    const RightSwipeOpen = () => {
-        return (
-            <View
-                style={{ flex: 1, backgroundColor: '#fc0303', justifyContent: 'center', alignItems: 'flex-end' }}
-            >
-                <Text
-                    style={{
-                        color: 'white',
-                        paddingHorizontal: 10,
-                        fontWeight: 'bold',
-                        paddingVertical: 20,
-                    }}
-                >
-                    Delete
-                </Text>
-            </View>
-        );
-    }
+export function BudgetList({ data, monthlyData, updateCallback }: BudgetListProps) {
+    // TODO move this component outside BudgetList component.
     const RowItem = (item: BudgetCategoryType) => {
         const applicableMonthlyData = monthlyData?.monthBreakdown.__typename == "MonthBreakdown" ?
             monthlyData.monthBreakdown.byCategory.find(x => x.category?.name == item.category.name) : undefined
@@ -48,14 +26,14 @@ const ShowBudgets = ({
                 category={item.category.name}
                 color={'#' + item.category.colourHex}
                 onPressDots={() => updateCallback(item)} />
-        )
+        );
     }
 
     return <View>
         <FakeFlatList
             data={data ? data : []}
             renderItem={({ item }) => <RowItem {...item} />}
-            ItemSeparatorComponent={() => <Separator />}
+            ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
         />
     </View>
 }
@@ -72,6 +50,3 @@ const styles = StyleSheet.create({
         backgroundColor: '#969696',
     },
 });
-
-
-export default ShowBudgets

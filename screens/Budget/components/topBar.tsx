@@ -2,9 +2,14 @@ import { View, Text } from "react-native"
 import { AntDesign } from "@expo/vector-icons";
 import { MONTHS_ORDER } from "../../../constants/Months"
 
+export interface TopBarProps {
+    month: string,
+    year: number,
+    setMonth: (newMonth: string) => void;
+    setYear: (newYear: number) => void;
+}
 
-const TopBar = ({ month, year, setMonth, setYear }: { month: string, year: number, setMonth: Function, setYear: Function }) => {
-
+export function TopBar({ month, year, setMonth, setYear }: TopBarProps) {
     const months = MONTHS_ORDER
 
     const backAMonth = () => {
@@ -38,5 +43,3 @@ const TopBar = ({ month, year, setMonth, setYear }: { month: string, year: numbe
 
     </View>
 }
-
-export default TopBar
