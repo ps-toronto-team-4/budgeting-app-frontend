@@ -1,30 +1,22 @@
 import { useMutation } from '@apollo/client';
 import { useEffect, useState } from 'react';
-import { View, Text, Button } from 'react-native'
+import { View, Text } from 'react-native';
+import Button from '../../../components/Button';
 import { CreateBudgetDocument, CreateBudgetMutation, GetBudgetsQuery, MonthType, CopyBudgetMutation, CopyBudgetDocument } from '../../../components/generated';
-import { MONTHS_ORDER, MONTH_TO_NUM_STRING } from "../../../constants/Months"
+import { MONTHS_ORDER, MONTH_TO_NUM_STRING } from "../../../constants/Months";
 
-const MissingBudget = (
-    {
-        otherBudgets,
-        triggerRefetch,
-        passwordHash,
-        month,
-        year
-    }
-        :
-        {
-            otherBudgets: GetBudgetsQuery | undefined,
-            triggerRefetch: Function,
-            passwordHash: string,
-            month: string,
-            year: number
-        }) => {
+export interface MissingBudgetProps {
+    otherBudgets?: GetBudgetsQuery;
+    triggerRefetch: () => void;
+    passwordHash: string;
+    month: string;
+    year: number;
+}
 
+export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, month, year }: MissingBudgetProps) {
     const [closetBudgetId, setClosetBudgetId] = useState<number | undefined>()
 
-
-    const [createBudget] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
+    const [createBudget, { }] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
         variables: { passwordHash, month, year },
         onError: (error => {
             alert(error.message);
@@ -36,9 +28,9 @@ const MissingBudget = (
         })
     })
 
-    const [copyBudget] = useMutation<CopyBudgetMutation>(CopyBudgetDocument, {
+    const [copyBudget, { }] = useMutation<CopyBudgetMutation>(CopyBudgetDocument, {
         variables: { passwordHash, month, year, id: closetBudgetId },
-        onError: (error => {
+        onError: ((error) => {
             alert(error.message);
         }),
         onCompleted: ((response) => {
@@ -49,48 +41,48 @@ const MissingBudget = (
     })
 
     useEffect(() => {
-        var closetBudget: string | undefined = ''
+        var closestBudget: string | undefined = ''
         if (otherBudgets?.budgets.__typename == 'BudgetsSuccess') {
             otherBudgets.budgets.budgets.forEach(ele => {
                 const monthString = MONTH_TO_NUM_STRING(ele.month.valueOf())
-                if (monthString === null || monthString === undefined) {
+                if (monthString === null) {
                     return
                 }
                 const curr = ele.year + "-" + MONTH_TO_NUM_STRING(ele.month)
-                if (closetBudget === undefined && curr < year + '-' + month) {
-                    closetBudget = curr
-                } else if (closetBudget === undefined) {
+                if (closestBudget === undefined && curr < year + '-' + month) {
+                    closestBudget = curr
+                } else if (closestBudget === undefined) {
                     return
                 }
-                else if ((curr > closetBudget && curr < year + '-' + month)) {
-                    closetBudget = curr
+                else if ((curr > closestBudget && curr < year + '-' + month)) {
+                    closestBudget = curr
                 }
             })
 
         }
-        const closetsMonth = closetBudget !== undefined ? MONTHS_ORDER[parseInt(closetBudget.split('-')[1])] : 'No Month found'
-        const closetsYear = closetBudget !== undefined ? parseInt(closetBudget.split('-')[0]) : -1
+        const closestMonth = closestBudget !== undefined ? MONTHS_ORDER[parseInt(closestBudget.split('-')[1])] : 'No Month found'
+        const closestYear = closestBudget !== undefined ? parseInt(closestBudget.split('-')[0]) : -1
         if (otherBudgets?.budgets.__typename == 'BudgetsSuccess') {
             const foundBudget = otherBudgets.budgets.budgets.find(bud => {
-                return (bud.month == closetsMonth && bud.year == closetsYear)
+                return (bud.month == closestMonth && bud.year == closestYear)
             })
             setClosetBudgetId(foundBudget?.id)
         }
     }, [otherBudgets])
 
-    return (<View>
-        <Text>
-            Wow such emptiness, make a budget for this month
-            <Button
-                title="New Budget from scratch"
-                onPress={() => createBudget()}
-            />
-            <Button
-                title="Copy Last Month's Budget"
-                onPress={() => copyBudget()}
-            />
-        </Text>
-    </View>)
+    return (
+        <View>
+            <Text>
+                Wow such emptiness, make a budget for this month
+                <Button
+                    text="New Budget from scratch"
+                    onPress={() => createBudget()}
+                />
+                <Button
+                    text="Copy most recent Budget"
+                    onPress={() => copyBudget()}
+                />
+            </Text>
+        </View>
+    );
 }
-
-export default MissingBudget
