@@ -34,7 +34,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }),
         onCompleted: () => {
             console.log('Completed Mutation.');
-            navigation.canGoBack() ? navigation.goBack() : navigation.navigate('CreateExpense', { refresh: true });
+            navigation.canGoBack() ? navigation.goBack() : navigation.navigate('CreateExpense');
         }
     });
 
@@ -122,7 +122,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     label="Category"
                     data={
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name} }) : []
+                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name } }) : []
                     }
                     onSelect={handleCategorySelect}
                     expanded={categoryOpen}

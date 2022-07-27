@@ -16,7 +16,7 @@ export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name
 
 export type DropdownRowProps = {
     label: string;
-    data: {id: string, name: string}[];
+    data: { id: string, name: string }[];
     onSelect: (name: string) => void;
     expanded?: boolean;
     onExpand?: () => void;
@@ -26,6 +26,7 @@ export type DropdownRowProps = {
     visible?: boolean;
     topBorder?: boolean;
     bottomBorder?: boolean;
+    error?: string;
 };
 
 export function DropdownRow({
@@ -40,21 +41,31 @@ export function DropdownRow({
     visible,
     topBorder,
     bottomBorder,
+    error,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
+    const [cachedValue, setCachedValue] = useState('');
     // this state is only used when expanded prop is undefined
     const [expandedState, setExpandedState] = useState(false);
     const expanded = expandedProp === undefined ? expandedState : expandedProp
 
     useEffect(() => {
         if (expanded) {
+            setCachedValue(value);
             setValue('');
             inputRef.current?.focus();
         } else {
+            if (value === '') {
+                setValue(cachedValue);
+            }
             inputRef.current?.blur();
         }
     }, [expanded]);
+
+    useEffect(() => {
+        console.log(defaultValue)
+    }, []);
 
     const collapse = () => {
         if (expanded) {
@@ -94,28 +105,36 @@ export function DropdownRow({
     }
 
     return (
-        <View style={{display: visible === false ? 'none' : 'flex'}}>
+        <View style={{ display: visible === false ? 'none' : 'flex' }}>
             <Row
                 topBorder={topBorder}
                 bottomBorder={bottomBorder}
                 onPress={() => handleRowPress()}
-                >
-                <View style={styles.fieldLabelAndInputContainer}>
-                    <Text style={styles.fieldLabel}>{label}:</Text>
-                    <TextInput
-                        style={styles.fieldInput}
-                        editable={expanded}
-                        placeholder={"Select " + label}
-                        ref={inputRef}
-                        value={value}
-                        onChangeText={setValue}>
-                    </TextInput>
+            >
+                <View style={styles.fieldAndErrorContainer}>
+                    <View style={styles.fieldLabelAndInputAndArrowContainer}>
+                        <View style={styles.fieldLabelAndInputContainer}>
+                            <Text style={styles.fieldLabel}>{label}:</Text>
+                            <TextInput
+                                style={styles.fieldInput}
+                                editable={expanded}
+                                placeholder={"Select " + label}
+                                ref={inputRef}
+                                value={value}
+                                onChangeText={setValue}>
+                            </TextInput>
+                        </View>
+                        <AntDesign
+                            name={expanded ? 'up' : 'down'}
+                            size={20}
+                            color="black"
+                            onPress={handleIconPress} />
+                    </View>
+                    {
+                        !expanded && !!error?.length &&
+                        <Text style={styles.error}>{error}</Text>
+                    }
                 </View>
-                <AntDesign
-                    name={expanded ? 'up' : 'down'}
-                    size={20}
-                    color="black"
-                    onPress={handleIconPress} />
             </Row>
             {
                 (expanded) ?
@@ -131,9 +150,9 @@ export function DropdownRow({
                         keyExtractor={item => item.id}
                         ListFooterComponent={
                             onCreateNew &&
-                                <DropdownItem
-                                    name={'Create new ' + label.toLowerCase()}
-                                    onSelect={(_) => onCreateNew()} />
+                            <DropdownItem
+                                name={'Create new ' + label.toLowerCase()}
+                                onSelect={(_) => onCreateNew()} />
                         }>
                     </FlatList>
                     :
@@ -144,6 +163,16 @@ export function DropdownRow({
 };
 
 const styles = StyleSheet.create({
+    fieldAndErrorContainer: {
+        backgroundColor: 'rgba(0,0,0,0)',
+    },
+    fieldLabelAndInputAndArrowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 320,
+        backgroundColor: 'rgba(0,0,0,0)',
+    },
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -161,5 +190,10 @@ const styles = StyleSheet.create({
     listItem: {
         fontSize: 15,
         paddingLeft: 40,
+    },
+    error: {
+        paddingTop: 10,
+        color: 'red',
+        alignSelf: 'center',
     },
 });

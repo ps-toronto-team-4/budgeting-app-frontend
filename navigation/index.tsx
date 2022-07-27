@@ -28,10 +28,9 @@ import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
 import CreateCategoryScreen from '../screens/CategoryScreens/CreateCategoryScreen';
 import CreateMerchant from '../screens/CreateMerchantScreen';
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
-import CreateBudget from '../screens/Budget/CreateBudgetScreen';
-import UpdateBudget from '../screens/Budget/UpdateBudgetScreen';
+import CreateBudgetScreen from '../screens/Budget/CreateBudgetScreen';
+import UpdateBudgetScreen from '../screens/Budget/UpdateBudgetScreen';
 
-import { View } from '../components/Themed';
 import UpdateExpenseScreen from '../screens/UpdateExpenseScreen';
 import EditCategoryScreen from '../screens/CategoryScreens/EditCategoryScreen';
 import CategorySettingsScreen from '../screens/CategoryScreens/CategorySettingsScreen';
@@ -76,8 +75,8 @@ function RootNavigator() {
         <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{ title: 'Edit Category' }} />
         <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerTitle: 'Create Category' }} />
         <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: 'Edit Expense' }} />
-        <Stack.Screen name="UpdateBudget" component={UpdateBudget} options={{ headerTitle: 'Update Budget' }} />
-        <Stack.Screen name="CreateBudget" component={CreateBudget} options={{ headerTitle: 'Create Budget' }} />
+        <Stack.Screen name="EditBudget" component={UpdateBudgetScreen} options={{ headerTitle: 'Edit Budget' }} />
+        <Stack.Screen name="CreateBudget" component={CreateBudgetScreen} options={{ headerTitle: 'Create Budget' }} />
       </Stack.Group>
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>

@@ -16,8 +16,8 @@ import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 
 const EditButton = (onPress: () => void) => (
-    <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
-        <Feather name="edit-2" size={15} color="black" />
+    <TouchableOpacity style={{ paddingRight: 30 }} onPress={onPress}>
+        <Feather name="edit-2" size={20} color="black" />
     </TouchableOpacity>
 );
 

@@ -1,6 +1,25 @@
 import { ColorValue, StyleSheet, TouchableHighlight } from "react-native";
 import { View, Text } from "./Themed";
-import { Entypo } from '@expo/vector-icons'; 
+import { Entypo } from '@expo/vector-icons';
+import Colors from "../constants/Colors";
+
+interface BudgetWarningProps {
+    label?: 'Over Budget' | 'Near Budget';
+}
+
+function BudgetWarning({ label }: BudgetWarningProps) {
+    if (!label) {
+        return null;
+    }
+
+    return (
+        <View style={staticStyles.warningRow}>
+            <Text style={staticStyles.warningText}>
+                {label}
+            </Text>
+        </View>
+    );
+}
 
 export interface BudgetCategoryProps {
     category: string;
@@ -12,7 +31,7 @@ export interface BudgetCategoryProps {
     bottomBorder?: boolean;
 }
 
-export function BudgetCategory({category, color, planned, actual, onPressDots, topBorder, bottomBorder}: BudgetCategoryProps) {
+export function BudgetCategory({ category, color, planned, actual, onPressDots, topBorder, bottomBorder }: BudgetCategoryProps) {
     const dynamicStyles = StyleSheet.create({
         container: {
             flexDirection: 'row',
@@ -25,6 +44,8 @@ export function BudgetCategory({category, color, planned, actual, onPressDots, t
             width: 10,
         },
     });
+    const overBudget = actual > planned;
+    const nearBudget = !overBudget && actual > planned * 0.75
 
     return (
         <View style={dynamicStyles.container}>
@@ -39,6 +60,7 @@ export function BudgetCategory({category, color, planned, actual, onPressDots, t
                             <Entypo name="dots-three-horizontal" size={16} color="black" />
                         </TouchableHighlight>
                     </View>
+                    <BudgetWarning label={(overBudget && 'Over Budget') || (nearBudget && 'Near Budget') || undefined} />
                     <View style={staticStyles.body}>
                         <View style={staticStyles.amntDisplayContainer}>
                             <View style={staticStyles.amntTitleContainer}>
@@ -78,7 +100,6 @@ const staticStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
     },
     headerText: {
         fontWeight: 'bold',
@@ -87,13 +108,24 @@ const staticStyles = StyleSheet.create({
     iconContainer: {
         height: 40,
         width: 40,
-        borderRadius: 40/2,
+        borderRadius: 40 / 2,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    warningRow: {
+        alignItems: 'center',
+    },
+    warningText: {
+        color: 'white',
+        borderRadius: 20,
+        backgroundColor: Colors.light.btnBackground,
+        padding: 10,
+        width: 100,
     },
     body: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginTop: 15,
     },
     amntDisplayContainer: {
         width: 120,

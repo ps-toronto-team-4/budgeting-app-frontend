@@ -13,13 +13,13 @@ const FakeFlatList = (
             data: Array<any>,
             title?: string | undefined,
             renderItem: (item: any) => ReactElement,
-            ItemSeparatorComponent: () => ReactElement
+            ItemSeparatorComponent?: () => ReactElement
         }) => {
 
     const itemsRender = data.map((item: any, index: number) => {
 
         return (<View key={index}>
-            {index != 0 && ItemSeparatorComponent()}
+            {index != 0 && (ItemSeparatorComponent && ItemSeparatorComponent())}
             {renderItem({ item })}
         </View>)
     })

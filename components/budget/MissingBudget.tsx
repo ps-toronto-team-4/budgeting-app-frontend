@@ -71,18 +71,15 @@ export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, mont
     }, [otherBudgets])
 
     return (
-        <View>
-            <Text>
-                Wow such emptiness, make a budget for this month
-                <Button
-                    text="New Budget from scratch"
-                    onPress={() => createBudget()}
-                />
-                <Button
-                    text="Copy most recent Budget"
-                    onPress={() => copyBudget()}
-                />
-            </Text>
+        <View style={{ alignItems: 'center', flex: 1, paddingTop: 70, }}>
+            <Button
+                text="Add Budget"
+                onPress={() => createBudget()}
+            />
+            <Button
+                text="Use Previous Budget"
+                onPress={() => copyBudget()}
+            />
         </View>
     );
 }
