@@ -1,11 +1,8 @@
-import { useQuery } from "@apollo/client";
-import React, { useState } from "react";
+import React from "react";
 import { View, Text } from "react-native";
-import Svg from "react-native-svg";
-import { VictoryChart, VictoryLabel, VictoryLegend, VictoryPie } from "victory-native";
+import { VictoryLegend, VictoryPie } from "victory-native";
 import { useAuth } from "../../hooks/useAuth";
-import { useRefresh } from "../../hooks/useRefresh";
-import { Category, GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, MonthBreakdown, MonthBreakdownCategory } from "../generated";
+import { MonthBreakdownCategory } from "../generated";
 
 type byCategoryProps = {
     categoryData: MonthBreakdownCategory[];
