@@ -7,7 +7,7 @@ import { Screen } from "../components/Screen";
 import Styles from '../constants/Styles';
 import { useQuery } from '@apollo/client';
 import { GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, MonthBreakdownCategory } from '../components/generated';
-import ByCategory from '../components/GraphDisplays/ByCategory';
+import ByCategory from '../components/GraphDisplays/byCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
 
