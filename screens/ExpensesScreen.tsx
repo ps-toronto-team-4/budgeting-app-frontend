@@ -12,44 +12,12 @@ import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 import { Row } from "../components/Row";
 import Colors from "../constants/Colors";
+import { ExpenseDisplay } from "../components/ExpenseDisplay";
 
 const Separator = () => <View style={staticStyles.itemSeparator} />;
 
-interface ListItemProps {
-    id: number;
-    color: ColorValue;
-    name: string;
-    amount: number;
-    onPress: (id: number) => void;
-}
-
-function ListItem({ id, color, name, amount, onPress }: ListItemProps) {
-    const dynamicStyles = useMemo(() => {
-        return StyleSheet.create({
-            coloredBar: {
-                backgroundColor: color,
-                width: 15,
-            }
-        });
-    }, [color]);
-
-    return (
-        <TouchableHighlight style={staticStyles.container} onPress={() => onPress(id)} underlayColor="rgba(0,0,0,0.2)">
-            <>
-                <View style={dynamicStyles.coloredBar}></View>
-                <View style={staticStyles.contentContainer}>
-                    <View style={staticStyles.content}>
-                        <Text style={staticStyles.itemName}>{name}</Text>
-                        <Text style={staticStyles.amount}>${amount.toFixed(2)}</Text>
-                    </View>
-                </View>
-            </>
-        </TouchableHighlight>
-    );
-}
-
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
-    const passwordHash = useAuth();
+    const passwordHash = useAuth(); useUnauthRedirect();
     const [maxExpenses, setMaxExpenses] = useState(20);
     const { data, refetch } = useQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
         variables: { passwordHash }
@@ -61,8 +29,12 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         if (typeof item === 'string') {
             return <Text>{item}</Text>
         } else {
-            return <ListItem {...item} />
+            return <ExpenseDisplay {...item} />
         }
+    }
+
+    function handleAddExpense() {
+        navigation.navigate('CreateExpense');
     }
 
     if (data === undefined) {
@@ -79,10 +51,13 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                             name: expense?.category?.name || 'Uncategorized',
                             color: `#${expense?.category?.colourHex || Colors.light.uncategorizedColor}`,
                             amount: expense?.amount || 0,
-                            onPress: () => console.log(`clicked ${expense?.category?.name}`),
+                            onPress: (id: number) => navigation.navigate('ExpenseDetails', { expenseId: id }),
                         };
                     })
                 } renderItem={renderItem}></FlatList>
+                <View style={staticStyles.addExpenseBtn}>
+                    <AddButton size={100} onPress={handleAddExpense} />
+                </View>
             </Screen>
         );
     }
@@ -147,7 +122,7 @@ function ExpensesScreen2({ navigation, route }: RootTabScreenProps<'Expenses'>) 
                                 data={gItem.item}
                                 title={gItem.key}
                                 key={index}
-                                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
+                                renderItem={({ item }) => <ExpenseDisplay {...item} navigateCallBack={navigateCallBack} />}
                                 ItemSeparatorComponent={() => <Separator />}
                             />)
                         })}
@@ -225,28 +200,5 @@ const staticStyles = StyleSheet.create({
         position: 'absolute',
         right: 20,
         bottom: 20,
-    },
-    container: {
-        flexDirection: 'row',
-    },
-    contentContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 20,
-        flex: 1,
-        borderTopWidth: 1,
-        borderColor: 'rgba(0,0,0,0.1)',
-    },
-    content: {
-        width: 300,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    itemName: {
-        fontWeight: 'bold',
-        fontSize: 22,
-    },
-    amount: {
-        fontSize: 22,
     },
 });
