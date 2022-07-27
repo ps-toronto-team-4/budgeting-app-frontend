@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client';
 import { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import Button from '../../components/Button';
-import { CreateBudgetDocument, CreateBudgetMutation, GetBudgetsQuery, MonthType, CopyBudgetMutation, CopyBudgetDocument } from '../generated';
+import { CreateBudgetDocument, CreateBudgetMutation, GetBudgetsQuery, MonthType, CopyBudgetMutation, CopyBudgetDocument, BudgetCategory, Budget } from '../generated';
 import { MONTHS_ORDER, MONTH_TO_NUM_STRING } from "../../constants/Months";
 
 export interface MissingBudgetProps {
@@ -11,9 +11,10 @@ export interface MissingBudgetProps {
     passwordHash: string;
     month: string;
     year: number;
+    navigation: (budgetCategory: Budget) => void;
 }
 
-export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, month, year }: MissingBudgetProps) {
+export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, month, year, navigation }: MissingBudgetProps) {
     const [closetBudgetId, setClosetBudgetId] = useState<number | undefined>()
 
     const [createBudget, { }] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
@@ -23,7 +24,8 @@ export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, mont
         }),
         onCompleted: ((response) => {
             if (response.createBudget.__typename == "BudgetSuccess") {
-                triggerRefetch()
+                // triggerRefetch()
+                navigation(response.createBudget.budget as Budget)
             }
         })
     })
@@ -74,10 +76,12 @@ export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, mont
         <View style={{ alignItems: 'center', flex: 1, paddingTop: 70, }}>
             <Button
                 text="Add Budget"
+                accessibilityLabel='Create new budget'
                 onPress={() => createBudget()}
             />
             <Button
                 text="Use Previous Budget"
+                accessibilityLabel='Copy last months budget'
                 onPress={() => copyBudget()}
             />
         </View>

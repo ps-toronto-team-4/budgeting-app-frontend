@@ -98,14 +98,15 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
 
     return (
         <Screen>
+            <ChartDisplay
+                planned={plannedAmount ? plannedAmount : 0}
+                actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0} />
             {(selectedBudget &&
                 <>
-                    <ChartDisplay
-                        planned={plannedAmount ? plannedAmount : 0}
-                        actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0} />
                     <View style={{ alignSelf: 'center', marginBottom: 10, }}>
                         <Button
                             text="Add Budget"
+                            accessibilityLabel="Create new budget"
                             onPress={() => navigation.navigate("CreateBudget", { budget: selectedBudget as Budget })}
                         />
                     </View>
@@ -126,7 +127,8 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                     passwordHash={passwordHash}
                     triggerRefetch={() => { budgetRefetch(); monthRefetch(); }}
                     year={year}
-                    month={month} />
+                    month={month}
+                    navigation={(passedBudget: Budget) => navigation.navigate("CreateBudget", { budget: passedBudget })} />
 
             }
         </Screen>
