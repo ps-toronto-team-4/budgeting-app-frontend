@@ -308,6 +308,8 @@ mutation createBudget($passwordHash: String!, $month:MonthType!, $year:Int!){
         ... on BudgetSuccess{
             budget{
                 id
+                month
+                year
             }
         }
         ... on FailurePayload{
@@ -324,6 +326,16 @@ mutation createBudgetCategory($passwordHash: String!, $budgetId:Int!, $categoryI
         ... on BudgetCategorySuccess{
             budgetCategory{
                 id
+                category {
+                    name
+                    colourHex
+                }
+                amount
+                budget {
+                    id
+                    month
+                    year
+                }
             }
         }
         ... on FailurePayload{
