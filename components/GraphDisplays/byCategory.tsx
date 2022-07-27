@@ -13,7 +13,7 @@ type byCategoryProps = {
     year: number;
 }
 
-export default function byCategory({ categoryData, month, year }: byCategoryProps) {
+export default function ByCategory({ categoryData, month, year }: byCategoryProps) {
 
     const passwordHash = useAuth();
 
