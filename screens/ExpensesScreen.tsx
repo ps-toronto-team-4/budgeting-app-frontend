@@ -1,102 +1,109 @@
 import { useQuery } from "@apollo/client";
-import { ReactElement, useEffect, useRef, useState } from "react";
-import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
-import { Button, ColorValue, TouchableHighlight } from "react-native"
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { ReactElement, useMemo, useState } from "react";
+import { GetExpensesDocument, GetExpensesQuery, GetExpensesQueryVariables } from "../components/generated";
+import { Button, ColorValue, FlatList, TouchableHighlight } from "react-native";
 import React from 'react';
-import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    Text,
-    StatusBar,
-    FlatList,
-    ScrollView,
-} from 'react-native';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AddButton from "../components/AddButton";
 import { useAuth } from "../hooks/useAuth";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
+import { Row } from "../components/Row";
+import Colors from "../constants/Colors";
 
-const Separator = () => <View style={styles.itemSeparator} />;
+const Separator = () => <View style={staticStyles.itemSeparator} />;
 
-const rightSwipeActions = ({ id }: { id: number | null | undefined }) => {
+interface ListItemProps {
+    id: number;
+    color: ColorValue;
+    name: string;
+    amount: number;
+    onPress: (id: number) => void;
+}
+
+function ListItem({ id, color, name, amount, onPress }: ListItemProps) {
+    const dynamicStyles = useMemo(() => {
+        return StyleSheet.create({
+            coloredBar: {
+                backgroundColor: color,
+                width: 15,
+            }
+        });
+    }, [color]);
+
     return (
-        <View style={styles.deleteContainer}>
-            <Text style={styles.deleteText}>
-                Delete
-            </Text>
-        </View>
-    );
-};
-
-const swipeFromLeftOpen = ({ id, navigateCallBack, swipeableRef }: { id: number | null | undefined, navigateCallBack: Function, swipeableRef: React.MutableRefObject<any> }) => {
-    if (swipeableRef.current != null) {
-        const casted = swipeableRef as React.MutableRefObject<Swipeable>
-        casted.current.close()
-    }
-    navigateCallBack(id)
-};
-
-const ListItem = ({ id, title, amount, description, category, navigateCallBack }:
-    {
-        id?: number | null | undefined,
-        title?: String | null | undefined,
-        amount?: Number | null | undefined,
-        description?: String | null | undefined,
-        category?: Category | null | undefined,
-        navigateCallBack: Function
-    }) => {
-    const swipeableRef = useRef(null);
-    const selectedColor = (category?.colourHex) ? '#' + category.colourHex : '#03c2fc'
-    return (
-        <Swipeable
-            ref={swipeableRef}
-            // renderLeftActions={() => LeftSwipeActions(selectedColor)}
-            renderRightActions={() => rightSwipeActions({ id })}
-            onSwipeableLeftOpen={() => swipeFromLeftOpen({ id, navigateCallBack, swipeableRef })}
-        >
-            <View style={styles.expenseItemWrapper}>
-                <View style={{ flexBasis: 10, width: 10, backgroundColor: selectedColor }}></View>
-                <TouchableHighlight
-                    style={{ flex: 1 }}
-                    onPress={() => navigateCallBack(id)}
-                >
-                    <View style={styles.expenseItemDisplayContainer}>
-                        <Text style={{ flex: 1, fontSize: 24 }}>
-                            {category?.name || 'Uncategorized'}
-                        </Text>
-                        <Text style={{ fontSize: 24 }}>
-                            ${amount}
-                        </Text>
+        <TouchableHighlight style={staticStyles.container} onPress={() => onPress(id)} underlayColor="rgba(0,0,0,0.2)">
+            <>
+                <View style={dynamicStyles.coloredBar}></View>
+                <View style={staticStyles.contentContainer}>
+                    <View style={staticStyles.content}>
+                        <Text style={staticStyles.itemName}>{name}</Text>
+                        <Text style={staticStyles.amount}>${amount.toFixed(2)}</Text>
                     </View>
-                </TouchableHighlight>
-            </View>
-        </Swipeable>
-    )
-};
+                </View>
+            </>
+        </TouchableHighlight>
+    );
+}
 
-export default function ExpensesScreen({ navigation, route }: RootTabScreenProps<'Expenses'>) {
+export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
+    const passwordHash = useAuth();
+    const [maxExpenses, setMaxExpenses] = useState(20);
+    const { data, refetch } = useQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
+        variables: { passwordHash }
+    });
+
+    useRefresh(refetch, [passwordHash]);
+
+    function renderItem({ item }: { item: { id: number, name: string, color: ColorValue, amount: number, onPress: (id: number) => void } | string }) {
+        if (typeof item === 'string') {
+            return <Text>{item}</Text>
+        } else {
+            return <ListItem {...item} />
+        }
+    }
+
+    if (data === undefined) {
+        return <Text>Loading data...</Text>;
+    } else if (data.expenses.__typename !== 'ExpensesSuccess') {
+        return <Text>Error fetching data.</Text>
+    } else {
+        return (
+            <Screen>
+                <FlatList data={
+                    data.expenses.expenses.filter((expense) => !!expense).map((expense) => {
+                        return {
+                            id: expense?.id || -1,
+                            name: expense?.category?.name || 'Uncategorized',
+                            color: `#${expense?.category?.colourHex || Colors.light.uncategorizedColor}`,
+                            amount: expense?.amount || 0,
+                            onPress: () => console.log(`clicked ${expense?.category?.name}`),
+                        };
+                    })
+                } renderItem={renderItem}></FlatList>
+            </Screen>
+        );
+    }
+}
+
+function ExpensesScreen2({ navigation, route }: RootTabScreenProps<'Expenses'>) {
     const passwordHash = useAuth();
     useUnauthRedirect();
-    const [amountToRender, setAmountToRender] = useState(20);
-    const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
+    const [numExpenses, setNumExpenses] = useState(20);
+    const { data, refetch } = useQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
         variables: { passwordHash }
     });
     useRefresh(refetch, [passwordHash]);
     const navigateCallBack = (id: number | null | undefined) => {
         if (id === undefined || id == null) {
-            alert("Transaction could not be found!")
+            alert("Transaction could not be found!");
         } else {
-            navigation.navigate('ExpenseDetails', { expenseId: id })
+            navigation.navigate('ExpenseDetails', { expenseId: id });
         }
-
     }
-    const dailyGrouping = splitTransationsOnDate(data, amountToRender)
+    const dailyGrouping = splitTransationsOnDate(data, numExpenses);
     function handleAddExpense() {
         navigation.navigate('CreateExpense');
     }
@@ -120,7 +127,7 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
             return (<View key={index}>
                 {index != 0 && ItemSeparatorComponent()}
                 {renderItem({ item })}
-            </View>)
+            </View>);
         })
 
         return (<View>
@@ -128,8 +135,7 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
             {itemsRender}
             {/* <Text>hi</Text> */}
         </View>)
-    }
-
+    };
 
     return (
         <Screen>
@@ -145,7 +151,7 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
                                 ItemSeparatorComponent={() => <Separator />}
                             />)
                         })}
-                        <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
+                        <Button title="Load More Expenses" onPress={() => setNumExpenses(numExpenses + 20)} />
                     </View>)
                 }
                 {data?.expenses.__typename == 'FailurePayload' && <View>
@@ -153,7 +159,7 @@ export default function ExpensesScreen({ navigation, route }: RootTabScreenProps
                     <Text>{data.expenses.exceptionName}</Text>
                 </View>}
             </ScrollView>
-            <View style={styles.addExpenseBtn}>
+            <View style={staticStyles.addExpenseBtn}>
                 <AddButton size={100} onPress={handleAddExpense} />
             </View>
         </Screen>
@@ -165,7 +171,7 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRend
         return undefined
     }
 
-    let dailyGrouping: { [key: string]: Array<any> } = {}
+    let dailyGrouping: { [key: string]: Array<any> } = {};
 
     if (data.expenses.__typename == 'ExpensesSuccess') {
         const listOfEle = JSON.parse(JSON.stringify(data.expenses.expenses));
@@ -180,7 +186,7 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRend
                 return 1
             }
             return 0
-        })
+        });
         listOfEle.slice(0, amountToRender).forEach((item: any) => { // REMOIVE THIS AFTER DEMO- TOO LAGGY WITH OUT
             if (item?.date == undefined) {
                 console.warn("date is undefined for transation")
@@ -191,7 +197,7 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRend
                 dailyGrouping[date] = []
             }
             dailyGrouping[date].push(item)
-        })
+        });
     }
     const orderDays: Array<{ key: string, item: Array<any> }> = Object.keys(dailyGrouping).map(key => {
         return {
@@ -205,49 +211,42 @@ const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRend
             return -1
         }
         return 0
-    })
-    return orderDays
+    });
+    return orderDays;
 }
 
-const styles = StyleSheet.create({
+const staticStyles = StyleSheet.create({
     itemSeparator: {
         flex: 1,
         flexBasis: 2,
         backgroundColor: '#c9c9c9',
     },
-    seeDetailsText: {
-        color: '#40394a',
-        paddingHorizontal: 10,
-        fontWeight: '100',
-        fontSize: 30,
-        paddingVertical: 20,
-    },
-    deleteContainer: {
-        backgroundColor: '#fc0303',
-        justifyContent: 'center',
-        alignItems: 'flex-end',
-    },
-    deleteText: {
-        color: '#1b1a17',
-        paddingHorizontal: 10,
-        fontWeight: '600',
-        paddingVertical: 20,
-    },
-    expenseItemDisplayContainer: {
-        flex: 1,
-        flexDirection: "row",
-        alignContent: "space-between",
-        paddingHorizontal: 30,
-        paddingVertical: 20,
-        backgroundColor: 'white',
-    },
-    expenseItemWrapper: {
-        flex: 1,
-        flexDirection: "row",
-    },
     addExpenseBtn: {
         position: 'absolute',
         right: 20,
         bottom: 20,
+    },
+    container: {
+        flexDirection: 'row',
+    },
+    contentContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 20,
+        flex: 1,
+        borderTopWidth: 1,
+        borderColor: 'rgba(0,0,0,0.1)',
+    },
+    content: {
+        width: 300,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    itemName: {
+        fontWeight: 'bold',
+        fontSize: 22,
+    },
+    amount: {
+        fontSize: 22,
     },
 });
