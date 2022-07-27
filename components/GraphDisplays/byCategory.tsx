@@ -41,24 +41,25 @@ export default function byCategory({ categoryData, month, year }: byCategoryProp
                             } else {
                                 return data
                             }
-                        })
+                        }).filter((data) => data.amountSpent != 0)
 
                     }
+                    animate={{ duration: 100, easing: "circle" }}
                     labels={({ datum }) => datum.category.name.substring(0, 3) + "..."}
                     y={"amountSpent"}
                     colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
                     width={900}
-                    height={200}
+                    height={300}
                     events={
                         [{
                             target: "data",
                             eventHandlers: {
-                                onClick: () => {
+                                onPressIn: () => {
                                     return (
                                         {
                                             target: "labels",
                                             mutation: (props) => {
-                                                console.log(props);
+                                                // console.log(props);
                                                 return props.text === "$" + props.datum.amountSpent ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
                                             }
                                         }
@@ -82,8 +83,7 @@ export default function byCategory({ categoryData, month, year }: byCategoryProp
                                     fill: "#757575",
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             return {
                                 name: data.category?.name,
                                 symbol: {
