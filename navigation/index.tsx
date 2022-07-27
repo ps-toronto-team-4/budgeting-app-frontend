@@ -31,6 +31,8 @@ import CategorySettingsScreen from '../screens/CategoryScreens/CategorySettingsS
 import UpdateMerchantScreen from '../screens/MerchantScreens/UpdateMerchantScreen';
 import CreateMerchant from '../screens/MerchantScreens/CreateMerchantScreen';
 import MerchantSettingsScreen from '../screens/MerchantScreens/MerchantSettingsScreen';
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '../constants/Colors';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -89,11 +91,17 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 function Root() {
   return (
     <Tab.Navigator>
-      <Tab.Group screenOptions={{ headerShadowVisible: false, headerTitleAlign: 'center', headerTitleStyle: { fontWeight: 'bold' } }}>
-        <Tab.Screen name="Expenses" component={ExpensesScreen} />
-        <Tab.Screen name="Budget" component={BudgetScreen} />
-        <Tab.Screen name="Reports" component={ReportsScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Group screenOptions={{
+        headerShadowVisible: false,
+        headerTitleAlign: 'center',
+        headerTitleStyle: { fontWeight: 'bold' },
+        tabBarAllowFontScaling: true,
+        tabBarActiveTintColor: Colors.light.tabIconSelected,
+        tabBarInactiveTintColor: Colors.light.btnBackground }}>
+        <Tab.Screen name="Expenses" component={ExpensesScreen} options={{ tabBarIcon: ({color}) => <Ionicons name="pricetags" size={24} color={color}/>, }}/>
+        <Tab.Screen name="Budget" component={BudgetScreen} options={{ tabBarIcon: ({color}) => <Ionicons name="wallet" size={24} color={color}/>}}/>
+        <Tab.Screen name="Reports" component={ReportsScreen} options={{ tabBarIcon: ({color}) => <Ionicons name="pie-chart" size={24} color={color}/>}}/>
+        <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarIcon: ({color}) => <Ionicons name="settings-sharp" size={24} color={color}/>}}/>
       </Tab.Group>
     </Tab.Navigator>
   );
