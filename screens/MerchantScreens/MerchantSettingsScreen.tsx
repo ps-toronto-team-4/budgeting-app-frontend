@@ -11,6 +11,7 @@ import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Styles from "../../constants/Styles";
 import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
+import { useRefresh } from "../../hooks/useRefresh";
 
 export default function MerchantSettingsScreen({ navigation }: RootStackScreenProps<'MerchantSettings'>) {
     
@@ -25,11 +26,7 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
         })
     });
     
-    useFocusEffect(
-        React.useCallback(() => {
-          refetch();
-        },[])
-    );
+    useRefresh(refetch, [passwordHash]);
 
       const renderMerchant = ({item}: {item: Merchant}) => {
         return (

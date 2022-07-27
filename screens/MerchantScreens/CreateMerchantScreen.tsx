@@ -10,18 +10,17 @@ import { useAuth } from "../../hooks/useAuth";
 import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 import { InputRow } from "../../components/InputRow";
 import { Screen } from "../../components/Screen";
+import { useRefresh } from "../../hooks/useRefresh";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
+    
     const passwordHash = useAuth();
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
-    const [validMerchant, setValidMerchant] = React.useState(true);
-    const [check, setCheck] = React.useState(false);
-    const [categoryOpen, setCategoryOpen] = React.useState(false);
     const [categoryId, setCategoryId] = React.useState<number | undefined>();
-    const [categoryName, setCategoryName] = React.useState("");
+    const [check, setCheck] = React.useState(false);
     const [disabledButton, setDisabledButton] = React.useState(false);
-    const [merchantId, setMerchantId] = React.useState<number | undefined>();
+    const [categoryOpen, setCategoryOpen] = React.useState(false);
 
     useUnauthRedirect();
 
@@ -36,51 +35,39 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     });
 
-    const { loading: categoryLoading, data: categoryData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+    const { data: categoryData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
         variables: { passwordHash: passwordHash },
         onError: (error => {
             Alert.alert(error.message);
         }),
     });
 
-    const { loading: manyMerchantsLoading, data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
+    const { data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash }
     });
 
-    const { loading: singleMerchantsLoading, data: singleMerchantData } = useQuery<GetMerchantQuery>(GetMerchantDocument, {
-        variables: { passwordHash: passwordHash, id: merchantId }
+    useRefresh(refetch, [passwordHash]);
 
-    });
+    const merchantTaken = () => {
+        if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName) {
 
+            // Searches the array of merchants for the name of vendor.
+            return manyMerchantsData?.merchants.merchants.find((mer) => {
+                return mer.name.toLowerCase() === merchantName.toLowerCase()
+            });
 
-
-    const handleMerchant = () => {
-        setCheck(true);
-        merchantsQuery();
-    };
-
-    const merchantsQuery = () => {
-        if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName.length != 0) {
-            // Searches the array of merchants for the name of vendor. If the user submits a vendor that they already have, 
-            // this will display a Found it! on the console.
-            if (manyMerchantsData?.merchants.merchants.map(ele => ele.name.toLowerCase()).includes(merchantName.toLowerCase())) {
-                console.log("Found it!");
-                setValidMerchant(false);
-                setDisabledButton(true);
-
-            } else {
-                console.log("Merchant Name is not found.");
-                setDisabledButton(false);
-                console.log(merchantName);
-                setValidMerchant(true);
-                createMerchant();
-            }
         } else {
-            console.log("Something went wrong within the Lazy Query.");
-            setValidMerchant(false);
-            setDisabledButton(true);
+            return undefined;
         }
-    };
+    }
+
+    const merchantError = (() => {
+        if (check && !merchantName) {
+            return 'Field is required';
+        } else if (check && merchantTaken()) {
+            return 'This merchant already exists.';
+        }
+    })();
 
     function handleCategorySelect(categoryName: String) {
         if (categoryData?.categories.__typename == "CategoriesSuccess") {
@@ -88,38 +75,28 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
             if (foundCategory !== undefined) {
                 setCategoryId(foundCategory.id);
-                setCategoryName(foundCategory.name);
             }
         }
     }
 
-    function onChangeMerchant(text: string) {
-        setMerchantName(text);
-        setDisabledButton(false);
-        setValidMerchant(true);
-    }
-
-    const merchantError = (() => {
-        if (check && !merchantName) {
-            return 'Field is required';
-        } else if (check && !validMerchant) {
-            return 'Name already taken';
-        }
-    })();
+    const handleMerchant = () => {
+        setCheck(true);
+        if (merchantName && !merchantTaken()) createMerchant();
+    };
 
     return (
         <Screen>
             <View style={styles.container}>
                 <InputRow
                     label="Merchant:"
-                    placeholder="Enter merchant name*"
+                    placeholder="(mandatory)"
                     value={merchantName}
-                    onChangeText={onChangeMerchant}
+                    onChangeText={setMerchantName}
                     error={merchantError}
                     topBorder />
                 <InputRow
                     label="Details:"
-                    placeholder="Enter details"
+                    placeholder="(optional)"
                     value={details}
                     onChangeText={setDetails}
                     topBorder
@@ -175,6 +152,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         alignSelf: 'center',
         justifyContent: 'flex-end',
-        top: '30%',
+        position: 'absolute',
+        bottom: '5%'
     },
 });

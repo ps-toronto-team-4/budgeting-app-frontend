@@ -13,7 +13,6 @@ import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, Get
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 import modalStyle from '../../constants/Modal';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUnauthRedirect } from '../../hooks/useUnauthRedirect';
 import { Screen } from "../../components/Screen";
 
@@ -87,8 +86,8 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
   }
 
   return (
-      <Screen >
-        <View style={{ backgroundColor: confirmDelete ? 'grey' : 'white' }}>
+      <Screen backdrop={confirmDelete}>
+        <View style={Styles.container}>
         {loading ? (
           <ActivityIndicator size={'large'}/>
         ) : (
@@ -109,7 +108,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
           <></>
         )}
         <RequiredField check={check} input={newName} />
-        <View style={[Styles.palette, {backgroundColor: confirmDelete ? 'grey' : 'white'}]}>
+        <View style={[Styles.palette]}>
         <ColorPalette 
           onChange={(color: string) => setNewColor(color.substring(1))}
           value={'#' + newColor}

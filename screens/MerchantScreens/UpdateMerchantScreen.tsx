@@ -3,26 +3,27 @@ import React, { useEffect, useState } from "react";
 import { DeleteMerchantDocument, DeleteMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, UpdateMerchantDocument, UpdateMerchantMutation } from "../../components/generated";
 import { StyleSheet, View, Text, TextInput, ActivityIndicator, SafeAreaView, Alert, TouchableOpacity, Modal } from 'react-native';
 import { RootStackScreenProps } from "../../types";
-import Colors from "../../constants/Colors";
 import { AntDesign, Feather } from '@expo/vector-icons';
 import Button from "../../components/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../../components/generated";
 import { DropdownRow } from "../../components/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
-import { RequiredField } from "../../components/Themed";
+import { useRefresh } from "../../hooks/useRefresh";
 import modalStyle from "../../constants/Modal";
 import Styles from "../../constants/Styles";
+import { Screen } from "../../components/Screen";
+import { InputRow } from "../../components/InputRow";
 
-export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
+export default function UpdateMerchantScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
     
     const passwordHash = useAuth();
     const {id, name, description, category} = route.params
-    const [categoryOpen, setCategoryOpen] = useState(false);
     const [newName, setNewName] = useState(name)
-    const [confirmDelete, setConfirmDelete] = useState(false)
     const [newDescription, setNewDescription] = useState(description)
-    const [newCategory, setNewCategory] = useState<number | undefined>(undefined)
+    const [newCategory, setNewCategory] = useState<number | undefined>()
     const [check, setCheck] = useState(false)
+    const [confirmDelete, setConfirmDelete] = useState(false)
+    const [categoryOpen, setCategoryOpen] = useState(false);
 
     const { data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash }
@@ -59,11 +60,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         }
     )
     
-    // useFocusEffect(
-    //     React.useCallback(() => {
-    //       refetch();
-    //     },[])
-    // );
+    useRefresh(refetch, [passwordHash]);
     
     const DeleteButton = () => {
         return (
@@ -92,16 +89,13 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         });
     }, [confirmDelete]);
 
-    function MerchantNotFound() {
-
-        if (merchantTaken()) {
-            return (
-                <Text style={Styles.alert}>This merchant already exists.</Text>
-            );
-        } else {
-            return (<></>);
+    const merchantError = (() => {
+        if (check && !newName) {
+            return 'Field is required';
+        } else if (check && merchantTaken()) {
+            return 'This merchant already exists.';
         }
-    }
+    })();
 
     function handleCategorySelect(categoryName: String) {
         if (categoryData?.categories.__typename === "CategoriesSuccess") {
@@ -121,74 +115,70 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
     }
 
     return (
-        <SafeAreaView style={[styles.screen, { backgroundColor: confirmDelete ? 'grey' : 'white' }]}>
-            <View style={[styles.row]}>
-                <Text style={styles.fieldLabel}>Merchant:</Text>
-                <TextInput
-                    style={styles.fieldInput}
-                    placeholder='(mandatory)'
-                    onChangeText={(merchantName) => setNewName(merchantName)}
-                    value={newName} />
-            </View>
-            <RequiredField check={check} input={newName} />
-            <MerchantNotFound/>
-
-            <View style={[styles.row]}>
-                <Text style={[styles.fieldLabel]}>Details:</Text>
-                <TextInput
-                    style={styles.fieldInput}
-                    placeholder='(optional)'
-                    onChangeText={(details) => setNewDescription(details)}
-                    value={newDescription || undefined} />
-            </View>
-            <View>
-                <DropdownRow
-                    label="Categories"
-                    data={
-                        categoryData?.categories.__typename === "CategoriesSuccess" ?
-                            categoryData.categories.categories : []
-                    }
-                    onSelect={handleCategorySelect}
-                    expanded={categoryOpen}
-                    onExpand={() => setCategoryOpen(true)}
-                    onCollapse={() => setCategoryOpen(false)}
-                    defaultValue={category?.name}
-                    onCreateNew={() => navigation.navigate("CreateCategory")}
-                />
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button text={"Update Merchant"} disabled={confirmDelete} accessibilityLabel={"Button to Update Merchant"} onPress={() => handleMerchant()} />
-            </View>
-            {!merchantLoading ? (
-                merchantData?.updateMerchant.__typename === "MerchantSuccess" ? (
-                    <Text>Merchant updated successfully!</Text>
-                ) : (
-                    <Text style={Styles.alert}>{merchantData?.updateMerchant.errorMessage}</Text>
-                )) : (
-                <ActivityIndicator size='large' />
-            )}
-            <Modal
-            transparent={true}
-            visible={confirmDelete}
-            onRequestClose={() => setConfirmDelete(false)}
-            >
-                <View style={modalStyle.container}>
-                    <Text style={modalStyle.title}>Delete Merchant?</Text>
-                    <Text style={modalStyle.text}>Are you sure you want to delete this merchant?</Text>
-                    <View style={modalStyle.buttonView}>
-                    <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button'/>
-                    <Button text="Delete" onPress={() => {deleteMerchant()}} size='half' backgroundColor='red' accessibilityLabel='Delete Category button'/>
-                    </View>
+        <Screen>
+            <View style={styles.container}>
+                <InputRow
+                    label="Merchant:"
+                    placeholder="(mandatory)"
+                    value={newName}
+                    onChangeText={setNewName}
+                    error={merchantError}
+                    topBorder />
+                <InputRow
+                    label="Details:"
+                    placeholder="(optional)"
+                    value={newDescription || ""}
+                    onChangeText={setNewDescription}
+                    topBorder
+                    bottomBorder />
+                <View>
+                    <DropdownRow
+                        label="Categories"
+                        data={
+                            categoryData?.categories.__typename === "CategoriesSuccess" ?
+                                categoryData.categories.categories : []
+                        }
+                        onSelect={handleCategorySelect}
+                        expanded={categoryOpen}
+                        onExpand={() => setCategoryOpen(true)}
+                        onCollapse={() => setCategoryOpen(false)}
+                        defaultValue={category?.name}
+                        onCreateNew={() => navigation.navigate("CreateCategory")}
+                    />
                 </View>
-            </Modal>
-        </SafeAreaView>
+                <View style={styles.buttonContainer}>
+                    <Button text={"Update Merchant"} disabled={confirmDelete} accessibilityLabel={"Button to Update Merchant"} onPress={() => handleMerchant()} />
+                </View>
+                {!merchantLoading ? (
+                    merchantData?.updateMerchant.__typename === "MerchantSuccess" ? (
+                        <Text>Merchant updated successfully!</Text>
+                    ) : (
+                        <Text style={Styles.alert}>{merchantData?.updateMerchant.errorMessage}</Text>
+                    )) : (
+                    <ActivityIndicator size='large' />
+                )}
+                <Modal
+                transparent={true}
+                visible={confirmDelete}
+                onRequestClose={() => setConfirmDelete(false)}
+                >
+                    <View style={modalStyle.container}>
+                        <Text style={modalStyle.title}>Delete Merchant?</Text>
+                        <Text style={modalStyle.text}>Are you sure you want to delete this merchant?</Text>
+                        <View style={modalStyle.buttonView}>
+                        <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button'/>
+                        <Button text="Delete" onPress={() => {deleteMerchant()}} size='half' backgroundColor='red' accessibilityLabel='Delete Category button'/>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
+        </Screen>
     );
 }
 
 const styles = StyleSheet.create({
-    screen: {
+    container: {
         flex: 1,
-        backgroundColor: Colors.light.background,
         justifyContent: 'center',
     },
     row: {
@@ -202,7 +192,8 @@ const styles = StyleSheet.create({
     buttonContainer: {
         alignSelf: 'center',
         justifyContent: 'flex-end',
-        top: '30%',
+        position: 'absolute',
+        bottom: '5%'
     },
     fieldLabel: {
         fontWeight: 'bold',

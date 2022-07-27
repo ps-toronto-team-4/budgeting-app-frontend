@@ -8,9 +8,9 @@ import { RootStackScreenProps } from "../../types";
 import Button from "../../components/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 import Styles from "../../constants/Styles";
 import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
+import { useRefresh } from "../../hooks/useRefresh";
 import { Screen } from "../../components/Screen";
 
 export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
@@ -26,11 +26,7 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
         })
     });
     
-    useFocusEffect(
-        React.useCallback(() => {
-          refetch();
-        },[])
-    );
+    useRefresh(refetch, [passwordHash]);
 
       const renderCategory = ({item}: {item: Category}) => {
         return (
