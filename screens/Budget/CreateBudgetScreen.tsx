@@ -25,6 +25,8 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [budget, setBudget] = useState<Budget | null>(route.params.budget || null);
     const [categoryExpanded, setCategoryExpanded] = useState(false);
+    const [amountError, setAmountError] = useState('');
+    const [categoryError, setCategoryError] = useState('');
 
     const [createBudget] = useMutation<CreateBudgetCategoryMutation>(CreateBudgetCategoryDocument, {
         variables: { passwordHash, budgetId: budget?.id, categoryId, amount },
@@ -43,31 +45,46 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
     function selectCategory(name: string) {
         if (categoryData?.categories.__typename === 'CategoriesSuccess') {
             const found = categoryData?.categories.categories.find(cat => cat.name === name);
-            if (found !== undefined) setCategoryId(found?.id);
+            if (found !== undefined) {
+                setCategoryId(found?.id);
+                setCategoryError('');
+            }
         }
     }
 
     function handleBudgetCreation() {
+        let noErrors = true;
+
         if (amount == 0) {
-            alert("Budgeted amount can't be zero")
-        } else if (budget == null || budget.id == null) {
-            alert("Parent budget not found")
-        } else if (categoryId == null) {
-            alert("Please select a catgeory")
-        } else {
-            createBudget()
+            setAmountError("Please enter a non-zero amount.");
+            noErrors = false;
+        }
+        if (budget == null || budget.id == null) {
+            alert("Parent budget not found");
+            noErrors = false;
+        }
+        if (categoryId == null) {
+            setCategoryError("This field is required.");
+            noErrors = false;
         }
 
+        if (noErrors) createBudget();
+    }
+
+    function handleChangeAmount(newAmount: number) {
+        if (newAmount !== 0) {
+            setAmountError('');
+        }
+        setAmount(newAmount);
     }
 
     return (
         <Screen onDismissKeyboard={() => setCategoryExpanded(false)}>
-            <View style={styles.amountInputContainer}>
-                <AmountInput defaultAmount={0} onChangeAmount={setAmount} />
-                <View>
-
-                </View>
-            </View>
+            <AmountInput
+                defaultAmount={0}
+                onChangeAmount={handleChangeAmount}
+                onSelect={() => setCategoryExpanded(false)}
+                error={amountError} />
             <DropdownRow
                 label="Category"
                 data={
@@ -84,7 +101,8 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
                 onExpand={() => setCategoryExpanded(true)}
                 onCollapse={() => setCategoryExpanded(false)}
                 topBorder
-                bottomBorder />
+                bottomBorder
+                error={categoryError} />
 
             <InputRow label="Month:" disabled bottomBorder value={`${budget?.month} ${budget?.year}`} />
             <View style={styles.buttonContainer}>
@@ -98,20 +116,6 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
 }
 
 const styles = StyleSheet.create({
-
-    screen: {
-        flex: 1,
-        backgroundColor: Colors.light.background
-    },
-    amountInputContainer: {
-        height: 200,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    dollarSignAndAmountInput: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-    },
     dollarSign: {
         fontSize: 20,
         marginRight: 5,

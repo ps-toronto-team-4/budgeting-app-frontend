@@ -13,6 +13,8 @@ import {
 export interface AmountInputProps {
     onChangeAmount: (amount: number) => void;
     defaultAmount: number;
+    onSelect?: () => void;
+    error?: string;
 };
 
 function amountToValue(amount: number): string {
@@ -23,7 +25,7 @@ function valueToAmount(value: string): number {
     return parseFloat(value);
 }
 
-export function AmountInput({ onChangeAmount, defaultAmount }: AmountInputProps) {
+export function AmountInput({ onChangeAmount, defaultAmount, onSelect, error }: AmountInputProps) {
     const [fontLoaded] = useFonts({ B612Mono_700Bold });
     const [value, setValue] = useState(amountToValue(defaultAmount));
     const charWidth = 30;
@@ -45,6 +47,10 @@ export function AmountInput({ onChangeAmount, defaultAmount }: AmountInputProps)
         setValue(amount.toFixed(2));
     }
 
+    function handleFocus() {
+        onSelect && onSelect();
+    }
+
     if (!fontLoaded) {
         return <View></View>;
     }
@@ -61,9 +67,15 @@ export function AmountInput({ onChangeAmount, defaultAmount }: AmountInputProps)
                         onChangeText={handleChangeText}
                         maxLength={maxLength}
                         onBlur={handleBlur}
+                        onFocus={handleFocus}
                         selectTextOnFocus />
                 </>
             </TouchableHighlight>
+            <Text style={styles.error}>
+                {
+                    error || ''
+                }
+            </Text>
         </View>
     );
 }
@@ -85,5 +97,9 @@ const styles = StyleSheet.create({
     },
     input: {
         fontFamily: 'B612Mono_700Bold', // Must be a monospaced font
+    },
+    error: {
+        color: 'red',
+        fontSize: 18,
     },
 });
