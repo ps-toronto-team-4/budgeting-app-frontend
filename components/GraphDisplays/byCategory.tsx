@@ -5,7 +5,6 @@ import Svg from "react-native-svg";
 import { VictoryChart, VictoryLabel, VictoryLegend, VictoryPie } from "victory-native";
 import { useAuth } from "../../hooks/useAuth";
 import { useRefresh } from "../../hooks/useRefresh";
-import { MONTHS_ORDER } from "../../constants/Months";
 import { Category, GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, MonthBreakdown, MonthBreakdownCategory } from "../generated";
 
 type byCategoryProps = {
@@ -17,6 +16,7 @@ type byCategoryProps = {
 export default function byCategory({ categoryData, month, year }: byCategoryProps) {
 
     const passwordHash = useAuth();
+
 
     return (
 
@@ -59,7 +59,6 @@ export default function byCategory({ categoryData, month, year }: byCategoryProp
                                         {
                                             target: "labels",
                                             mutation: (props) => {
-                                                // console.log(props);
                                                 return props.text === "$" + props.datum.amountSpent ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
                                             }
                                         }
@@ -70,35 +69,38 @@ export default function byCategory({ categoryData, month, year }: byCategoryProp
                 />
 
             </View>
+            {
+                categoryData != [] && <VictoryLegend
+                    centerTitle={true}
+                    orientation="horizontal"
+                    colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
+                    data={
 
-            <VictoryLegend
-                centerTitle={true}
-                orientation="horizontal"
-                colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
-                data={
-                    categoryData.map((data) => {
-                        if (data.category === null) {
-                            return {
-                                name: "Uncategorized",
-                                symbol: {
-                                    fill: "#757575",
+                        categoryData.filter((data) => data.amountSpent != 0).map((data) => {
+                            if (data.category === null) {
+                                return {
+                                    name: "Uncategorized",
+                                    symbol: {
+                                        fill: "#757575",
+                                    }
+                                }
+                            } else {
+                                return {
+                                    name: data.category?.name,
+                                    symbol: {
+                                        fill: "#" + data.category?.colourHex
+                                    }
                                 }
                             }
-                        } else {
-                            return {
-                                name: data.category?.name,
-                                symbol: {
-                                    fill: "#" + data.category?.colourHex
-                                }
-                            }
-                        }
-                    })
+                        })
 
 
-                }
-                itemsPerRow={3}
-                gutter={20}
-            />
+                    }
+                    itemsPerRow={3}
+                    gutter={20}
+                />
+            }
+
         </View>
 
 
