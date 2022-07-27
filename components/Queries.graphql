@@ -276,3 +276,48 @@ query getMerchant ($passwordHash: String!, $id: Int!){
     }
 }
 
+query getBudgetCategory($passwordHash: String!){
+    budgetCategories(passwordHash: $passwordHash){
+        __typename
+        ...on BudgetCategoriesSuccess{
+            budgetCategories {
+                id
+                category {
+                    name
+                }
+                amount
+            }
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query getMonthBreakdown($passwordHash: String!, $month: MonthType!, $year: Int!){
+    monthBreakdown(passwordHash:$passwordHash, month: $month, year: $year){
+        __typename
+        ...on MonthBreakdown{
+            month
+            year
+            totalSpent
+            byCategory{
+                category{
+                    name
+                    colourHex
+                    id
+                }
+                amountSpent
+            }
+        }
+
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+

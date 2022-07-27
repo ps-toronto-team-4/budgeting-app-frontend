@@ -1,25 +1,34 @@
-import { useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
-import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
-import { ColorValue } from "react-native"
-
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from "../hooks/useAuth";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
+import Styles from '../constants/Styles';
+import { useQuery } from '@apollo/client';
+import { GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, MonthBreakdownCategory } from '../components/generated';
+import ByCategory from '../components/GraphDisplays/byCategory';
+import { TopBar } from '../components/budget/TopBar';
+import { MONTHS_ORDER } from '../constants/Months';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const passwordHash = useAuth();
+    const date = new Date();
+    const [month, setMonth] = useState(MONTHS_ORDER[date.getMonth()]);
+    const [year, setYear] = useState(date.getFullYear());
+
 
     useUnauthRedirect();
 
+    const { loading: monthlyBreakdownLoading, data: monthlyBreakdownData, refetch: monthlyBreakdownRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument,
+        { variables: { passwordHash: passwordHash, month: month, year: year } }
+    )
+
+
     return (
         <Screen>
-            <Text>Hello from BudgetScreen!</Text>
-            <Text>The locally stored password hash is: {passwordHash}</Text>
+            <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
+            <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : [{ "category": null, "amountSpent": 0 }]} month={month} year={year}></ByCategory>
         </Screen>
     );
 }
