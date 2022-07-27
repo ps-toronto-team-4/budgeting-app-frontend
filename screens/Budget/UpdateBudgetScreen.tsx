@@ -11,7 +11,7 @@ import { AmountInput } from "../../components/AmountInput";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'UpdateBudget'>) {
-    const passwordHash = useAuth(() => console.log('retrieved passwordHash for update budget screen'));
+    const passwordHash = useAuth();
     const [amount, setAmount] = useState(route.params.budgetCategory.amount);
     const [budgetCategory, setBudgetCategory] = useState<BudgetCategory>(route.params.budgetCategory);
 
