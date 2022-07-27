@@ -11,7 +11,7 @@ import { AmountInput } from "../../components/AmountInput";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'UpdateBudget'>) {
-    const passwordHash = useAuth();
+    const passwordHash = useAuth(() => console.log('retrieved passwordHash for update budget screen'));
     const [amount, setAmount] = useState(route.params.budgetCategory.amount);
     const [budgetCategory, setBudgetCategory] = useState<BudgetCategory>(route.params.budgetCategory);
 
@@ -41,12 +41,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
 
     return (
         <View style={styles.screen}>
-            <View style={styles.amountInputContainer}>
-                <AmountInput defaultAmount={amount} onChangeAmount={setAmount} />
-                <View>
-
-                </View>
-            </View>
+            <AmountInput defaultAmount={amount} onChangeAmount={setAmount} />
             <Row>
                 <View style={styles.detailsIconAndLabel}>
                     <Text style={styles.fieldLabel}>For Category: {budgetCategory?.category.name}</Text>
@@ -74,11 +69,6 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: Colors.light.background
-    },
-    amountInputContainer: {
-        height: 200,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     dollarSignAndAmountInput: {
         flexDirection: 'row',
@@ -139,14 +129,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
         marginRight: 27,
         alignItems: 'center',
-    },
-    detailsIcon: {
-        transform: [{ rotateZ: '90deg' }, { rotateY: '180deg' }],
-        marginRight: 5,
-    },
-    detailsInput: {
-        fontSize: 15,
-        width: 250,
     },
     buttonContainer: {
         flex: 1,
