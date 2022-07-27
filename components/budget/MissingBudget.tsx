@@ -15,7 +15,7 @@ export interface MissingBudgetProps {
 }
 
 export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, month, year }: MissingBudgetProps) {
-    const nav = useNavigation()
+    const nav = useNavigation();;;;;;;;;;;;
     const [closetBudgetId, setClosetBudgetId] = useState<number | undefined>()
 
     const [createBudget, { }] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
