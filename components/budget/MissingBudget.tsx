@@ -4,6 +4,7 @@ import { View, Text } from 'react-native';
 import Button from '../../components/Button';
 import { CreateBudgetDocument, CreateBudgetMutation, GetBudgetsQuery, MonthType, CopyBudgetMutation, CopyBudgetDocument, BudgetCategory, Budget } from '../generated';
 import { MONTHS_ORDER, MONTH_TO_NUM_STRING } from "../../constants/Months";
+import { useNavigation } from '@react-navigation/native';
 
 export interface MissingBudgetProps {
     otherBudgets?: GetBudgetsQuery;
@@ -11,10 +12,10 @@ export interface MissingBudgetProps {
     passwordHash: string;
     month: string;
     year: number;
-    navigation: (budgetCategory: Budget) => void;
 }
 
-export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, month, year, navigation }: MissingBudgetProps) {
+export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, month, year }: MissingBudgetProps) {
+    const nav = useNavigation()
     const [closetBudgetId, setClosetBudgetId] = useState<number | undefined>()
 
     const [createBudget, { }] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
@@ -25,7 +26,7 @@ export function MissingBudget({ otherBudgets, triggerRefetch, passwordHash, mont
         onCompleted: ((response) => {
             if (response.createBudget.__typename == "BudgetSuccess") {
                 // triggerRefetch()
-                navigation(response.createBudget.budget as Budget)
+                nav.navigate('CreateBudget', { budget: response.createBudget.budget as Budget })
             }
         })
     })

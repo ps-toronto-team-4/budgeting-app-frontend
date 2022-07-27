@@ -127,8 +127,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                     passwordHash={passwordHash}
                     triggerRefetch={() => { budgetRefetch(); monthRefetch(); }}
                     year={year}
-                    month={month}
-                    navigation={(passedBudget: Budget) => navigation.navigate("CreateBudget", { budget: passedBudget })} />
+                    month={month} />
 
             }
         </Screen>
