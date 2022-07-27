@@ -29,7 +29,7 @@ export type RootStackParamList = {
   NotFound: undefined;
   CreateMerchant: undefined;
   CreateBudget: { budget: Budget };
-  UpdateBudget: { budgetCategory: BudgetCategory };
+  EditBudget: { budgetCategory: BudgetCategory };
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<

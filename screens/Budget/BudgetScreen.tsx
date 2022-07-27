@@ -116,7 +116,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                                 data={selectedBudget.budgetCategories as BudgetCategory[]}
                                 monthlyData={monthData}
                                 updateCallback={(budCat: BudgetCategory) => {
-                                    navigation.navigate("UpdateBudget", { budgetCategory: budCat })
+                                    navigation.navigate("EditBudget", { budgetCategory: budCat })
                                 }} />
                         </TouchableHighlight>
                     </ScrollView>
