@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import React from "react";
+import React, { useState } from "react";
 import { View, Text } from "react-native";
 import Svg from "react-native-svg";
 import { VictoryChart, VictoryLabel, VictoryLegend, VictoryPie } from "victory-native";
@@ -8,43 +8,14 @@ import { useRefresh } from "../../hooks/useRefresh";
 import { Category, GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, MonthBreakdown, MonthBreakdownCategory } from "../generated";
 
 type byCategoryProps = {
-    CategoryData: MonthBreakdownCategory[];
-    Month: string;
-    Year: number;
+    categoryData: MonthBreakdownCategory[];
+    month: string;
+    year: number;
 }
 
-export default function byCategory({ CategoryData, Month, Year }: byCategoryProps) {
+export default function byCategory({ categoryData, month, year }: byCategoryProps) {
 
     const passwordHash = useAuth();
-    const [month, setMonth] = React.useState("JULY");
-    const [year, setYear] = React.useState("2022");
-    const listOfAmountAndCategories: MonthBreakdownCategory[] = [];
-    const listofCategories: Category[] = [];
-    const [listofMonthNames, setListOfMonthNames] = React.useState([]);
-
-    const { loading: monthlyBreakdownLoading, data: monthlyBreakdownData, refetch: monthlyBreakdownRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument,
-        { variables: { passwordHash: passwordHash, month: month, year: year } }
-    )
-
-    const { loading: categoriesLoading, data: categoriesData, refetch: categoriesRefetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument,
-        {
-            variables: { passwordHash: passwordHash }
-        })
-
-    useRefresh(() => {
-        monthlyBreakdownRefetch();
-    }, [passwordHash]);
-
-    function getMonthNames() {
-        if (categoriesData?.categories.__typename === "CategoriesSuccess") {
-
-        }
-    }
-
-    // Function to get Month Names in an array format for categories attribute
-
-    // Constant to return data dynamically so that I do not have to manually insert each data point 
-    // (returns {x: Name, y: Value, fill: "#colorHex", label: "$" + Value})
 
     return (
 
@@ -55,10 +26,10 @@ export default function byCategory({ CategoryData, Month, Year }: byCategoryProp
                     <Text>{month}</Text>
                 </View>
                 <VictoryPie
-                    padAngle={3}
-                    innerRadius={100}
+                    padAngle={2}
+                    innerRadius={70}
                     data={
-                        CategoryData.map((data) => {
+                        categoryData.map((data) => {
                             if (data.category === null) {
                                 return {
                                     amountSpent: data.amountSpent,
@@ -73,10 +44,11 @@ export default function byCategory({ CategoryData, Month, Year }: byCategoryProp
                         })
 
                     }
-                    x={"category.name"}
+                    labels={({ datum }) => datum.category.name}
                     y={"amountSpent"}
-                    colorScale={CategoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
-                    width={600}
+                    colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
+                    width={900}
+                    height={200}
                     events={
                         [{
                             target: "data",
@@ -100,9 +72,9 @@ export default function byCategory({ CategoryData, Month, Year }: byCategoryProp
             <VictoryLegend
                 centerTitle={true}
                 orientation="horizontal"
-                colorScale={CategoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
+                colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
                 data={
-                    CategoryData.map((data) => {
+                    categoryData.map((data) => {
                         if (data.category === null) {
                             return {
                                 name: "Uncategorized",
@@ -124,7 +96,7 @@ export default function byCategory({ CategoryData, Month, Year }: byCategoryProp
 
                 }
                 itemsPerRow={3}
-                gutter={50}
+                gutter={20}
             />
         </View>
 
