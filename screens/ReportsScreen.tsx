@@ -9,11 +9,13 @@ import { useQuery } from '@apollo/client';
 import { GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, MonthBreakdownCategory } from '../components/generated';
 import ByCategory from '../components/GraphDisplays/ByCategory';
 import { TopBar } from '../components/budget/TopBar';
+import { MONTHS_ORDER } from '../constants/Months';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const passwordHash = useAuth();
-    const [month, setMonth] = useState("JANUARY");
-    const [year, setYear] = useState(2022);
+    const date = new Date();
+    const [month, setMonth] = useState(MONTHS_ORDER[date.getMonth()]);
+    const [year, setYear] = useState(date.getFullYear());
 
 
     useUnauthRedirect();

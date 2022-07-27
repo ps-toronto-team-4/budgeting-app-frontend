@@ -5,6 +5,7 @@ import Svg from "react-native-svg";
 import { VictoryChart, VictoryLabel, VictoryLegend, VictoryPie } from "victory-native";
 import { useAuth } from "../../hooks/useAuth";
 import { useRefresh } from "../../hooks/useRefresh";
+import { MONTHS_ORDER } from "../../constants/Months";
 import { Category, GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, MonthBreakdown, MonthBreakdownCategory } from "../generated";
 
 type byCategoryProps = {
@@ -44,7 +45,6 @@ export default function byCategory({ categoryData, month, year }: byCategoryProp
                         }).filter((data) => data.amountSpent != 0)
 
                     }
-                    animate={{ duration: 100, easing: "circle" }}
                     labels={({ datum }) => datum.category.name.substring(0, 3) + "..."}
                     y={"amountSpent"}
                     colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
@@ -70,6 +70,7 @@ export default function byCategory({ categoryData, month, year }: byCategoryProp
                 />
 
             </View>
+
             <VictoryLegend
                 centerTitle={true}
                 orientation="horizontal"
@@ -101,19 +102,6 @@ export default function byCategory({ categoryData, month, year }: byCategoryProp
         </View>
 
 
-
-        // <View>
-        //     <VictoryPie
-        //         padAngle={({ datum }) => datum.y}
-        //         innerRadius={100}
-        //         data={
-        //             [
-
-        //             ]
-        //         }
-
-        //     />
-        // </View>
     );
 
 }
