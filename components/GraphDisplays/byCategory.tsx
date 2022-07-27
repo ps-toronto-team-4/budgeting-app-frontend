@@ -44,7 +44,7 @@ export default function byCategory({ categoryData, month, year }: byCategoryProp
                         })
 
                     }
-                    labels={({ datum }) => datum.category.name}
+                    labels={({ datum }) => datum.category.name.substring(0, 3) + "..."}
                     y={"amountSpent"}
                     colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
                     width={900}
