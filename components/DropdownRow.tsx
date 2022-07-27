@@ -63,6 +63,10 @@ export function DropdownRow({
         }
     }, [expanded]);
 
+    useEffect(() => {
+        console.log(defaultValue)
+    }, []);
+
     const collapse = () => {
         if (expanded) {
             onCollapse && onCollapse();
