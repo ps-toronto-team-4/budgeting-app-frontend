@@ -276,23 +276,3 @@ query getMerchant ($passwordHash: String!, $id: Int!){
     }
 }
 
-query getBudgetCategory($passwordHash: String!){
-    budgetCategories(passwordHash: $passwordHash){
-        __typename
-        ...on BudgetCategoriesSuccess{
-            budgetCategories {
-                id
-                category {
-                    name
-                }
-                amount
-            }
-        }
-
-        ...on FailurePayload{
-            exceptionName
-            errorMessage
-        }
-    }
-}
-

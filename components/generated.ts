@@ -176,31 +176,6 @@ export type MerchantsSuccess = {
   merchants: Array<Merchant>;
 };
 
-export type MonthBreakdown = {
-  __typename?: 'MonthBreakdown';
-  byCategory: Array<MonthBreakdownCategory>;
-  byMerchant: Array<MonthBreakdownMerchant>;
-  month: MonthType;
-  topCategory?: Maybe<MonthBreakdownCategory>;
-  topMerchant?: Maybe<MonthBreakdownMerchant>;
-  totalSpent: Scalars['Float'];
-  year: Scalars['Int'];
-};
-
-export type MonthBreakdownCategory = {
-  __typename?: 'MonthBreakdownCategory';
-  amountSpent: Scalars['Float'];
-  category?: Maybe<Category>;
-};
-
-export type MonthBreakdownMerchant = {
-  __typename?: 'MonthBreakdownMerchant';
-  amountSpent: Scalars['Float'];
-  merchant?: Maybe<Merchant>;
-};
-
-export type MonthBreakdownPayload = FailurePayload | MonthBreakdown;
-
 export enum MonthType {
   April = 'APRIL',
   August = 'AUGUST',
@@ -218,7 +193,6 @@ export enum MonthType {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  copyBudget: BudgetPayload;
   createBudget: BudgetPayload;
   createBudgetCategory: BudgetCategoryPayload;
   createCategory: CategoryPayload;
@@ -235,14 +209,6 @@ export type Mutation = {
   updateCategory: CategoryPayload;
   updateExpense: ExpensePayload;
   updateMerchant: MerchantPayload;
-};
-
-
-export type MutationCopyBudgetArgs = {
-  id: Scalars['Int'];
-  month: MonthType;
-  passwordHash: Scalars['String'];
-  year: Scalars['Int'];
 };
 
 
@@ -383,7 +349,7 @@ export type Query = {
   greeting: Scalars['String'];
   merchant: MerchantPayload;
   merchants: MerchantsPayload;
-  monthBreakdown: MonthBreakdownPayload;
+  /** # Helper for testing. */
   signIn: SignInPayload;
   user?: Maybe<User>;
 };
@@ -461,13 +427,6 @@ export type QueryMerchantArgs = {
 
 export type QueryMerchantsArgs = {
   passwordHash: Scalars['String'];
-};
-
-
-export type QueryMonthBreakdownArgs = {
-  month: MonthType;
-  passwordHash: Scalars['String'];
-  year: Scalars['Int'];
 };
 
 
