@@ -37,8 +37,8 @@ type Expenses = {
  * @param onPress Callback that is passed to the ExpenseDisplay component.
  * @returns List of expenses that ExpenseDisplay can understand.
  */
-function processExpenses(expenses: Expenses, maxExpenses: number, onPress: (id: number) => void): ExpenseDisplayPropsOrDate[] {
-    if (expenses.length === 0 || maxExpenses === 0) return [];
+function processExpenses(expenses: Expenses, onPress: (id: number) => void): ExpenseDisplayPropsOrDate[] {
+    if (expenses.length === 0) return [];
 
     // Call map first to copy the array and avoid mutating it while extracting the necessary info
     const preProcessed = expenses.map((expense) => {
@@ -56,7 +56,7 @@ function processExpenses(expenses: Expenses, maxExpenses: number, onPress: (id: 
         } else {
             return 1;
         }
-    }).slice(0, maxExpenses); // Limit number of expenses
+    });
 
     let processed: ExpenseDisplayPropsOrDate[] = [];
 
@@ -84,17 +84,21 @@ function renderItem({ item }: { item: ExpenseDisplayPropsOrDate }) {
     }
 }
 
+function keyExtractor(item: ExpenseDisplayPropsOrDate) {
+    if (typeof item === 'string') return item;
+    return item.id.toString();
+}
+
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
     const passwordHash = useAuth(); useUnauthRedirect();
-    const [maxExpenses, setMaxExpenses] = useState(20);
     const { data, refetch } = useQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
         variables: { passwordHash }
     });
     const processedExpenses = useMemo(() => {
         if (data?.expenses.__typename === 'ExpensesSuccess')
-            return processExpenses(data.expenses.expenses, maxExpenses, (id) => navigation.navigate('ExpenseDetails', { expenseId: id }));
+            return processExpenses(data.expenses.expenses, (id) => navigation.navigate('ExpenseDetails', { expenseId: id }));
         return [];
-    }, [data, maxExpenses]);
+    }, [data]);
 
     useRefresh(refetch, [passwordHash]);
 
@@ -110,15 +114,8 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                 <FlatList
                     data={processedExpenses}
                     renderItem={renderItem}
-                    keyExtractor={(item) => {
-                        if (typeof item === 'string') return item;
-                        return item.id.toString();
-                    }}
-                    ListFooterComponent={
-                        <View style={staticStyles.btnContainer}>
-                            <Button text="Load More Expenses" onPress={() => setMaxExpenses((prevState) => prevState + 20)} />
-                        </View>
-                    } />
+                    keyExtractor={keyExtractor}
+                    maxToRenderPerBatch={30} />
                 <View style={staticStyles.addExpenseBtn}>
                     <AddButton size={100} onPress={handleAddExpense} />
                 </View>
@@ -146,10 +143,5 @@ const staticStyles = StyleSheet.create({
     },
     date: {
         fontSize: 18,
-    },
-    btnContainer: {
-        alignItems: 'center',
-        paddingTop: 10,
-        paddingBottom: 20,
     },
 });
