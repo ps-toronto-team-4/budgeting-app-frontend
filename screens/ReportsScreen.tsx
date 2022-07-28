@@ -22,7 +22,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
     return (
         <Screen>
             <MonthlyExpenseGraph />
-            <View style={Styles.center}>
+            {/* <View style={Styles.center}>
                 <VictoryPie
                     padAngle={({ datum }) => datum.y}
                     innerRadius={100}
@@ -52,7 +52,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                         { name: "Planned" }, { name: "Actual" }
                     ]}
                 />
-            </View>
+            </View> */}
         </Screen>
     );
 }
