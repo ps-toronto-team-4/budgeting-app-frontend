@@ -14,6 +14,7 @@ import ByCategory from '../components/GraphDisplays/byCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
 import MonthlyVsBudgeted from '../components/GraphDisplays/monthlyVsBudgeted';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const passwordHash = useAuth();
@@ -31,9 +32,13 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
 
     return (
         <Screen>
-            <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
-            <Text></Text>
-            <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : [{ "category": null, "amountSpent": 0 }]} month={month} year={year}></ByCategory>
+            <ScrollView>
+                <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
+                <Text></Text>
+                <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : [{ "category": null, "amountSpent": 0 }]} month={month} year={year}></ByCategory>
+                <MonthlyExpenseGraph />
+                <MonthlyVsBudgeted />
+            </ScrollView>
         </Screen>
     );
 }
