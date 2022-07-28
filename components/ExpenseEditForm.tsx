@@ -131,6 +131,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                                 categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
                                 : undefined
                         }
+                        placeholder="Uncategorized"
                         onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
                         expanded={categoryExpanded}
                         onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}

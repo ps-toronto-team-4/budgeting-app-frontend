@@ -28,6 +28,7 @@ export type DropdownRowProps = {
     bottomBorder?: boolean;
     error?: string;
     value?: string;
+    placeholder?: string;
 };
 
 export function DropdownRow({
@@ -44,6 +45,7 @@ export function DropdownRow({
     bottomBorder,
     error,
     value: valueProp,
+    placeholder,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
@@ -115,7 +117,7 @@ export function DropdownRow({
                             <TextInput
                                 style={styles.fieldInput}
                                 editable={expanded}
-                                placeholder={"Select " + label}
+                                placeholder={placeholder || "Select " + label}
                                 ref={inputRef}
                                 value={value}
                                 onChangeText={setValue}
