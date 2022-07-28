@@ -276,3 +276,19 @@ query getMerchant ($passwordHash: String!, $id: Int!){
     }
 }
 
+query getMonthBreakdown($passwordHash:String!, $month:MonthType!, $year: Int!){
+  monthBreakdown(passwordHash: $passwordHash, month: $month, year: $year){
+    __typename
+    ...on MonthBreakdown{
+      byCategory{
+        category{
+          name
+          colourHex
+          id
+        }
+        amountSpent
+      }
+    }
+  }
+
+}
