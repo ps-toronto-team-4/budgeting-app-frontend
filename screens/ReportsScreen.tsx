@@ -13,6 +13,7 @@ import { GetMonthBreakdownDocument, GetMonthBreakdownQuery } from '../components
 import ByCategory from '../components/GraphDisplays/byCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
+import MonthlyVsBudgeted from '../components/GraphDisplays/monthlyVsBudgeted';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const passwordHash = useAuth();
