@@ -35,6 +35,24 @@ query getGreetings {
     greeting
 }
 
+query getUser($passwordHash: String!) {
+    user(passwordHash: $passwordHash) {
+        __typename
+        ...on User {
+            lastName
+            firstName
+            username
+            email
+            phoneNumber
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
 
 query getCategories($passwordHash: String!) {
     categories(passwordHash: $passwordHash) {
