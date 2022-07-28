@@ -88,7 +88,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     }
 
     return (
-        <Screen onDismissKeyboard={() => { setCalendarShown(false); console.log('screen caught press') }}>
+        <Screen onDismissKeyboard={() => { setCalendarShown(false); setMerchantExpanded(false); setCategoryExpanded(false); }}>
             <AmountInput onChangeAmount={setAmount} defaultAmount={initVals?.amount || 0} />
             <>
                 {
