@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard } from 'react-native';
+import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import Colors from "../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
 import { Row } from "./Row";
@@ -27,6 +27,8 @@ export type DropdownRowProps = {
     topBorder?: boolean;
     bottomBorder?: boolean;
     error?: string;
+    value?: string;
+    placeholder?: string;
 };
 
 export function DropdownRow({
@@ -42,30 +44,32 @@ export function DropdownRow({
     topBorder,
     bottomBorder,
     error,
+    value: valueProp,
+    placeholder,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
-    const [cachedValue, setCachedValue] = useState('');
+    const [cachedValue, setCachedValue] = useState(defaultValue || '');
     // this state is only used when expanded prop is undefined
     const [expandedState, setExpandedState] = useState(false);
     const expanded = expandedProp === undefined ? expandedState : expandedProp
 
     useEffect(() => {
         if (expanded) {
-            setCachedValue(value);
             setValue('');
             inputRef.current?.focus();
         } else {
-            if (value === '') {
-                setValue(cachedValue);
-            }
+            setValue(cachedValue);
             inputRef.current?.blur();
         }
     }, [expanded]);
 
     useEffect(() => {
-        console.log(defaultValue)
-    }, []);
+        if (valueProp !== undefined) {
+            setCachedValue(valueProp);
+            setValue(valueProp);
+        }
+    }, [valueProp]);
 
     const collapse = () => {
         if (expanded) {
@@ -92,13 +96,8 @@ export function DropdownRow({
         collapse();
     };
 
-    function renderDropdownItem({ item }: { item: { id: string, name: string, onSelect: (name: string) => void } }) {
-        return (
-            <DropdownItem name={item.name} onSelect={item.onSelect}></DropdownItem>
-        );
-    }
-
     function handleSelect(name: string) {
+        setCachedValue(name);
         setValue(name);
         collapse();
         onSelect(name);
@@ -118,11 +117,11 @@ export function DropdownRow({
                             <TextInput
                                 style={styles.fieldInput}
                                 editable={expanded}
-                                placeholder={"Select " + label}
+                                placeholder={placeholder || "Select " + label}
                                 ref={inputRef}
                                 value={value}
-                                onChangeText={setValue}>
-                            </TextInput>
+                                onChangeText={setValue}
+                                placeholderTextColor="black" />
                         </View>
                         <AntDesign
                             name={expanded ? 'up' : 'down'}
@@ -137,26 +136,20 @@ export function DropdownRow({
                 </View>
             </Row>
             {
-                (expanded) ?
-                    <FlatList
-                        data={
-                            data.filter(item => {
-                                return item.name.toLowerCase().startsWith(value.toLowerCase())
-                            }).map(item => {
-                                return { id: item.id, name: item.name, onSelect: handleSelect }
-                            })
-                        }
-                        renderItem={renderDropdownItem}
-                        keyExtractor={item => item.id}
-                        ListFooterComponent={
-                            onCreateNew &&
-                            <DropdownItem
-                                name={'Create new ' + label.toLowerCase()}
-                                onSelect={(_) => onCreateNew()} />
-                        }>
-                    </FlatList>
-                    :
-                    <View></View>
+                expanded &&
+                <ScrollView style={styles.scrollView}>
+                    {
+                        data.filter((item) => {
+                            return item.name.toLowerCase().startsWith(value.toLowerCase())
+                        }).map((item) => {
+                            return <DropdownItem name={item.name} onSelect={handleSelect} key={item.id} />
+                        })
+                    }
+                    {
+                        onCreateNew &&
+                        <DropdownItem name={`Create new ${label.toLowerCase()}`} onSelect={() => onCreateNew()} />
+                    }
+                </ScrollView>
             }
         </View>
     );
@@ -185,7 +178,11 @@ const styles = StyleSheet.create({
     },
     fieldInput: {
         fontSize: 15,
-        width: 180
+        width: 180,
+        color: 'black',
+    },
+    scrollView: {
+        height: 150,
     },
     listItem: {
         fontSize: 15,

@@ -101,10 +101,9 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
                 onExpand={() => setCategoryExpanded(true)}
                 onCollapse={() => setCategoryExpanded(false)}
                 topBorder
-                bottomBorder
                 error={categoryError} />
 
-            <InputRow label="Month:" disabled bottomBorder value={`${budget?.month} ${budget?.year}`} />
+            <InputRow label="Month:" disabled topBorder bottomBorder value={`${budget?.month} ${budget?.year}`} />
             <View style={styles.buttonContainer}>
                 <Button
                     text="Create New Budget"

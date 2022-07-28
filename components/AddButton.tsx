@@ -2,6 +2,7 @@ import { StyleSheet, Touchable, TouchableOpacity, GestureResponderEvent, StylePr
 import { View, Text } from './Themed';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
+import { AntDesign } from '@expo/vector-icons';
 
 type AddButtonProps = {
     onPress?: ((event: GestureResponderEvent) => void) | undefined;
@@ -20,17 +21,12 @@ export default function AddButton(props: AddButtonProps) {
             height: props.size,
             borderRadius: props.size / 2
         },
-        text: {
-            fontWeight: 'bold',
-            color: 'white',
-            fontSize: props.size / 2,
-        }
     });
 
     return (
         <TouchableOpacity onPress={props.onPress} activeOpacity={0.85}>
             <View style={dynamicStyles.container}>
-                <Text style={dynamicStyles.text}>+</Text>
+                <AntDesign name="plus" size={props.size / 2} color="white" />
             </View>
         </TouchableOpacity>
     );

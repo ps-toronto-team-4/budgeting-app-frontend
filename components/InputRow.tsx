@@ -17,7 +17,7 @@ export type InputRowProps = Omit<RowProps, 'children'> & {
  * Not tested for the case where the `wrap` prop changes over component lifecycle. So keep `wrap` static to be safe.
  */
 export function InputRow({ label, placeholder, value, onChangeText, wrap, error, disabled, ...otherProps }: InputRowProps) {
-    const [ inputHeight, setInputHeight ] = useState(20);
+    const [inputHeight, setInputHeight] = useState(20);
 
     return (
         <Row {...otherProps}>
@@ -28,6 +28,7 @@ export function InputRow({ label, placeholder, value, onChangeText, wrap, error,
                     </Text>
                     <TextInput
                         style={[styles.input, { height: inputHeight }]}
+                        placeholderTextColor="black"
                         placeholder={placeholder}
                         value={value}
                         onChangeText={onChangeText}
@@ -39,9 +40,9 @@ export function InputRow({ label, placeholder, value, onChangeText, wrap, error,
                 </View>
                 {
                     error &&
-                        <Text style={styles.error}>
-                            {error}
-                        </Text>
+                    <Text style={styles.error}>
+                        {error}
+                    </Text>
                 }
             </View>
         </Row>
@@ -68,6 +69,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         width: 180,
         padding: 2,
+        color: 'black',
     },
     error: {
         paddingTop: 10,
