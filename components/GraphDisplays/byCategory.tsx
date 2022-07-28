@@ -53,16 +53,43 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                             eventHandlers: {
                                 onPressIn: () => {
                                     return (
+                                        [{
+                                            target: "labels",
+                                            mutation: (props) => {
+                                                return props.text.charAt(0) === "$" ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
+                                            }
+                                        },
                                         {
+                                            target: "data",
+                                            mutation: (props) => {
+                                                console.log(props);
+                                                return props.radius === 100 ? { radius: 120, innerRadius: 90 } : { radius: 100 };
+                                            }
+                                        }
+                                        ]
+                                    );
+                                },
+                                onClick: () => {
+                                    return (
+                                        [{
                                             target: "labels",
                                             mutation: (props) => {
                                                 return props.text === "$" + props.datum.amountSpent ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
                                             }
+                                        },
+                                        {
+                                            target: "data",
+                                            mutation: (props) => {
+                                                console.log(props);
+                                                return props.radius === 100 ? { radius: 120, innerRadius: 90, labelRadius: 120 } : { radius: 100 };
+                                            }
                                         }
+                                        ]
                                     );
                                 }
                             }
-                        }]}
+                        }
+                        ]}
                 />
 
             </View>
@@ -95,6 +122,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                     }
                     itemsPerRow={3}
                     gutter={20}
+                    height={200}
                 />
             }
 
