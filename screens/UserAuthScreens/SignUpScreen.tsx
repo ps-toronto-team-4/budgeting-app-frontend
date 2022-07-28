@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View, RequiredField } from '../../components/Themed';
-import { RootStackScreenProps, RootTabScreenProps } from '../../types';
+import { RootStackScreenProps } from '../../types';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
 import Styles from "../../constants/Styles";

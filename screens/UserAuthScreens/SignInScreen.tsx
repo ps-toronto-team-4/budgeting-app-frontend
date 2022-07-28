@@ -1,15 +1,15 @@
-import React, { useEffect } from "react"
-import { StyleSheet, SafeAreaView, Alert, TouchableOpacity, Pressable, Modal, ActivityIndicator } from 'react-native';
-import Button from "../components/Button";
-import TextInput from "../components/TextInput";
-import Colors from '../constants/Colors';
-import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from "../types";
-import { useLazyQuery, useQuery } from '@apollo/client';
-import { GetPasswordHashDocument, GetPasswordHashQuery } from "../components/generated";
-import Styles from "../constants/Styles";
+import React from "react"
+import { StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import Button from "../../components/Button";
+import TextInput from "../../components/TextInput";
+import Colors from '../../constants/Colors';
+import { Text, View } from '../../components/Themed';
+import { RootStackScreenProps } from "../../types";
+import { useLazyQuery } from '@apollo/client';
+import { GetPasswordHashDocument, GetPasswordHashQuery } from "../../components/generated";
+import Styles from "../../constants/Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAuthRedirect } from "../hooks/useAuthRedirect";
+import { useAuthRedirect } from "../../hooks/useAuthRedirect";
 
 export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
   const [username, setUsername] = React.useState("");

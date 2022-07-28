@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Category, GetCategoriesDocument, GetCategoriesQuery } from "../../components/generated";
+import { GetMerchantsDocument, GetMerchantsQuery, Merchant, } from "../../components/generated";
 import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
@@ -8,18 +8,18 @@ import { RootStackScreenProps } from "../../types";
 import Button from "../../components/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import Styles from "../../constants/Styles";
 import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 import { useRefresh } from "../../hooks/useRefresh";
-import { Screen } from "../../components/Screen";
 
-export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
+export default function MerchantSettingsScreen({ navigation }: RootStackScreenProps<'MerchantSettings'>) {
     
     const passwordHash = useAuth();
 
     useUnauthRedirect();
 
-    const {data, loading, refetch} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+    const {data, loading, refetch} = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash },
         onError: (error => {
           Alert.alert(error.message);
@@ -28,11 +28,10 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
     
     useRefresh(refetch, [passwordHash]);
 
-      const renderCategory = ({item}: {item: Category}) => {
+      const renderMerchant = ({item}: {item: Merchant}) => {
         return (
-        <TouchableOpacity style={Styles.list} onPress={() => navigation.navigate("EditCategory", {id: item.id, name: item.name, color: item.colourHex, details: item.description})}>
+        <TouchableOpacity style={Styles.list} onPress={() => navigation.navigate("UpdateMerchant", {id: item.id, name: item.name, description: item.description, category: item.defaultCategory || undefined})}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 30, marginHorizontal: 15, height: 30, backgroundColor: "#" + item.colourHex, borderRadius: 90, borderWidth: 1 }} />
             <Text style={{ fontSize: 18, marginHorizontal: 5 }}>{item.name}</Text>
             </View>
             <MaterialIcons name="navigate-next" size={24} color="black" />
@@ -40,20 +39,21 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
       )}
 
     return (
-        <Screen>
-            <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')}/>
-                { loading ? (<ActivityIndicator size='large'/>) : (
-                    data?.categories.__typename === "CategoriesSuccess" ? (
+        <View>
+            <Button text="Create New Merchant" accessibilityLabel="Link to Create New" onPress={() => navigation.navigate('CreateMerchant')}/>
+            { loading ? (<ActivityIndicator size='large'/>) : (
+                    data?.merchants.__typename === "MerchantsSuccess" ? (
                         <FlatList
-                            data={data.categories.categories}
-                            renderItem={renderCategory}
+                            data={data.merchants.merchants}
+                            renderItem={renderMerchant}
                         />
                     ) : (
                     <View>
-                        <Text>{data?.categories.exceptionName}</Text>
-                        <Text>{data?.categories.errorMessage}</Text>
+                        <Text>{data?.merchants.exceptionName}</Text>
+                        <Text>{data?.merchants.errorMessage}</Text>
                     </View>
                 ))}
-        </Screen>
+        </View>
     );
 }
+
