@@ -16,13 +16,14 @@ export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name
 
 export type DropdownRowProps = {
     label: string;
-    data: { id: string, name: string }[];
+    data: { id: number, name: string }[];
     onSelect: (name: string) => void;
     expanded?: boolean;
     onExpand?: () => void;
     onCollapse?: () => void;
     defaultValue?: string;
     onCreateNew?: () => void;
+    createLabel?: string;
     visible?: boolean;
     topBorder?: boolean;
     bottomBorder?: boolean;
@@ -40,6 +41,7 @@ export function DropdownRow({
     onCollapse,
     defaultValue,
     onCreateNew,
+    createLabel,
     visible,
     topBorder,
     bottomBorder,
@@ -53,6 +55,10 @@ export function DropdownRow({
     // this state is only used when expanded prop is undefined
     const [expandedState, setExpandedState] = useState(false);
     const expanded = expandedProp === undefined ? expandedState : expandedProp
+
+    useEffect(() => {
+        setValue(defaultValue || '')
+    }, [defaultValue])
 
     useEffect(() => {
         if (expanded) {
@@ -117,7 +123,7 @@ export function DropdownRow({
                             <TextInput
                                 style={styles.fieldInput}
                                 editable={expanded}
-                                placeholder={placeholder || "Select " + label}
+                                placeholder={placeholder || expanded ? "Start typing to search" : "Select " + label}
                                 ref={inputRef}
                                 value={value}
                                 onChangeText={setValue}
@@ -175,10 +181,11 @@ const styles = StyleSheet.create({
     fieldLabel: {
         fontWeight: 'bold',
         fontSize: 15,
+        paddingLeft: 5
     },
     fieldInput: {
         fontSize: 15,
-        width: 180,
+        width: 180, // TODO test 160
         color: 'black',
     },
     scrollView: {
