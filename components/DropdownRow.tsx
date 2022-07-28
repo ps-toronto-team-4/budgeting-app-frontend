@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard } from 'react-native';
+import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import Colors from "../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
 import { Row } from "./Row";
@@ -16,7 +16,7 @@ export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name
 
 export type DropdownRowProps = {
     label: string;
-    data: {id: number, name: string}[];
+    data: { id: number, name: string }[];
     onSelect: (name: string) => void;
     expanded?: boolean;
     onExpand?: () => void;
@@ -27,6 +27,9 @@ export type DropdownRowProps = {
     visible?: boolean;
     topBorder?: boolean;
     bottomBorder?: boolean;
+    error?: string;
+    value?: string;
+    placeholder?: string;
 };
 
 export function DropdownRow({
@@ -42,9 +45,13 @@ export function DropdownRow({
     visible,
     topBorder,
     bottomBorder,
+    error,
+    value: valueProp,
+    placeholder,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
+    const [cachedValue, setCachedValue] = useState(defaultValue || '');
     // this state is only used when expanded prop is undefined
     const [expandedState, setExpandedState] = useState(false);
     const expanded = expandedProp === undefined ? expandedState : expandedProp
@@ -58,9 +65,17 @@ export function DropdownRow({
             setValue('');
             inputRef.current?.focus();
         } else {
+            setValue(cachedValue);
             inputRef.current?.blur();
         }
     }, [expanded]);
+
+    useEffect(() => {
+        if (valueProp !== undefined) {
+            setCachedValue(valueProp);
+            setValue(valueProp);
+        }
+    }, [valueProp]);
 
     const collapse = () => {
         if (expanded) {
@@ -87,69 +102,76 @@ export function DropdownRow({
         collapse();
     };
 
-    function renderDropdownItem({ item }: { item: { id: string, name: string, onSelect: (name: string) => void } }) {
-        return (
-            <DropdownItem name={item.name} onSelect={item.onSelect}></DropdownItem>
-        );
-    }
-
     function handleSelect(name: string) {
+        setCachedValue(name);
         setValue(name);
         collapse();
         onSelect(name);
     }
 
     return (
-        <View style={{display: visible === false ? 'none' : 'flex'}}>
+        <View style={{ display: visible === false ? 'none' : 'flex' }}>
             <Row
                 topBorder={topBorder}
                 bottomBorder={bottomBorder}
                 onPress={() => handleRowPress()}
             >
-                <View style={styles.fieldLabelAndInputContainer}>
-                    <Text style={styles.fieldLabel}>{label}:</Text>
-                    <TextInput
-                        style={styles.fieldInput}
-                        editable={expanded}
-                        placeholder={expanded? ("Start typing to search") : ("Select " + label)}
-                        ref={inputRef}
-                        value={value}
-                        onChangeText={setValue}>
-                    </TextInput>
+                <View style={styles.fieldAndErrorContainer}>
+                    <View style={styles.fieldLabelAndInputAndArrowContainer}>
+                        <View style={styles.fieldLabelAndInputContainer}>
+                            <Text style={styles.fieldLabel}>{label}:</Text>
+                            <TextInput
+                                style={styles.fieldInput}
+                                editable={expanded}
+                                placeholder={placeholder || expanded ? "Start typing to search" : "Select " + label}
+                                ref={inputRef}
+                                value={value}
+                                onChangeText={setValue}
+                                placeholderTextColor="black" />
+                        </View>
+                        <AntDesign
+                            name={expanded ? 'up' : 'down'}
+                            size={20}
+                            color="black"
+                            onPress={handleIconPress} />
+                    </View>
+                    {
+                        !expanded && !!error?.length &&
+                        <Text style={styles.error}>{error}</Text>
+                    }
                 </View>
-                <AntDesign
-                    name={expanded ? 'up' : 'down'}
-                    size={20}
-                    color="black"
-                    onPress={handleIconPress} />
             </Row>
             {
-                (expanded) ?
-                    <FlatList
-                        data={
-                            data.filter(item => {
-                                return item.name.toLowerCase().startsWith(value.toLowerCase())
-                            }).map(item => {
-                                return { id: item.id.toString(), name: item.name, onSelect: handleSelect }
-                            })
-                        }
-                        renderItem={renderDropdownItem}
-                        keyExtractor={item => item.id}
-                        ListFooterComponent={
-                            onCreateNew &&
-                                <DropdownItem
-                                    name={'Create new ' + createLabel}
-                                    onSelect={(_) => onCreateNew()} />
-                        }
-                    />
-                :
-                <></>
+                expanded &&
+                <ScrollView style={styles.scrollView}>
+                    {
+                        data.filter((item) => {
+                            return item.name.toLowerCase().startsWith(value.toLowerCase())
+                        }).map((item) => {
+                            return <DropdownItem name={item.name} onSelect={handleSelect} key={item.id} />
+                        })
+                    }
+                    {
+                        onCreateNew &&
+                        <DropdownItem name={`Create new ${label.toLowerCase()}`} onSelect={() => onCreateNew()} />
+                    }
+                </ScrollView>
             }
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    fieldAndErrorContainer: {
+        backgroundColor: 'rgba(0,0,0,0)',
+    },
+    fieldLabelAndInputAndArrowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 320,
+        backgroundColor: 'rgba(0,0,0,0)',
+    },
     fieldLabelAndInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -163,10 +185,19 @@ const styles = StyleSheet.create({
     },
     fieldInput: {
         fontSize: 15,
-        width: 160,
+        width: 180, // TODO test 160
+        color: 'black',
+    },
+    scrollView: {
+        height: 150,
     },
     listItem: {
         fontSize: 15,
         paddingLeft: 40,
+    },
+    error: {
+        paddingTop: 10,
+        color: 'red',
+        alignSelf: 'center',
     },
 });

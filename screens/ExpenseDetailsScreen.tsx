@@ -16,8 +16,8 @@ import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 
 const EditButton = (onPress: () => void) => (
-    <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
-        <Feather name="edit-2" size={15} color="black" />
+    <TouchableOpacity style={{ paddingRight: 30 }} onPress={onPress}>
+        <Feather name="edit-2" size={20} color="orange" />
     </TouchableOpacity>
 );
 
@@ -87,11 +87,11 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                         <View style={styles.separator}></View>
                         <View style={styles.merchantContainer}>
                             <Text style={styles.merchantLabel}>Merchant:</Text>
-                            <Text style={styles.merchant}>{data?.expense.expense.merchant?.name ? data.expense.expense.merchant.name : 'undefined'}</Text>
+                            <Text style={styles.merchant}>{data?.expense.expense.merchant?.name ? data.expense.expense.merchant.name : 'None'}</Text>
                         </View>
                         <View style={styles.descContainer}>
-                            <Text style={styles.descLabel}>Details</Text>
-                            <Text>{data?.expense.expense.description ? data.expense.expense.description : 'undefined'}</Text>
+                            <Text style={styles.descLabel}>Details:</Text>
+                            <Text>{data?.expense.expense.description ? data.expense.expense.description : 'None'}</Text>
                         </View>
                         <View style={styles.separator}></View>
                     </View>

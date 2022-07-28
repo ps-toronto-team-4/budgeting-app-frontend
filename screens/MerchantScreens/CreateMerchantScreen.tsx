@@ -14,11 +14,11 @@ import { useRefresh } from "../../hooks/useRefresh";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
-    
+
     const passwordHash = useAuth();
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
-    const [category, setCategory] = React.useState<{id: number, name: string} | undefined>();
+    const [category, setCategory] = React.useState<{ id: number, name: string } | undefined>();
     const [check, setCheck] = React.useState(false);
     const [disabledButton, setDisabledButton] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
@@ -27,14 +27,14 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
     const preFillCategory = () => {
         AsyncStorage.getItem('New Category')
-        .then((val) => {
-            if(val) {
-                setCategory(JSON.parse(val));
-            }
-        })
-        .catch((err) => {
-            console.log("Couldn't retrieve new category: " + err)
-        })
+            .then((val) => {
+                if (val) {
+                    setCategory(JSON.parse(val));
+                }
+            })
+            .catch((err) => {
+                console.log("Couldn't retrieve new category: " + err)
+            })
     }
 
     useRefresh(preFillCategory);
@@ -114,22 +114,22 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     placeholder="(optional)"
                     value={details}
                     onChangeText={setDetails}
-                    topBorder
-                    bottomBorder />
+                    topBorder />
                 <DropdownRow
                     label="Default Category"
                     data={
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => { return { id: x.id, name: x.name} }) : []
+                            categoryData.categories.categories.map(x => { return { id: x.id, name: x.name } }) : []
                     }
                     onSelect={handleCategorySelect}
                     expanded={categoryOpen}
-                    onExpand={() => setCategoryOpen(true) }
+                    onExpand={() => setCategoryOpen(true)}
                     onCollapse={() => setCategoryOpen(false)}
+                    topBorder
+                    bottomBorder={!categoryOpen}
                     onCreateNew={() => navigation.navigate("CreateCategory")}
                     createLabel="Category"
-                    defaultValue={category?.name}
-                    bottomBorder />
+                    defaultValue={category?.name} />
                 <View style={styles.buttonContainer}>
                     <Button text="Save Merchant"
                         accessibilityLabel="Save Merchant"
