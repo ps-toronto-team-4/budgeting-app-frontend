@@ -88,7 +88,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     }
 
     return (
-        <Screen onDismissKeyboard={() => setCalendarShown(false)}>
+        <Screen onDismissKeyboard={() => { setCalendarShown(false); console.log('screen caught press') }}>
             <AmountInput onChangeAmount={setAmount} defaultAmount={initVals?.amount || 0} />
             <>
                 {
@@ -135,46 +135,41 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                 }
             </>
             <>
-                {
-                    !merchantExpanded && !categoryExpanded &&
-                    <>
-                        <View>
-                            <InputRow
-                                onPress={() => setCalendarShown(true)}
-                                label="Date:"
-                                value={
-                                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
-                                    " " + moment(date).date() + " " + moment(date).year()
-                                }
-                                topBorder
-                                disabled />
-                            {
-                                calendarShown &&
-                                <View style={styles.calendarContainer}>
-                                    <CalendarPicker
-                                        onDateChange={(date, type) => { setDate(date.toISOString()); setCalendarShown(false); }}
-                                        width={300} />
-                                </View>
-                            }
+                <View>
+                    <InputRow
+                        onPress={() => setCalendarShown(true)}
+                        label="Date:"
+                        value={
+                            ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
+                            " " + moment(date).date() + " " + moment(date).year()
+                        }
+                        topBorder
+                        disabled />
+                    {
+                        calendarShown &&
+                        <View style={styles.calendarContainer}>
+                            <CalendarPicker
+                                onDateChange={(date, type) => { setDate(date.toISOString()); setCalendarShown(false); }}
+                                width={300} />
                         </View>
-                        <View style={styles.detailsRow}>
-                            <InputRow
-                                label="Details:"
-                                placeholder="Enter Details"
-                                value={desc}
-                                onChangeText={setDesc}
-                                wrap
-                                topBorder
-                                bottomBorder />
-                        </View>
-                        <View style={styles.buttonContainer}>
-                            <Button
-                                text="Save Expense"
-                                accessibilityLabel="Button to Save Expense"
-                                onPress={handleSubmit} />
-                        </View>
-                    </>
-                }
+                    }
+                </View>
+                <View style={styles.detailsRow}>
+                    <InputRow
+                        label="Details:"
+                        placeholder="Enter Details"
+                        value={desc}
+                        onChangeText={setDesc}
+                        wrap
+                        topBorder
+                        bottomBorder />
+                </View>
+                <View style={styles.buttonContainer}>
+                    <Button
+                        text="Save Expense"
+                        accessibilityLabel="Button to Save Expense"
+                        onPress={handleSubmit} />
+                </View>
             </>
         </Screen>
     );

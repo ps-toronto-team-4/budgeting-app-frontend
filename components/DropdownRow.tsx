@@ -6,7 +6,7 @@ import { Row } from "./Row";
 
 export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name: string) => void }) {
     return ( // todo fix below
-        <Row onPress={() => onSelect(name)} topBorder>
+        <Row onPress={() => { console.log('dropdown item caught press'); onSelect(name) }} topBorder>
             {/* <View style={[styles.fieldContainer, { paddingLeft: 70 }]}> */}
             <Text style={styles.listItem}>{name}</Text>
             {/* </View> */}
@@ -94,7 +94,7 @@ export function DropdownRow({
 
     function renderDropdownItem({ item }: { item: { id: string, name: string, onSelect: (name: string) => void } }) {
         return (
-            <DropdownItem name={item.name} onSelect={item.onSelect}></DropdownItem>
+            <DropdownItem name={item.name} onSelect={item.onSelect} />
         );
     }
 
@@ -137,7 +137,8 @@ export function DropdownRow({
                 </View>
             </Row>
             {
-                (expanded) ?
+                expanded &&
+                <View style={styles.flatListContainer}>
                     <FlatList
                         data={
                             data.filter(item => {
@@ -153,10 +154,8 @@ export function DropdownRow({
                             <DropdownItem
                                 name={'Create new ' + label.toLowerCase()}
                                 onSelect={(_) => onCreateNew()} />
-                        }>
-                    </FlatList>
-                    :
-                    <View></View>
+                        } />
+                </View>
             }
         </View>
     );
@@ -186,6 +185,9 @@ const styles = StyleSheet.create({
     fieldInput: {
         fontSize: 15,
         width: 180
+    },
+    flatListContainer: {
+        height: 150,
     },
     listItem: {
         fontSize: 15,
