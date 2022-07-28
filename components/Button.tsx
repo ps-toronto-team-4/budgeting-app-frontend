@@ -8,7 +8,7 @@ type ButtonProps = {
     backgroundColor?: string;
     textColor?: string;
     onPress?: ((event: GestureResponderEvent) => void) | undefined;
-    accessibilityLabel: string;
+    accessibilityLabel?: string;
     disabled?: boolean | undefined;
     size?: "full" | "half"
 };
