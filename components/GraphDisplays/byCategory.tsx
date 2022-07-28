@@ -25,6 +25,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 </View>
                 <VictoryPie
                     padAngle={2}
+                    labelRadius={135}
                     innerRadius={70}
                     data={
                         categoryData.map((data) => {
@@ -62,7 +63,6 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                                         {
                                             target: "data",
                                             mutation: (props) => {
-                                                console.log(props);
                                                 return props.radius === 100 ? { radius: 120, innerRadius: 90 } : { radius: 100 };
                                             }
                                         }
@@ -80,7 +80,6 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                                         {
                                             target: "data",
                                             mutation: (props) => {
-                                                console.log(props);
                                                 return props.radius === 100 ? { radius: 120, innerRadius: 90, labelRadius: 120 } : { radius: 100 };
                                             }
                                         }
