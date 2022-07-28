@@ -15,6 +15,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { MONTHS_ORDER } from "../../constants/Months"
 import { Screen } from "../../components/Screen";
 import Button from "../../components/Button";
+import moment from "moment";
 
 interface HeaderButtonProps {
     direction: 'left' | 'right';
@@ -41,31 +42,31 @@ function HeaderButton({ direction, onPress, marginLeft, marginRight }: HeaderBut
 
 export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'Budget'>) {
     const passwordHash = useAuth();
-    const [month, setMonth] = useState("JULY")
-    const [year, setYear] = useState(2022)
+    const now = moment();
+    const [month, setMonth] = useState(MONTHS_ORDER[now.month()]);
+    const [year, setYear] = useState(now.year());
 
-    const { data: budgetData, loading: budgetLoading, refetch: budgetRefetch } = useQuery<GetBudgetsQuery>(GetBudgetsDocument, {
+    const { data: budgetData, refetch: budgetRefetch } = useQuery<GetBudgetsQuery>(GetBudgetsDocument, {
         variables: { passwordHash }
-    })
-    const { data: monthData, loading: monthLoading, refetch: monthRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument, {
+    });
+    const { data: monthData, refetch: monthRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument, {
         variables: {
             passwordHash,
             month,
             year
         }
-    })
+    });
 
     useRefresh(() => {
         budgetRefetch()
         monthRefetch()
-    }, [passwordHash])
+    }, [passwordHash]);
 
-
-    const selectedBudget = budgetData?.budgets.__typename == 'BudgetsSuccess' ? budgetData.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined
+    const selectedBudget = budgetData?.budgets.__typename == 'BudgetsSuccess' ? budgetData.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined;
     const plannedAmount = selectedBudget === undefined ? 0 :
-        selectedBudget.budgetCategories?.reduce((previousValue, currentValue) => previousValue + currentValue.amount, 0)
+        selectedBudget.budgetCategories?.reduce((previousValue, currentValue) => previousValue + currentValue.amount, 0);
 
-    const months = MONTHS_ORDER
+    const months = MONTHS_ORDER;
 
     const backAMonth = () => {
         const curIndex = months.indexOf(month)
@@ -73,9 +74,9 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
             setMonth(months[months.length - 1])
             setYear((prevYear) => prevYear - 1);
         } else {
-            setMonth((prevMonth) => months[months.indexOf(prevMonth) - 1])
+            setMonth((prevMonth) => months[months.indexOf(prevMonth) - 1]);
         }
-    }
+    };
 
     const forwardAMonth = () => {
         const curIndex = months.indexOf(month)
@@ -85,7 +86,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
         } else {
             setMonth((prevMonth) => months[months.indexOf(prevMonth) + 1]);
         }
-    }
+    };
 
     useEffect(() => {
         navigation.setOptions({
