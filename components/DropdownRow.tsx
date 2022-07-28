@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard } from 'react-native';
+import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import Colors from "../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
 import { Row } from "./Row";
@@ -92,12 +92,6 @@ export function DropdownRow({
         collapse();
     };
 
-    function renderDropdownItem({ item }: { item: { id: string, name: string, onSelect: (name: string) => void } }) {
-        return (
-            <DropdownItem name={item.name} onSelect={item.onSelect} />
-        );
-    }
-
     function handleSelect(name: string) {
         setValue(name);
         collapse();
@@ -138,24 +132,19 @@ export function DropdownRow({
             </Row>
             {
                 expanded &&
-                <View style={styles.flatListContainer}>
-                    <FlatList
-                        data={
-                            data.filter(item => {
-                                return item.name.toLowerCase().startsWith(value.toLowerCase())
-                            }).map(item => {
-                                return { id: item.id, name: item.name, onSelect: handleSelect }
-                            })
-                        }
-                        renderItem={renderDropdownItem}
-                        keyExtractor={item => item.id}
-                        ListFooterComponent={
-                            onCreateNew &&
-                            <DropdownItem
-                                name={'Create new ' + label.toLowerCase()}
-                                onSelect={(_) => onCreateNew()} />
-                        } />
-                </View>
+                <ScrollView style={styles.scrollView}>
+                    {
+                        data.filter((item) => {
+                            return item.name.toLowerCase().startsWith(value.toLowerCase())
+                        }).map((item) => {
+                            return <DropdownItem name={item.name} onSelect={handleSelect} key={item.id} />
+                        })
+                    }
+                    {
+                        onCreateNew &&
+                        <DropdownItem name={`Create new ${label.toLowerCase()}`} onSelect={() => onCreateNew()} />
+                    }
+                </ScrollView>
             }
         </View>
     );
@@ -186,7 +175,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         width: 180
     },
-    flatListContainer: {
+    scrollView: {
         height: 150,
     },
     listItem: {
