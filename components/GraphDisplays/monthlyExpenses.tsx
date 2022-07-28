@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Button } from "react-native";
+import Svg from "react-native-svg";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
 
@@ -83,10 +84,24 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
 
     // const [data, setData] = useState(dumpy)
 
+    const onPressClickHandler = () => {
+        return [{
+            target: "data",
+            mutation: (props: any) => {
+                setSelectedMonth(props.datum.id)
+                handleClick(props.datum.id)
+                if (monthSelectedCallback !== undefined) {
+                    monthSelectedCallback(props.datum)
+                }
+                return null
+            }
+        }];
+    }
 
     return (<View>
+        {/* <Svg height={400}> */}
         <VictoryChart
-            width={350}
+            width={400}
             theme={VictoryTheme.material}
             domainPadding={20}>
             <VictoryAxis
@@ -99,7 +114,6 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                 style={{
                     grid: { stroke: "none" },
                 }}
-            // dependentAxis={true}
             />
             <VictoryBar
                 externalEventMutations={mutations as unknown as EventCallbackInterface<string | string[], StringOrNumberOrList>[]}
@@ -118,24 +132,15 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                     {
                         target: "data",
                         eventHandlers: {
-                            onClick: () => {
-                                return [{
-                                    target: "data",
-                                    mutation: (props) => {
-                                        setSelectedMonth(props.datum.id)
-                                        handleClick(props.datum.id)
-                                        if (monthSelectedCallback !== undefined) {
-                                            monthSelectedCallback(props.datum)
-                                        }
-                                        return null
-                                    }
-                                }];
-                            }
+                            onClick: onPressClickHandler,
+                            onPressIn: onPressClickHandler,
+
                         }
                     }
                 ]}
             />
         </VictoryChart>
+        {/* </Svg> */}
     </View>)
 }
 
