@@ -6,7 +6,7 @@ import { Row } from "./Row";
 
 export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name: string) => void }) {
     return ( // todo fix below
-        <Row onPress={() => { console.log('dropdown item caught press'); onSelect(name) }} topBorder>
+        <Row onPress={() => onSelect(name)} topBorder>
             {/* <View style={[styles.fieldContainer, { paddingLeft: 70 }]}> */}
             <Text style={styles.listItem}>{name}</Text>
             {/* </View> */}
