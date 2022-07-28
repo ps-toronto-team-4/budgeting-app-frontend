@@ -1,5 +1,4 @@
-import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
-
+import { Alert, ActivityIndicator } from 'react-native';
 import { Text, View, RequiredField } from '../../components/Themed';
 import Button from '../../components/Button';
 import React, { useState } from 'react';
@@ -14,6 +13,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 import { useUnauthRedirect } from '../../hooks/useUnauthRedirect';
 import { Screen } from '../../components/Screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
   const [name, setName] = useState('')
@@ -32,7 +32,10 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
     }),
     onCompleted: (data => {
       if (data.createCategory.__typename === 'CategorySuccess') {
-        navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root");
+        AsyncStorage.setItem('New Category', JSON.stringify({name, id: data.createCategory.category.id}))
+        .then(() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root"))
+        .catch((err) => console.log("Couldn't store new category"))
+        
       }
     })
   })

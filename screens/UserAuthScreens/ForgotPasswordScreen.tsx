@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Modal } from 'react-native';
-import { Text, View } from '../components/Themed';
-import { RootStackScreenProps } from '../types';
-import Styles from '../constants/Styles';
+import { Text, View } from '../../components/Themed';
+import { RootStackScreenProps } from '../../types';
+import Styles from '../../constants/Styles';
 import { Svg, G, Circle, Rect, Path, ClipPath, Defs } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -32,7 +32,7 @@ export default function ForgotPasswordScreen({ navigation }: RootStackScreenProp
               </ClipPath>
             </Defs>
           </Svg>
-          <Text style={styles.contactemail}>Please contact <Text style={{fontWeight: 'bold'}}>{contactemail}</Text> for assistance with resetting your password.</Text>
+          <Text style={styles.contactemail}>Please contact <Text style={{ fontWeight: 'bold' }}>{contactemail}</Text> for assistance with resetting your password.</Text>
         </View>
       </Modal>
     </View>

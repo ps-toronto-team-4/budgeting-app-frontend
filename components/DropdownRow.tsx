@@ -16,13 +16,14 @@ export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name
 
 export type DropdownRowProps = {
     label: string;
-    data: {id: string, name: string}[];
+    data: {id: number, name: string}[];
     onSelect: (name: string) => void;
     expanded?: boolean;
     onExpand?: () => void;
     onCollapse?: () => void;
     defaultValue?: string;
     onCreateNew?: () => void;
+    createLabel?: string;
     visible?: boolean;
     topBorder?: boolean;
     bottomBorder?: boolean;
@@ -37,6 +38,7 @@ export function DropdownRow({
     onCollapse,
     defaultValue,
     onCreateNew,
+    createLabel,
     visible,
     topBorder,
     bottomBorder,
@@ -46,6 +48,10 @@ export function DropdownRow({
     // this state is only used when expanded prop is undefined
     const [expandedState, setExpandedState] = useState(false);
     const expanded = expandedProp === undefined ? expandedState : expandedProp
+
+    useEffect(() => {
+        setValue(defaultValue || '')
+    }, [defaultValue])
 
     useEffect(() => {
         if (expanded) {
@@ -99,13 +105,13 @@ export function DropdownRow({
                 topBorder={topBorder}
                 bottomBorder={bottomBorder}
                 onPress={() => handleRowPress()}
-                >
+            >
                 <View style={styles.fieldLabelAndInputContainer}>
                     <Text style={styles.fieldLabel}>{label}:</Text>
                     <TextInput
                         style={styles.fieldInput}
                         editable={expanded}
-                        placeholder={"Select " + label}
+                        placeholder={expanded? ("Start typing to search") : ("Select " + label)}
                         ref={inputRef}
                         value={value}
                         onChangeText={setValue}>
@@ -124,7 +130,7 @@ export function DropdownRow({
                             data.filter(item => {
                                 return item.name.toLowerCase().startsWith(value.toLowerCase())
                             }).map(item => {
-                                return { id: item.id, name: item.name, onSelect: handleSelect }
+                                return { id: item.id.toString(), name: item.name, onSelect: handleSelect }
                             })
                         }
                         renderItem={renderDropdownItem}
@@ -132,12 +138,12 @@ export function DropdownRow({
                         ListFooterComponent={
                             onCreateNew &&
                                 <DropdownItem
-                                    name={'Create new ' + label.toLowerCase()}
+                                    name={'Create new ' + createLabel}
                                     onSelect={(_) => onCreateNew()} />
-                        }>
-                    </FlatList>
-                    :
-                    <View></View>
+                        }
+                    />
+                :
+                <></>
             }
         </View>
     );
@@ -153,10 +159,11 @@ const styles = StyleSheet.create({
     fieldLabel: {
         fontWeight: 'bold',
         fontSize: 15,
+        paddingLeft: 5
     },
     fieldInput: {
         fontSize: 15,
-        width: 180
+        width: 160,
     },
     listItem: {
         fontSize: 15,

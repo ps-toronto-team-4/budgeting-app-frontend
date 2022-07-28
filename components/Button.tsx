@@ -18,11 +18,10 @@ export default function Button(props: ButtonProps) {
     const width = props.size === "half" ? 120 : 250;
     const bgColor = props.backgroundColor || Colors[theme].btnBackground;
     const txtColor = props.textColor || Colors[theme].btnText;
-    const opacity = props.disabled ? 0.5 : 1;
 
     return (
         <TouchableOpacity onPress={props.onPress} accessibilityLabel={props.accessibilityLabel} disabled={props.disabled}>
-            <View style={[styles.container, { backgroundColor: bgColor, width: width, opacity: opacity }]}>
+            <View style={[styles.container, { backgroundColor: bgColor, width: width }]}>
                 <Text style={[styles.text, { color: txtColor }]}>{props.text}</Text>
             </View>
         </TouchableOpacity>
