@@ -289,6 +289,7 @@ query getBudgets($passwordHash: String!){
                 budgetCategories{
                     amount
                     category{
+                        id
                         name
                         colourHex
                     }
@@ -328,6 +329,7 @@ mutation createBudgetCategory($passwordHash: String!, $budgetId:Int!, $categoryI
             budgetCategory{
                 id
                 category {
+                    id
                     name
                     colourHex
                 }

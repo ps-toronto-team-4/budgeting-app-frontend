@@ -1,15 +1,14 @@
-import { useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
-import { Budget, BudgetCategory, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery } from "../../components/generated";
-import { SafeAreaView, StatusBar, TouchableHighlight } from "react-native"
+import { useMutation, useQuery } from "@apollo/client";
+import { useEffect, useMemo, useState } from "react";
+import { Budget, BudgetCategory, CopyBudgetDocument, CopyBudgetMutation, CopyBudgetMutationVariables, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, CreateBudgetCategoryMutationVariables, CreateBudgetDocument, CreateBudgetMutation, CreateBudgetMutationVariables, GetBudgetsDocument, GetBudgetsQuery, GetBudgetsQueryVariables, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, MonthType } from "../../components/generated";
+import { TouchableHighlight } from "react-native"
 import { AntDesign } from "@expo/vector-icons";
 
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../../types";
 import { ChartDisplay } from "../../components/budget/ChartDisplay";
 import { BudgetList } from "../../components/budget/BudgetList";
-import { MissingBudget } from "../../components/budget/MissingBudget";
 import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
 import { MONTHS_ORDER } from "../../constants/Months"
@@ -46,8 +45,8 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
     const [month, setMonth] = useState(MONTHS_ORDER[now.month()]);
     const [year, setYear] = useState(now.year());
 
-    const { data: budgetData, refetch: budgetRefetch } = useQuery<GetBudgetsQuery>(GetBudgetsDocument, {
-        variables: { passwordHash }
+    const { data: budgetData, refetch: budgetRefetch } = useQuery<GetBudgetsQuery, GetBudgetsQueryVariables>(GetBudgetsDocument, {
+        variables: { passwordHash },
     });
     const { data: monthData, refetch: monthRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument, {
         variables: {
@@ -56,15 +55,54 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
             year
         }
     });
+    const [createBudget] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
+        variables: { passwordHash, month, year },
+    });
+    const [createBudgetCategory] = useMutation<CreateBudgetCategoryMutation, CreateBudgetCategoryMutationVariables>(CreateBudgetCategoryDocument);
+    const [copyBudget] = useMutation<CopyBudgetMutation, CopyBudgetMutationVariables>(CopyBudgetDocument);
 
     useRefresh(() => {
-        budgetRefetch()
-        monthRefetch()
+        budgetRefetch();
+        monthRefetch();
     }, [passwordHash]);
 
-    const selectedBudget = budgetData?.budgets.__typename == 'BudgetsSuccess' ? budgetData.budgets.budgets.find(bud => (bud.month == month && bud.year == year)) : undefined;
-    const plannedAmount = selectedBudget === undefined ? 0 :
-        selectedBudget.budgetCategories?.reduce((previousValue, currentValue) => previousValue + currentValue.amount, 0);
+    const selectedBudget = useMemo(() => {
+        if (budgetData?.budgets.__typename == 'BudgetsSuccess') {
+            return budgetData.budgets.budgets.find(bud => (bud.month == month && bud.year == year));
+        }
+    }, [month, year, budgetData]);
+
+    const previousBudget = useMemo(() => {
+        if (budgetData?.budgets.__typename === 'BudgetsSuccess') {
+            const sorted = budgetData.budgets.budgets.slice().sort((a, b) => {
+                if (a.year > b.year) {
+                    return 1;
+                } else if (a.year < b.year) {
+                    return -1;
+                } else {
+                    if (MONTHS_ORDER.indexOf(a.month) > MONTHS_ORDER.indexOf(b.month)) {
+                        return 1;
+                    } else if (MONTHS_ORDER.indexOf(a.month) < MONTHS_ORDER.indexOf(b.month)) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }).filter((budget) => budget.budgetCategories && budget.budgetCategories.length > 0);
+
+            for (let i = sorted.length - 1; i >= 0; i--) {
+                if (sorted[i].year < year || (sorted[i].year === year && MONTHS_ORDER.indexOf(sorted[i].month) < MONTHS_ORDER.indexOf(month))) {
+                    return sorted[i];
+                }
+            }
+        }
+    }, [month, year, budgetData]);
+
+    const plannedAmount = useMemo(() => {
+        if (selectedBudget !== undefined) {
+            return selectedBudget.budgetCategories?.reduce((previousValue, currentValue) => previousValue + currentValue.amount, 0);
+        }
+    }, [month, year, budgetData]);
 
     const months = MONTHS_ORDER;
 
@@ -92,49 +130,95 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
         navigation.setOptions({
             headerTitle: `${month} ${year}`,
             headerBackVisible: false,
-            headerLeft: (_) => <HeaderButton direction="left" marginLeft={10} onPress={backAMonth} />,
-            headerRight: (_) => <HeaderButton direction="right" marginRight={10} onPress={forwardAMonth} />,
+            headerLeft: () => <HeaderButton direction="left" marginLeft={10} onPress={backAMonth} />,
+            headerRight: () => <HeaderButton direction="right" marginRight={10} onPress={forwardAMonth} />,
         });
     }, [month]);
+
+    function handleAddBudget() {
+        if (selectedBudget) {
+            navigation.navigate("CreateBudget", { budget: selectedBudget as Budget });
+        } else {
+            createBudget({
+                onError: (error => {
+                    alert(error.message);
+                }),
+                onCompleted: ((response) => {
+                    if (response.createBudget.__typename == "BudgetSuccess") {
+                        navigation.navigate('CreateBudget', { budget: response.createBudget.budget as Budget })
+                    }
+                })
+            });
+        }
+    }
+
+    function handleUsePreviousBudget() {
+        if (!previousBudget) return;
+        if (selectedBudget) {
+            previousBudget?.budgetCategories?.forEach((budgetCategory) => {
+                createBudgetCategory({
+                    variables: {
+                        passwordHash,
+                        amount: budgetCategory.amount,
+                        budgetId: selectedBudget.id,
+                        categoryId: budgetCategory.category.id,
+                    },
+                    onCompleted: () => {
+                        budgetRefetch();
+                    }
+                });
+            });
+        } else {
+            copyBudget({
+                variables: {
+                    passwordHash,
+                    month: month as MonthType,
+                    year,
+                    id: previousBudget.id,
+                },
+                onCompleted: () => {
+                    budgetRefetch();
+                }
+            });
+        }
+    }
 
     return (
         <Screen>
             <ChartDisplay
-                planned={plannedAmount ? plannedAmount : 0}
+                planned={plannedAmount || 0}
                 actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0} />
-            {(selectedBudget &&
-                <>
-                    <View style={{ alignSelf: 'center', marginBottom: 10, }}>
-                        <Button
-                            text="Add Budget"
-                            accessibilityLabel="Create new budget"
-                            onPress={() => navigation.navigate("CreateBudget", { budget: selectedBudget as Budget })}
-                        />
+            {
+                (selectedBudget && selectedBudget.budgetCategories && selectedBudget.budgetCategories.length > 0 &&
+                    <>
+                        <View style={{ alignSelf: 'center', marginBottom: 10, }}>
+                            <Button text="Add Budget" onPress={handleAddBudget} />
+                        </View>
+                        <View style={styles.itemSeparator}></View>
+                        <ScrollView>
+                            <TouchableHighlight>
+                                <BudgetList
+                                    data={selectedBudget.budgetCategories as BudgetCategory[]}
+                                    monthlyData={monthData}
+                                    updateCallback={(budCat: BudgetCategory) => {
+                                        navigation.navigate("EditBudget", { budgetCategory: budCat })
+                                    }} />
+                            </TouchableHighlight>
+                        </ScrollView>
+                    </>)
+                || (
+                    <View style={{ alignItems: 'center', flex: 1, paddingTop: 70, }}>
+                        <Button text="Add Budget" onPress={handleAddBudget} />
+                        {
+                            previousBudget &&
+                            <Button text="Use Previous Budget" onPress={handleUsePreviousBudget} />
+                        }
                     </View>
-                    <View style={styles.itemSeparator}></View>
-                    <ScrollView>
-                        <TouchableHighlight>
-                            <BudgetList
-                                data={selectedBudget.budgetCategories as BudgetCategory[]}
-                                monthlyData={monthData}
-                                updateCallback={(budCat: BudgetCategory) => {
-                                    navigation.navigate("EditBudget", { budgetCategory: budCat })
-                                }} />
-                        </TouchableHighlight>
-                    </ScrollView>
-                </>)
-                || <MissingBudget
-                    otherBudgets={budgetData}
-                    passwordHash={passwordHash}
-                    triggerRefetch={() => { budgetRefetch(); monthRefetch(); }}
-                    year={year}
-                    month={month} />
-
+                )
             }
         </Screen>
     );
 }
-
 
 const styles = StyleSheet.create({
     itemSeparator: {
