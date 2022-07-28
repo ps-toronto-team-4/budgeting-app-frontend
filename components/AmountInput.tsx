@@ -1,5 +1,5 @@
 import { TextInput, TextInputProps, StyleSheet, TouchableHighlight, Text, NativeSyntheticEvent, TextInputSelectionChangeEventData } from 'react-native';
-import { useEffect, useRef } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { View } from './Themed';
 import {
@@ -38,13 +38,10 @@ export function AmountInput({ onChangeAmount, defaultAmount, onSelect, error }: 
         newValue = newValue.replace(/(\d*\.\d*)(\.)(\d*)/, '$1$3');
         // Only two digits after the decimal point.
         newValue = newValue.replace(/(\d*\.)(\d{2})(\d*)/, '$1$2');
-        setValue(newValue);
-    }
 
-    function handleBlur() {
-        const amount = valueToAmount(value) || 0;
+        const amount = valueToAmount(newValue) || 0;
         onChangeAmount(amount);
-        setValue(amount.toFixed(2));
+        setValue(newValue);
     }
 
     function handleFocus() {
@@ -66,7 +63,7 @@ export function AmountInput({ onChangeAmount, defaultAmount, onSelect, error }: 
                         value={value}
                         onChangeText={handleChangeText}
                         maxLength={maxLength}
-                        onBlur={handleBlur}
+                        onBlur={() => setValue((valueToAmount(value) || 0).toFixed(2))}
                         onFocus={handleFocus}
                         selectTextOnFocus />
                 </>

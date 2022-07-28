@@ -45,6 +45,10 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
         });
     }, []);
 
+    function handleSubmit() {
+        updateBudget();
+    }
+
     return (
         <Screen>
             <AmountInput defaultAmount={amount} onChangeAmount={setAmount} />
@@ -54,7 +58,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
                 <Button
                     text="Save Budget"
                     accessibilityLabel="Button to Save Budget"
-                    onPress={() => updateBudget()} />
+                    onPress={handleSubmit} />
             </View>
         </Screen>
     );
