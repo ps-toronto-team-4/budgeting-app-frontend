@@ -17,7 +17,7 @@ import { useRefresh } from "../hooks/useRefresh";
 
 const EditButton = (onPress: () => void) => (
     <TouchableOpacity style={{ paddingRight: 30 }} onPress={onPress}>
-        <Feather name="edit-2" size={20} color="black" />
+        <Feather name="edit-2" size={20} color="orange" />
     </TouchableOpacity>
 );
 
