@@ -21,6 +21,15 @@ const EditButton = (onPress: () => void) => (
     </TouchableOpacity>
 );
 
+export function formatDate(date: string | null | undefined): string {
+    if (!date) {
+        return 'undefined';
+    }
+    const [year, month, dayOfMonth] = date.split(' ')[0].split('-');
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return `${months[parseInt(month) - 1]} ${dayOfMonth}, ${year}`;
+}
+
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
     const passwordHash = useAuth();
     const { expenseId, ...otherParams } = route.params;
@@ -53,18 +62,6 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
             return '0.00';
         }
         return Number(amount).toFixed(2);
-    }
-
-    function formatDate(date: string | null | undefined): string {
-        if (!date) {
-            return 'undefined';
-        }
-        const momentDate = moment(date);
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const day = momentDate.date().toString(); // eg: 31
-        // Surely there is an easier way to do this. Not worth importing a new npm package though b/c that's unnecessary package bloat.
-        const dayWithPostfix = day.endsWith('1') ? day + 'st' : (day.endsWith('2') ? day + 'nd' : (day.endsWith('3') ? day + 'rd' : day + 'th'));
-        return `${months[momentDate.month() - 1]} ${dayWithPostfix}, ${momentDate.year()}`;
     }
 
     const expenseTypename = data?.expense.__typename;
