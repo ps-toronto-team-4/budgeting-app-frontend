@@ -204,7 +204,7 @@ const monthlyExpenses = ({ displayAmount, jumpAmount, data }: MonthlyExpenses) =
             data={inputData.length <= displayAmountNumber ? inputData :
                 inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
 
-        <View style={{ flex: 1, flexDirection: 'row', maxHeight: 50 }}>
+        <View style={{ flexDirection: 'row', maxHeight: 50 }}>
             <View style={{ flexBasis: 50 }}>
                 <HeaderButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
