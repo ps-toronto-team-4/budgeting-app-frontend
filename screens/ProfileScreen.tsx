@@ -14,7 +14,7 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
     const passwordHash = useAuth();
 
     const logout = () => {
-        AsyncStorage.removeItem('passwordHash').then(() => {
+        AsyncStorage.multiRemove(['passwordHash', 'New Category']).then(() => {
             navigation.navigate('Welcome');
         });
     };

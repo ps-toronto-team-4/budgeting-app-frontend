@@ -11,21 +11,36 @@ import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 import { InputRow } from "../../components/InputRow";
 import { Screen } from "../../components/Screen";
 import { useRefresh } from "../../hooks/useRefresh";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
     
     const passwordHash = useAuth();
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
-    const [categoryId, setCategoryId] = React.useState<number | undefined>();
+    const [category, setCategory] = React.useState<{id: number, name: string} | undefined>();
     const [check, setCheck] = React.useState(false);
     const [disabledButton, setDisabledButton] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
 
     useUnauthRedirect();
 
+    const preFillCategory = () => {
+        AsyncStorage.getItem('New Category')
+        .then((val) => {
+            if(val) {
+                setCategory(JSON.parse(val));
+            }
+        })
+        .catch((err) => {
+            console.log("Couldn't retrieve new category: " + err)
+        })
+    }
+
+    useRefresh(preFillCategory);
+
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
-        variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: categoryId },
+        variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: category?.id },
         onError: (error => {
             Alert.alert(error.message);
         }),
@@ -74,7 +89,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             const foundCategory = categoryData.categories.categories.find(x => x.name == categoryName);
 
             if (foundCategory !== undefined) {
-                setCategoryId(foundCategory.id);
+                setCategory(foundCategory);
             }
         }
     }
@@ -102,15 +117,18 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     topBorder
                     bottomBorder />
                 <DropdownRow
-                    label="Category"
+                    label="Default Category"
                     data={
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
                             categoryData.categories.categories.map(x => { return { id: x.id, name: x.name} }) : []
                     }
                     onSelect={handleCategorySelect}
                     expanded={categoryOpen}
-                    onExpand={() => { setCategoryOpen(true); }}
+                    onExpand={() => setCategoryOpen(true) }
                     onCollapse={() => setCategoryOpen(false)}
+                    onCreateNew={() => navigation.navigate("CreateCategory")}
+                    createLabel="Category"
+                    defaultValue={category?.name}
                     bottomBorder />
                 <View style={styles.buttonContainer}>
                     <Button text="Save Merchant"

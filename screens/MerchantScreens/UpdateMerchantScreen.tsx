@@ -13,6 +13,8 @@ import modalStyle from "../../constants/Modal";
 import Styles from "../../constants/Styles";
 import { Screen } from "../../components/Screen";
 import { InputRow } from "../../components/InputRow";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 
 export default function UpdateMerchantScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
     
@@ -20,11 +22,29 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     const {id, name, description, category} = route.params
     const [newName, setNewName] = useState(name)
     const [newDescription, setNewDescription] = useState(description)
-    const [newCategory, setNewCategory] = useState<number | undefined>()
+    const [newCategory, setNewCategory] = useState<{id: number, name: string} | undefined>(category)
     const [check, setCheck] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
     const [categoryOpen, setCategoryOpen] = useState(false);
+    const [preFill, setPreFill] = useState(false)
 
+    useUnauthRedirect();
+
+    const preFillCategory = () => {
+        if (!newCategory && preFill) {
+            AsyncStorage.getItem('New Category')
+            .then((val) => {
+                if(val) {
+                    setNewCategory(JSON.parse(val));
+                }
+            })
+            .catch((err) => {
+                console.log("Couldn't retrieve new category: " + err)
+            })
+    }}
+
+    useRefresh(preFillCategory, [preFill]);
+    
     const { data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash }
     });
@@ -40,7 +60,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     })
 
     const [updateMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<UpdateMerchantMutation>(UpdateMerchantDocument, {
-        variables: { passwordHash: passwordHash, id, name: newName, description: newDescription, defaultCategoryId: newCategory },
+        variables: { passwordHash: passwordHash, id, name: newName, description: newDescription, defaultCategoryId: newCategory?.id },
         onError: (error => {
             Alert.alert(error.message);
         }),
@@ -102,7 +122,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
             const foundCategory = categoryData.categories.categories.find(x => x.name === categoryName);
 
             if (foundCategory !== undefined) {
-                setNewCategory(foundCategory.id);
+                setNewCategory(foundCategory);
             } else {
                 Alert.alert("Category hasn't been created yet.")
             }
@@ -133,7 +153,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                     bottomBorder />
                 <View>
                     <DropdownRow
-                        label="Categories"
+                        label="Default Category"
                         data={
                             categoryData?.categories.__typename === "CategoriesSuccess" ?
                                 categoryData.categories.categories : []
@@ -142,8 +162,9 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                         expanded={categoryOpen}
                         onExpand={() => setCategoryOpen(true)}
                         onCollapse={() => setCategoryOpen(false)}
-                        defaultValue={category?.name}
-                        onCreateNew={() => navigation.navigate("CreateCategory")}
+                        defaultValue={newCategory?.name}
+                        onCreateNew={() => {navigation.navigate("CreateCategory"); setPreFill(true)}}
+                        createLabel="Category"
                     />
                 </View>
                 <View style={styles.buttonContainer}>

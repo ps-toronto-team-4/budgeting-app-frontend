@@ -23,6 +23,7 @@ export type DropdownRowProps = {
     onCollapse?: () => void;
     defaultValue?: string;
     onCreateNew?: () => void;
+    createLabel?: string;
     visible?: boolean;
     topBorder?: boolean;
     bottomBorder?: boolean;
@@ -37,6 +38,7 @@ export function DropdownRow({
     onCollapse,
     defaultValue,
     onCreateNew,
+    createLabel,
     visible,
     topBorder,
     bottomBorder,
@@ -46,6 +48,10 @@ export function DropdownRow({
     // this state is only used when expanded prop is undefined
     const [expandedState, setExpandedState] = useState(false);
     const expanded = expandedProp === undefined ? expandedState : expandedProp
+
+    useEffect(() => {
+        setValue(defaultValue || '')
+    }, [defaultValue])
 
     useEffect(() => {
         if (expanded) {
@@ -99,13 +105,13 @@ export function DropdownRow({
                 topBorder={topBorder}
                 bottomBorder={bottomBorder}
                 onPress={() => handleRowPress()}
-                >
+            >
                 <View style={styles.fieldLabelAndInputContainer}>
                     <Text style={styles.fieldLabel}>{label}:</Text>
                     <TextInput
                         style={styles.fieldInput}
                         editable={expanded}
-                        placeholder={"Select " + label}
+                        placeholder={expanded? ("Start typing to search") : ("Select " + label)}
                         ref={inputRef}
                         value={value}
                         onChangeText={setValue}>
@@ -132,12 +138,12 @@ export function DropdownRow({
                         ListFooterComponent={
                             onCreateNew &&
                                 <DropdownItem
-                                    name={'Create new ' + label.toLowerCase()}
+                                    name={'Create new ' + createLabel}
                                     onSelect={(_) => onCreateNew()} />
-                        }>
-                    </FlatList>
-                    :
-                    <View></View>
+                        }
+                    />
+                :
+                <></>
             }
         </View>
     );
