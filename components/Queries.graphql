@@ -116,6 +116,7 @@ mutation deleteCategory($passwordHash: String!, $id: Int!) {
 
 query getExpenses ($passwordHash: String!) {
     expenses(passwordHash: $passwordHash) {
+        __typename
         ... on ExpensesSuccess {
             expenses {
                 amount
