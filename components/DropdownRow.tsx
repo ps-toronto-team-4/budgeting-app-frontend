@@ -118,8 +118,8 @@ export function DropdownRow({
                                 placeholder={"Select " + label}
                                 ref={inputRef}
                                 value={value}
-                                onChangeText={setValue}>
-                            </TextInput>
+                                onChangeText={setValue}
+                                placeholderTextColor="black" />
                         </View>
                         <AntDesign
                             name={expanded ? 'up' : 'down'}
@@ -176,7 +176,8 @@ const styles = StyleSheet.create({
     },
     fieldInput: {
         fontSize: 15,
-        width: 180
+        width: 180,
+        color: 'black',
     },
     scrollView: {
         height: 150,
