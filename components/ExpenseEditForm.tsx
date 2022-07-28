@@ -64,9 +64,14 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     }, [passwordHash]);
 
     function selectMerchant(name: string) {
-        if (merchantData?.merchants.__typename === 'MerchantsSuccess') {
-            const found = merchantData?.merchants.merchants.find(merchant => merchant.name === name);
-            if (found !== undefined) setMerchantId(found?.id);
+        if (merchantData && merchantData.merchants.__typename === 'MerchantsSuccess') {
+            const found = merchantData.merchants.merchants.find(merchant => merchant.name === name);
+            if (found !== undefined) {
+                setMerchantId(found?.id);
+                if (found.defaultCategory) {
+                    setCategoryId(found.defaultCategory.id);
+                }
+            }
         }
     }
 
@@ -131,7 +136,8 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                         onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
                         onCollapse={() => setCategoryExpanded(false)}
                         visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded}
-                        topBorder />
+                        topBorder
+                        value={categoryData.categories.categories.find((cat) => cat.id === categoryId)?.name} />
                 }
             </>
             <>

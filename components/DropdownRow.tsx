@@ -27,6 +27,7 @@ export type DropdownRowProps = {
     topBorder?: boolean;
     bottomBorder?: boolean;
     error?: string;
+    value?: string;
 };
 
 export function DropdownRow({
@@ -42,6 +43,7 @@ export function DropdownRow({
     topBorder,
     bottomBorder,
     error,
+    value: valueProp,
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
@@ -61,8 +63,11 @@ export function DropdownRow({
     }, [expanded]);
 
     useEffect(() => {
-        console.log(defaultValue)
-    }, []);
+        if (valueProp !== undefined) {
+            setCachedValue(valueProp);
+            setValue(valueProp);
+        }
+    }, [valueProp]);
 
     const collapse = () => {
         if (expanded) {
