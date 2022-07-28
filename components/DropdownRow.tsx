@@ -45,20 +45,17 @@ export function DropdownRow({
 }: DropdownRowProps) {
     const inputRef = useRef<TextInput | null>(null);
     const [value, setValue] = useState(defaultValue || '');
-    const [cachedValue, setCachedValue] = useState('');
+    const [cachedValue, setCachedValue] = useState(defaultValue || '');
     // this state is only used when expanded prop is undefined
     const [expandedState, setExpandedState] = useState(false);
     const expanded = expandedProp === undefined ? expandedState : expandedProp
 
     useEffect(() => {
         if (expanded) {
-            setCachedValue(value);
             setValue('');
             inputRef.current?.focus();
         } else {
-            if (value === '') {
-                setValue(cachedValue);
-            }
+            setValue(cachedValue);
             inputRef.current?.blur();
         }
     }, [expanded]);
@@ -93,6 +90,7 @@ export function DropdownRow({
     };
 
     function handleSelect(name: string) {
+        setCachedValue(name);
         setValue(name);
         collapse();
         onSelect(name);
