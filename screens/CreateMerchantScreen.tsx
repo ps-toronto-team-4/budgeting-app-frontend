@@ -116,8 +116,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     placeholder="Enter details"
                     value={details}
                     onChangeText={setDetails}
-                    topBorder
-                    bottomBorder />
+                    topBorder />
                 <DropdownRow
                     label="Category"
                     data={
@@ -128,7 +127,8 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     expanded={categoryOpen}
                     onExpand={() => { setCategoryOpen(true); }}
                     onCollapse={() => setCategoryOpen(false)}
-                    bottomBorder />
+                    topBorder
+                    bottomBorder={!categoryOpen} />
                 <View style={styles.buttonContainer}>
                     <Button text="Save Merchant"
                         accessibilityLabel="Save Merchant"
