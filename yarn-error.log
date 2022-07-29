@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\yarn\bin\yarn.js add -D @expo/webpack-config
+  C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\yarn\bin\yarn.js add -D @expo/webpack-config babel-loader
 
 PATH: 
   C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\CheckPoint\Endpoint Security\Endpoint Common\bin;C:\Program Files\Git\cmd;C:\Program Files\Microsoft VS Code\bin;C:\Users\nasmoham\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files\Java\jdk1.8.0_202\bin;;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Users\nasmoham\AppData\Local\Microsoft\WindowsApps;C:\Users\nasmoham\AppData\Local\GitHubDesktop\bin;C:\Program Files\JetBrains\IntelliJ IDEA 2022.1.2\bin;;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2022.1.2\bin;;C:\Users\nasmoham\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files\Java\jdk1.8.0_202\bin;
@@ -24,6 +24,7 @@ Trace:
       at TLSSocket.Socket._onTimeout (node:net:516:8)
       at listOnTimeout (node:internal/timers:559:17)
       at processTimers (node:internal/timers:502:7)
+  Error: EPERM: operation not permitted, unlink 'C:\Users\nasmoham\Documents\GitHub\Budgeting-App\budgeting-app-frontend\node_modules\xdl\binaries\windows\adb\AdbWinUsbApi.dll'
 
 npm manifest: 
   {
@@ -52,6 +53,7 @@ npm manifest:
       "@expo-google-fonts/b612-mono": "^0.2.2",
       "@expo/ngrok": "^4.1.0",
       "@expo/vector-icons": "^13.0.0",
+      "@expo/webpack-config": "^0.16.27",
       "@graphql-codegen/cli": "^2.7.0",
       "@react-native-async-storage/async-storage": "^1.17.7",
       "@react-navigation/bottom-tabs": "^6.0.5",
@@ -84,6 +86,12 @@ npm manifest:
       "react-native-web": "0.17.7",
       "victory-native": "^36.5.3",
       "webpack-config": "^7.5.0"
+      "react-native-gesture-handler": "~2.2.1",
+      "react-native-safe-area-context": "4.2.4",
+      "react-native-screens": "~3.11.1",
+      "react-native-svg": "^12.4.0",
+      "react-native-web": "0.17.7",
+      "victory-native": "^36.5.3"
     },
     "devDependencies": {
       "@babel/core": "^7.12.9",

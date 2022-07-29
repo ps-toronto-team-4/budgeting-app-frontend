@@ -16,10 +16,19 @@ import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 
 const EditButton = (onPress: () => void) => (
-    <TouchableOpacity style={{ paddingRight: 40 }} onPress={onPress}>
-        <Feather name="edit-2" size={15} color="black" />
+    <TouchableOpacity style={{ paddingRight: 30 }} onPress={onPress}>
+        <Feather name="edit-2" size={20} color="orange" />
     </TouchableOpacity>
 );
+
+export function formatDate(date: string | null | undefined): string {
+    if (!date) {
+        return 'undefined';
+    }
+    const [year, month, dayOfMonth] = date.split(' ')[0].split('-');
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return `${months[parseInt(month) - 1]} ${dayOfMonth}, ${year}`;
+}
 
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
     const passwordHash = useAuth();
@@ -55,18 +64,6 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
         return Number(amount).toFixed(2);
     }
 
-    function formatDate(date: string | null | undefined): string {
-        if (!date) {
-            return 'undefined';
-        }
-        const momentDate = moment(date);
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const day = momentDate.date().toString(); // eg: 31
-        // Surely there is an easier way to do this. Not worth importing a new npm package though b/c that's unnecessary package bloat.
-        const dayWithPostfix = day.endsWith('1') ? day + 'st' : (day.endsWith('2') ? day + 'nd' : (day.endsWith('3') ? day + 'rd' : day + 'th'));
-        return `${months[momentDate.month() - 1]} ${dayWithPostfix}, ${momentDate.year()}`;
-    }
-
     const expenseTypename = data?.expense.__typename;
 
     return (
@@ -90,11 +87,11 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                         <View style={styles.separator}></View>
                         <View style={styles.merchantContainer}>
                             <Text style={styles.merchantLabel}>Merchant:</Text>
-                            <Text style={styles.merchant}>{data?.expense.expense.merchant?.name ? data.expense.expense.merchant.name : 'undefined'}</Text>
+                            <Text style={styles.merchant}>{data?.expense.expense.merchant?.name ? data.expense.expense.merchant.name : 'None'}</Text>
                         </View>
                         <View style={styles.descContainer}>
-                            <Text style={styles.descLabel}>Details</Text>
-                            <Text>{data?.expense.expense.description ? data.expense.expense.description : 'undefined'}</Text>
+                            <Text style={styles.descLabel}>Details:</Text>
+                            <Text>{data?.expense.expense.description ? data.expense.expense.description : 'None'}</Text>
                         </View>
                         <View style={styles.separator}></View>
                     </View>
