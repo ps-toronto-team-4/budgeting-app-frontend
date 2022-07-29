@@ -101,7 +101,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                     <DropdownRow
                         label="Merchant"
                         data={
-                            merchantData.merchants.merchants.map(x => { return { id: x.id.toString(), name: x.name } })
+                            merchantData.merchants.merchants.map(x => { return { id: x.id, name: x.name } })
                         }
                         onSelect={selectMerchant}
                         defaultValue={
@@ -110,6 +110,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                                 : undefined
                         }
                         onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
+                        placeholder={merchantExpanded ? "Start typing to search" : "Select Merchant"}
                         expanded={merchantExpanded}
                         onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
                         onCollapse={() => setMerchantExpanded(false)}
@@ -123,7 +124,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                     <DropdownRow
                         label="Category"
                         data={
-                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), name: x.name } })
+                            categoryData.categories.categories.map(x => { return { id: x.id, name: x.name } })
                         }
                         onSelect={selectCategory}
                         defaultValue={
@@ -131,7 +132,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                                 categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
                                 : undefined
                         }
-                        placeholder="Uncategorized"
+                        placeholder={categoryExpanded ? "Start typing to search" : "Uncategorized"}
                         onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
                         expanded={categoryExpanded}
                         onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}

@@ -57,10 +57,6 @@ export function DropdownRow({
     const expanded = expandedProp === undefined ? expandedState : expandedProp
 
     useEffect(() => {
-        setValue(defaultValue || '')
-    }, [defaultValue])
-
-    useEffect(() => {
         if (expanded) {
             setValue('');
             inputRef.current?.focus();
@@ -123,7 +119,7 @@ export function DropdownRow({
                             <TextInput
                                 style={styles.fieldInput}
                                 editable={expanded}
-                                placeholder={placeholder || expanded ? "Start typing to search" : "Select " + label}
+                                placeholder={placeholder || "Select " + label}
                                 ref={inputRef}
                                 value={value}
                                 onChangeText={setValue}
@@ -181,7 +177,6 @@ const styles = StyleSheet.create({
     fieldLabel: {
         fontWeight: 'bold',
         fontSize: 15,
-        paddingLeft: 5
     },
     fieldInput: {
         fontSize: 15,

@@ -17,12 +17,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 
 export default function UpdateMerchantScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
-    
+
     const passwordHash = useAuth();
-    const {id, name, description, category} = route.params
+    const { id, name, description, category } = route.params
     const [newName, setNewName] = useState(name)
     const [newDescription, setNewDescription] = useState(description)
-    const [newCategory, setNewCategory] = useState<{id: number, name: string} | undefined>(category)
+    const [newCategory, setNewCategory] = useState<{ id: number, name: string } | undefined>(category)
     const [check, setCheck] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
     const [categoryOpen, setCategoryOpen] = useState(false);
@@ -33,18 +33,19 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     const preFillCategory = () => {
         if (!newCategory && preFill) {
             AsyncStorage.getItem('New Category')
-            .then((val) => {
-                if(val) {
-                    setNewCategory(JSON.parse(val));
-                }
-            })
-            .catch((err) => {
-                console.log("Couldn't retrieve new category: " + err)
-            })
-    }}
+                .then((val) => {
+                    if (val) {
+                        setNewCategory(JSON.parse(val));
+                    }
+                })
+                .catch((err) => {
+                    console.log("Couldn't retrieve new category: " + err)
+                })
+        }
+    }
 
     useRefresh(preFillCategory, [preFill]);
-    
+
     const { data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
         variables: { passwordHash: passwordHash }
     });
@@ -71,7 +72,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
         }
     })
 
-    const {data: categoryData, refetch} = useQuery<GetCategoriesQuery>(GetCategoriesDocument,
+    const { data: categoryData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument,
         {
             variables: { passwordHash: passwordHash },
             onError: (error => {
@@ -79,12 +80,12 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
             })
         }
     )
-    
+
     useRefresh(refetch, [passwordHash]);
-    
+
     const DeleteButton = () => {
         return (
-            <TouchableOpacity onPress={() => {setConfirmDelete(true)}} style={styles.deleteButton}>
+            <TouchableOpacity onPress={() => { setConfirmDelete(true) }} style={styles.deleteButton}>
                 <AntDesign name="delete" size={24} color={(confirmDelete ? 'grey' : 'red')} />
             </TouchableOpacity>
         );
@@ -105,7 +106,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
 
     useEffect(() => {
         navigation.setOptions({
-            headerRight: (_) => <DeleteButton/>
+            headerRight: (_) => <DeleteButton />
         });
     }, [confirmDelete]);
 
@@ -160,10 +161,11 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                         }
                         onSelect={handleCategorySelect}
                         expanded={categoryOpen}
+                        placeholder={categoryOpen ? "Start typing to search" : "Select Category"}
                         onExpand={() => setCategoryOpen(true)}
                         onCollapse={() => setCategoryOpen(false)}
                         defaultValue={newCategory?.name}
-                        onCreateNew={() => {navigation.navigate("CreateCategory"); setPreFill(true)}}
+                        onCreateNew={() => { navigation.navigate("CreateCategory"); setPreFill(true) }}
                         createLabel="Category"
                     />
                 </View>
@@ -179,16 +181,16 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                     <ActivityIndicator size='large' />
                 )}
                 <Modal
-                transparent={true}
-                visible={confirmDelete}
-                onRequestClose={() => setConfirmDelete(false)}
+                    transparent={true}
+                    visible={confirmDelete}
+                    onRequestClose={() => setConfirmDelete(false)}
                 >
                     <View style={modalStyle.container}>
                         <Text style={modalStyle.title}>Delete Merchant?</Text>
                         <Text style={modalStyle.text}>Are you sure you want to delete this merchant?</Text>
                         <View style={modalStyle.buttonView}>
-                        <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button'/>
-                        <Button text="Delete" onPress={() => {deleteMerchant()}} size='half' backgroundColor='red' accessibilityLabel='Delete Category button'/>
+                            <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button' />
+                            <Button text="Delete" onPress={() => { deleteMerchant() }} size='half' backgroundColor='red' accessibilityLabel='Delete Category button' />
                         </View>
                     </View>
                 </Modal>

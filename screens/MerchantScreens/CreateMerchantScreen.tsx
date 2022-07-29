@@ -126,6 +126,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     onExpand={() => setCategoryOpen(true)}
                     onCollapse={() => setCategoryOpen(false)}
                     topBorder
+                    placeholder={categoryOpen ? "Start typing to search" : "Select Category"}
                     bottomBorder={!categoryOpen}
                     onCreateNew={() => navigation.navigate("CreateCategory")}
                     createLabel="Category"
