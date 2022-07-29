@@ -74,7 +74,7 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                     }
                 },
                 callback: () => {
-                    if (mutations !== []) {
+                    if (mutations.length !== 0) {
                         setMutations([])
                     }
                 }
@@ -90,7 +90,7 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                     }
                 },
                 callback: () => {
-                    if (mutations !== []) {
+                    if (mutations.length !== 0) {
                         setMutations([])
                     }
                 }
