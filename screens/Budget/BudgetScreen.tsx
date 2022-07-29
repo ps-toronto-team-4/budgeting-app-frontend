@@ -5,7 +5,7 @@ import { TouchableHighlight } from "react-native"
 import { AntDesign } from "@expo/vector-icons";
 
 import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, Text } from 'react-native';
 import { RootTabScreenProps } from "../../types";
 import { ChartDisplay } from "../../components/budget/ChartDisplay";
 import { BudgetList } from "../../components/budget/BudgetList";
@@ -15,6 +15,7 @@ import { MONTHS_ORDER } from "../../constants/Months"
 import { Screen } from "../../components/Screen";
 import Button from "../../components/Button";
 import moment from "moment";
+import { Feather } from '@expo/vector-icons';
 
 interface HeaderButtonProps {
     direction: 'left' | 'right';
@@ -211,10 +212,19 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                 planned={plannedAmount || 0}
                 actualBudgeted={actualAmount?.budgeted || 0}
                 actualUnbudgeted={actualAmount?.unbudgeted || 0} />
+            <>
+                {
+                    actualAmount && actualAmount.unbudgeted > 0 &&
+                    <View style={styles.warningContainer}>
+                        <Feather name="info" size={21} color="red" style={styles.warningIcon} />
+                        <Text style={styles.warningText}>${actualAmount?.unbudgeted.toFixed(2)} of expenses are unplanned.</Text>
+                    </View>
+                }
+            </>
             {
                 (selectedBudget && selectedBudget.budgetCategories && selectedBudget.budgetCategories.length > 0 &&
                     <>
-                        <View style={{ alignSelf: 'center', marginBottom: 10, }}>
+                        <View style={{ alignSelf: 'center', marginBottom: 20, }}>
                             <Button text="Add Budget" onPress={handleAddBudget} />
                         </View>
                         <View style={styles.itemSeparator}></View>
@@ -247,5 +257,20 @@ const styles = StyleSheet.create({
     itemSeparator: {
         height: 1,
         backgroundColor: 'rgba(0,0,0,0.2)',
+    },
+    warningContainer: {
+        alignItems: 'center',
+        paddingTop: 8,
+        paddingBottom: 10,
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    warningIcon: {
+        marginRight: 8,
+    },
+    warningText: {
+        color: 'red',
+        fontSize: 18,
+        fontWeight: '700',
     },
 });
