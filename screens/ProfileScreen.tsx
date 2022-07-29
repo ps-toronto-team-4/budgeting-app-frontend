@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { View, Text, TouchableHighlight, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableHighlight, SafeAreaView, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import Button from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
@@ -34,7 +34,9 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <Text style={styles.logoutBtn}>Log Out</Text>
+                <TouchableOpacity onPress={logout}>
+                    <Text style={styles.logoutBtn}>Log Out</Text>
+                </TouchableOpacity>
             )
         });
     }, []);
