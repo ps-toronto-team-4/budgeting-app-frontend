@@ -1,4 +1,4 @@
-query getPasswordHash($username: String!, $password: String!) {
+query login($username: String!, $password: String!) {
     signIn(username: $username , password: $password) {
         __typename
         ...on SignInSuccess {
