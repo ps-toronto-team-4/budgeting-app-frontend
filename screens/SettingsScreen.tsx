@@ -18,7 +18,7 @@ function formatPhoneNumber(phoneNumber: string): string {
     return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`;
 }
 
-export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profile'>) {
+export default function SettingsScreen({ navigation }: RootTabScreenProps<'Settings'>) {
     const passwordHash = useAuth();
     const { data, refetch } = useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {
         variables: { passwordHash }
