@@ -36,7 +36,7 @@ export function ChartDisplay({ planned, actualBudgeted, actualUnbudgeted, height
                         categories={{ x: ['Planned', 'Actual'] }}
                         data={[
                             { x: 'Planned', y: 0 },
-                            { x: 'Actual', y: actualUnbudgeted, label: `${(actualBudgeted + actualUnbudgeted).toFixed(2)}` }
+                            { x: 'Actual', y: actualUnbudgeted, label: `$${(actualBudgeted + actualUnbudgeted).toFixed(2)}` }
                         ]}
                         width={200}
                         barWidth={50} />
