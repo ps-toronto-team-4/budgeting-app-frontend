@@ -104,6 +104,28 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
         }
     }, [month, year, budgetData]);
 
+    const actualAmount = useMemo(() => {
+        if (selectedBudget !== undefined && monthData?.monthBreakdown.__typename === 'MonthBreakdown') {
+            const calculated = { budgeted: 0, unbudgeted: 0 };
+            monthData.monthBreakdown.byCategory.filter((monthBreakdownCat) => {
+                if (monthBreakdownCat.category && selectedBudget.budgetCategories) {
+                    return !!selectedBudget.budgetCategories?.find((cat) => {
+                        return cat.category.name === monthBreakdownCat.category?.name;
+                    });
+                } else {
+                    return false;
+                }
+            }).forEach((applicableMonthBreakdownCat) => {
+                calculated.budgeted += applicableMonthBreakdownCat.amountSpent;
+            });
+            monthData.monthBreakdown.byCategory.forEach((monthBreakdownCat) => {
+                calculated.unbudgeted += monthBreakdownCat.amountSpent;
+            });
+            calculated.unbudgeted = calculated.unbudgeted - calculated.budgeted;
+            return calculated
+        }
+    }, [month, year, monthData, selectedBudget]);
+
     const months = MONTHS_ORDER;
 
     const backAMonth = () => {
@@ -187,7 +209,8 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
         <Screen>
             <ChartDisplay
                 planned={plannedAmount || 0}
-                actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0} />
+                actualBudgeted={actualAmount?.budgeted || 0}
+                actualUnbudgeted={actualAmount?.unbudgeted || 0} />
             {
                 (selectedBudget && selectedBudget.budgetCategories && selectedBudget.budgetCategories.length > 0 &&
                     <>
