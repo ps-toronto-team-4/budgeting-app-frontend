@@ -21,7 +21,7 @@ const linking: LinkingOptions<RootStackParamList> = {
                     Expenses: 'expenses-list',
                     Reports: 'reports',
                     Budget: 'budget',
-                    Profile: 'profile',
+                    Settings: 'Settings',
                 }
             },
             CreateCategory: 'create-category',
