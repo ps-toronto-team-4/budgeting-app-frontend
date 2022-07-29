@@ -102,7 +102,7 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
                     <SettingsBar
                         title='Privacy Policy'
                         subtitle='Learn more about this app'
-                        onPress={() => alert('Security screen is not yet implemented.')}
+                        onPress={() => alert('Privacy policy screen is not yet implemented.')}
                         topBorder
                         bottomBorder />
                 </View>
