@@ -14,6 +14,7 @@ import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
 import { formatDate } from "./ExpenseDetailsScreen";
 import Button from "../components/Button";
+import styles from "../constants/Styles";
 
 type ExpenseDisplayPropsOrDate = ExpenseDisplayProps | string;
 
@@ -111,6 +112,12 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <Screen>
+                <>
+                    {
+                        processedExpenses.length === 0 &&
+                        <Text style={staticStyles.noExpensesText}>You have no expenses. Press the '+' button to add one!</Text>
+                    }
+                </>
                 <FlatList
                     data={processedExpenses}
                     renderItem={renderItem}
@@ -129,6 +136,12 @@ const staticStyles = StyleSheet.create({
         flex: 1,
         flexBasis: 2,
         backgroundColor: '#c9c9c9',
+    },
+    noExpensesText: {
+        alignSelf: 'center',
+        fontSize: 15,
+        width: 300,
+        marginTop: 20,
     },
     addExpenseBtn: {
         position: 'absolute',
