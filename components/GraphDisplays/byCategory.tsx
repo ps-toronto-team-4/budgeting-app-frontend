@@ -1,8 +1,13 @@
-import React from "react";
-import { View, Text } from "react-native";
+import { useQuery } from "@apollo/client";
+import React, { useEffect, useState } from "react";
+import { View, Text, Alert } from "react-native";
 import { VictoryLegend, VictoryPie } from "victory-native";
+import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { useAuth } from "../../hooks/useAuth";
-import { MonthBreakdownCategory } from "../generated";
+import { RootStackScreenProps } from "../../types";
+import Button from "../Button";
+import { DropdownRow } from "../DropdownRow";
+import { GetCategoriesDocument, GetCategoriesQuery, MonthBreakdownCategory } from "../generated";
 
 type byCategoryProps = {
     categoryData: MonthBreakdownCategory[];
@@ -10,9 +15,81 @@ type byCategoryProps = {
     year: number;
 }
 
-export default function ByCategory({ categoryData, month, year }: byCategoryProps) {
+interface ExternalMutation {
+    target: string,
+    eventKey: string,
+    mutation: Function,
+    callback: Function
+}
+
+export default function ByCategory({ categoryData, month, year }: byCategoryProps, { navigation }: RootStackScreenProps<'CreateMerchant'>) {
 
     const passwordHash = useAuth();
+    const [category, setCategory] = useState<{ id: number, name: string } | undefined>();
+    const [categoryOpen, setCategoryOpen] = useState(false);
+    const [mutations, setMutations] = useState<Array<ExternalMutation>>([])
+
+
+    const { data: categoriesData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
+        variables: { passwordHash: passwordHash },
+        onError: (error => {
+            Alert.alert(error.message);
+        }),
+    });
+
+
+    const handleCategory = (id: number) => {
+        setMutations([
+            {
+                target: "data",
+                eventKey: "all",
+                mutation: (props: any) => {
+                    if (id === props.datum.category.id) {
+                        return props.radius === 100 ? { radius: 120, innerRadius: 90, labelRadius: 120 } : { radius: 100, innerRadius: 70 };
+                    } else {
+                        return props = { radius: 100, innerRadius: 70 }
+                    }
+
+                },
+                callback: () => {
+                    if (mutations.length === 0) {
+                        // console.log("I was in callback.")
+                        setMutations([])
+                    }
+                }
+            },
+            {
+                eventKey: "all",
+                target: "labels",
+                mutation: (props: any) => {
+                    if (id === props.datum.category.id) {
+                        return props.text === props.datum.category.name.substring(0, 3) + "..." ? { text: "$" + props.datum.amountSpent.toFixed(2) } : { text: props.datum.category.name.substring(0, 3) + "..." }
+                    } else {
+                        return props = { text: props.datum.category.name.substring(0, 3) + "..." };
+                    }
+
+                },
+                callback: () => {
+                    if (mutations.length === 0) {
+                        setMutations([])
+                    }
+                }
+            }
+        ])
+    }
+
+    function handleCategorySelect(categoryName: string | undefined) {
+        if (categoriesData?.categories.__typename == "CategoriesSuccess") {
+            const foundCategory = categoriesData.categories.categories.find(x => x.name == categoryName);
+
+            if (foundCategory !== undefined) {
+                setCategory(foundCategory);
+                setMutations([]);
+                handleCategory(foundCategory.id);
+            }
+        }
+    }
+
 
 
     return (
@@ -48,6 +125,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                     colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
                     width={900}
                     height={300}
+                    externalEventMutations={mutations as EventCallbackInterface<string | string[], StringOrNumberOrList>[]}
                     events={
                         [{
                             target: "data",
@@ -63,7 +141,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                                         {
                                             target: "data",
                                             mutation: (props) => {
-                                                return props.radius === 100 ? { radius: 120, innerRadius: 90 } : { radius: 100 };
+                                                return props.radius === 100 ? { radius: 120, innerRadius: 90 } : { radius: 100, innerRadius: 70 };
                                             }
                                         }
                                         ]
@@ -93,7 +171,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
 
             </View>
             {
-                categoryData != [] && <VictoryLegend
+                categoryData.length === 0 && <VictoryLegend
                     centerTitle={true}
                     orientation="horizontal"
                     colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
@@ -124,6 +202,21 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                     height={200}
                 />
             }
+            <DropdownRow
+                label="Category"
+                data={
+                    categoriesData?.categories.__typename == "CategoriesSuccess" ?
+                        categoriesData.categories.categories.map(x => { return { id: x.id, name: x.name } }) : []
+                }
+                onSelect={handleCategorySelect}
+                expanded={categoryOpen}
+                onExpand={() => setCategoryOpen(true)}
+                onCollapse={() => setCategoryOpen(false)}
+                topBorder
+                bottomBorder={!categoryOpen}
+                createLabel="Category"
+                defaultValue={category?.name}
+            ></DropdownRow>
 
         </View>
 
