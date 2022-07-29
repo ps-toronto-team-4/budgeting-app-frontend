@@ -6,8 +6,8 @@ import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { useAuth } from "../../hooks/useAuth";
 import { RootStackScreenProps } from "../../types";
 import Button from "../Button";
-import { DropdownRow } from "../DropdownRow";
 import { GetCategoriesDocument, GetCategoriesQuery, MonthBreakdownCategory } from "../generated";
+import { GraphDropdownRow } from "../GraphDropdownRow";
 
 type byCategoryProps = {
     categoryData: MonthBreakdownCategory[];
@@ -171,7 +171,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
 
             </View>
             {
-                categoryData.length === 0 && <VictoryLegend
+                categoryData != [] && <VictoryLegend
                     centerTitle={true}
                     orientation="horizontal"
                     colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
@@ -199,10 +199,10 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                     }
                     itemsPerRow={3}
                     gutter={20}
-                    height={200}
+                    height={100}
                 />
             }
-            <DropdownRow
+            <GraphDropdownRow
                 label="Category"
                 data={
                     categoriesData?.categories.__typename == "CategoriesSuccess" ?
@@ -216,7 +216,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 bottomBorder={!categoryOpen}
                 createLabel="Category"
                 defaultValue={category?.name}
-            ></DropdownRow>
+            ></GraphDropdownRow>
 
         </View>
 
