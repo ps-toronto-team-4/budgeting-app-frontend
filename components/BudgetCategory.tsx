@@ -1,6 +1,5 @@
 import { ColorValue, StyleSheet, TouchableHighlight } from "react-native";
 import { View, Text } from "./Themed";
-import { Feather } from '@expo/vector-icons';
 import Colors from "../constants/Colors";
 import { PencilButton } from "./PencilButton";
 
