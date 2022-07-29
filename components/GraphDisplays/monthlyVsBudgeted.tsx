@@ -63,10 +63,18 @@ const RenderGraph = ({ data }: GraphParameters) => {
         }
     })
     return (<VictoryChart>
+        <VictoryAxis
+            style={{
+                grid: { stroke: "none" },
+            }}
+        />
         <VictoryGroup offset={20}
             colorScale={['red', 'lime']}
+
         >
+
             <VictoryBar
+                name="bar-1"
                 barWidth={20}
                 data={filteredData}
                 y="amountSpent"
@@ -91,24 +99,26 @@ interface MonthlyVsBudgetedParameters {
 const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data }: MonthlyVsBudgetedParameters) => {
     const displayAmountNumber = displayAmount ? displayAmount : 5
     const jumpAmountNumber = jumpAmount ? jumpAmount : 1
-    const [sliceEnd, setSliceEnd] = useState(1)
-
     const inputData = data ? data : dumpy as GraphDatum[]
 
+    const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
+
+
+
     return (<View>
-        <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
-            inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
-        <View style={{ flexDirection: 'row', maxHeight: 50 }}>
-            <View style={{ flexBasis: 50 }}>
+
+        <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <ArrowButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
                 }} />
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>num:{sliceEnd}</Text>
+                <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
+                    inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
             </View>
 
-            <View style={{ flexBasis: 50 }}>
+            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <ArrowButton direction="right" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.min(inputData.length - displayAmountNumber, sliceEnd + jumpAmountNumber))
                 }} />

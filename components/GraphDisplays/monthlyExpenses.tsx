@@ -120,12 +120,12 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
             width={400}
             theme={VictoryTheme.material}
             domainPadding={30}>
-            <VictoryAxis
+            {/* <VictoryAxis
                 style={{
                     grid: { stroke: "none" },
                 }}
                 dependentAxis={true}
-            />
+            /> */}
             <VictoryAxis
                 style={{
                     grid: { stroke: "none" },
@@ -194,27 +194,28 @@ function HeaderButton({ direction, onPress, marginLeft, marginRight }: HeaderBut
 const monthlyExpenses = ({ displayAmount, jumpAmount, data }: MonthlyExpenses) => {
     const displayAmountNumber = displayAmount ? displayAmount : 5
     const jumpAmountNumber = jumpAmount ? jumpAmount : 3
-    const [sliceEnd, setSliceEnd] = useState(dumpy.length - displayAmountNumber)
-
     const inputData = data ? data : dumpy as MonthlyDatum[]
+    const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
+
+
 
 
     return (<>
-        <MonthlyExpenseGraph
-            data={inputData.length <= displayAmountNumber ? inputData :
-                inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
 
-        <View style={{ flexDirection: 'row', maxHeight: 50 }}>
-            <View style={{ flexBasis: 50 }}>
+
+        <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <HeaderButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
                 }} />
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>stuff</Text>
+                <MonthlyExpenseGraph
+                    data={inputData.length <= displayAmountNumber ? inputData :
+                        inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
             </View>
 
-            <View style={{ flexBasis: 50 }}>
+            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <HeaderButton direction="right" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.min(inputData.length - displayAmountNumber, sliceEnd + jumpAmountNumber))
                 }} />
