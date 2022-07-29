@@ -70,7 +70,7 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
                 <View style={styles.settingsList}>
                     <SettingsBar
                         title='Categories'
-                        subtitle='Modify your list of existing categories'
+                        subtitle=''
                         onPress={() => navigation.navigate('CategorySettings')}
                         topBorder />
                     <SettingsBar

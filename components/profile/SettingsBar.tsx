@@ -29,7 +29,10 @@ export function SettingsBar({ title, onPress, subtitle, topBorder, bottomBorder 
             <View style={staticStyles.content}>
                 <View style={staticStyles.titlesContiainer}>
                     <Text style={staticStyles.title}>{title}</Text>
-                    <Text style={staticStyles.subtitle}>{subtitle || 'no subtitle given'}</Text>
+                    {
+                        subtitle !== undefined && subtitle.length > 0 &&
+                        <Text style={staticStyles.subtitle}>{subtitle}</Text>
+                    }
                 </View>
                 <Entypo name="chevron-right" size={24} color="black" style={staticStyles.icon} />
             </View>
@@ -50,8 +53,9 @@ const staticStyles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        paddingBottom: 5,
     },
-    subtitle: {},
+    subtitle: {
+        paddingTop: 5,
+    },
     icon: {},
 });
