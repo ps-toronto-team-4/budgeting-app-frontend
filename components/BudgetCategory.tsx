@@ -1,7 +1,7 @@
 import { ColorValue, StyleSheet, TouchableHighlight } from "react-native";
 import { View, Text } from "./Themed";
-import { Entypo } from '@expo/vector-icons';
 import Colors from "../constants/Colors";
+import { PencilButton } from "./PencilButton";
 
 interface BudgetWarningProps {
     label?: 'Over Budget' | 'Near Budget';
@@ -56,9 +56,7 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
                         <Text style={staticStyles.headerText}>
                             {category}
                         </Text>
-                        <TouchableHighlight onPress={onPressDots} style={staticStyles.iconContainer} underlayColor="rgba(0,0,0,0.2)">
-                            <Entypo name="dots-three-horizontal" size={16} color="black" />
-                        </TouchableHighlight>
+                        <PencilButton onPress={onPressDots} paddingRight={0} color="black" />
                     </View>
                     <BudgetWarning label={(overBudget && 'Over Budget') || (nearBudget && 'Near Budget') || undefined} />
                     <View style={staticStyles.body}>

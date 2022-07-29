@@ -14,12 +14,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
-
-const EditButton = (onPress: () => void) => (
-    <TouchableOpacity style={{ paddingRight: 30 }} onPress={onPress}>
-        <Feather name="edit-2" size={20} color="orange" />
-    </TouchableOpacity>
-);
+import { PencilButton } from "../components/PencilButton";
 
 export function formatDate(date: string | null | undefined): string {
     if (!date) {
@@ -43,18 +38,21 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
     useEffect(() => {
         if (data) {
             navigation.setOptions({
-                headerRight: () => EditButton(() => navigation.navigate('UpdateExpense',
-                    data.expense.__typename === 'ExpenseSuccess' ? {
-                        id: data.expense.expense.id,
-                        amount: data.expense.expense.amount,
-                        date: data.expense.expense.date,
-                        desc: data.expense.expense.description || '',
-                        merchant: { id: data.expense.expense.merchant?.id, name: data.expense.expense.merchant?.name },
-                        category: { id: data.expense.expense.category?.id, name: data.expense.expense.category?.name },
-                    } : undefined
-                ))
-            });
-        }
+                headerRight: () =>
+                    <PencilButton onPress={() =>
+                        navigation.navigate('UpdateExpense',
+                            data.expense.__typename === 'ExpenseSuccess' ? {
+                                id: data.expense.expense.id,
+                                amount: data.expense.expense.amount,
+                                date: data.expense.expense.date,
+                                desc: data.expense.expense.description || '',
+                                merchant: { id: data.expense.expense.merchant?.id, name: data.expense.expense.merchant?.name },
+                                category: { id: data.expense.expense.category?.id, name: data.expense.expense.category?.name },
+                            } : undefined
+                        )}
+                    />
+            })
+        };
     }, [data]);
 
     function formatAmount(amount: number | null | undefined): string {
