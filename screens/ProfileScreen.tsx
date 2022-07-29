@@ -12,6 +12,7 @@ import { useQuery } from '@apollo/client';
 import { GetUserDocument, GetUserQuery, GetUserQueryVariables } from '../components/generated';
 import { useRefresh } from '../hooks/useRefresh';
 import { SettingsBar } from '../components/profile/SettingsBar';
+import { UserDetail } from '../components/profile/UserDetail';
 
 function formatPhoneNumber(phoneNumber: string): string {
     return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`;
@@ -52,26 +53,11 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
             <ScrollView style={styles.screen}>
                 <FontAwesome5 name="user-circle" size={80} color="black" style={styles.userIcon} />
                 <View style={styles.userDetailsContainer}>
-                    <View style={styles.userDetailsRow}>
-                        <Text style={styles.userDetailsLabel}>First name</Text>
-                        <Text style={styles.userDetailsValue}>{user.firstName}</Text>
-                    </View>
-                    <View style={styles.userDetailsRow}>
-                        <Text style={styles.userDetailsLabel}>Last name</Text>
-                        <Text style={styles.userDetailsValue}>{user.lastName}</Text>
-                    </View>
-                    <View style={styles.userDetailsRow}>
-                        <Text style={styles.userDetailsLabel}>Username</Text>
-                        <Text style={styles.userDetailsValue}>{user.username}</Text>
-                    </View>
-                    <View style={styles.userDetailsRow}>
-                        <Text style={styles.userDetailsLabel}>Email</Text>
-                        <Text style={styles.userDetailsValue}>{data.user.email}</Text>
-                    </View>
-                    <View style={styles.userDetailsRow}>
-                        <Text style={styles.userDetailsLabel}>Phone</Text>
-                        <Text style={styles.userDetailsValue}>{user.phoneNumber ? formatPhoneNumber(user.phoneNumber) : 'None'}</Text>
-                    </View>
+                    <UserDetail label="First name" value={user.firstName} />
+                    <UserDetail label="Last name" value={user.lastName} />
+                    <UserDetail label="Username" value={user.username} />
+                    <UserDetail label="Email" value={user.email} />
+                    <UserDetail label="Phone" value={user.phoneNumber ? formatPhoneNumber(user.phoneNumber) : 'None'} />
                 </View>
                 <View style={styles.settingsList}>
                     <SettingsBar
@@ -111,10 +97,6 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
     }
 }
 
-const userDetailsFontSize = 17;
-const userDetailsVerticalSpacing = 5;
-const userDetailsHorizontalSpacing = 20;
-
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
@@ -133,22 +115,6 @@ const styles = StyleSheet.create({
     },
     userDetailsContainer: {
         alignItems: 'center',
-    },
-    userDetailsRow: {
-        flexDirection: 'row',
-        paddingVertical: userDetailsVerticalSpacing,
-    },
-    userDetailsLabel: {
-        width: 100,
-        textAlign: 'right',
-        fontSize: userDetailsFontSize,
-    },
-    userDetailsValue: {
-        fontWeight: 'bold',
-        width: 250,
-        paddingLeft: userDetailsHorizontalSpacing,
-        paddingRight: 20,
-        fontSize: userDetailsFontSize,
     },
     settingsList: {
         marginTop: 25,
