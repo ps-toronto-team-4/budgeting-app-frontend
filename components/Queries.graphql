@@ -427,6 +427,7 @@ query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
                 category{
                     colourHex
                     name
+                    id
                 }
             }
             totalSpent
