@@ -61,6 +61,10 @@ export default function ProfileScreen({ navigation }: RootTabScreenProps<'Profil
                         <Text style={styles.userDetailsValue}>{user.lastName}</Text>
                     </View>
                     <View style={styles.userDetailsRow}>
+                        <Text style={styles.userDetailsLabel}>Username</Text>
+                        <Text style={styles.userDetailsValue}>{user.username}</Text>
+                    </View>
+                    <View style={styles.userDetailsRow}>
                         <Text style={styles.userDetailsLabel}>Email</Text>
                         <Text style={styles.userDetailsValue}>{data.user.email}</Text>
                     </View>
