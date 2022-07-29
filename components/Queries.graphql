@@ -53,7 +53,6 @@ query getUser($passwordHash: String!) {
     }
 }
 
-
 query getCategories($passwordHash: String!) {
     categories(passwordHash: $passwordHash) {
         __typename
@@ -439,6 +438,48 @@ query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
     }
 }
 
+query getMonthsTotals($passwordHash: String!){
+	monthsTotals(passwordHash: $passwordHash) {
+    __typename
+    ...on MonthsTotals {
+      averageSpent
+      byMonth {
+        amountSpent
+        year
+        amountBudgeted
+      }
+    }
+    ...on FailurePayload {
+      exceptionName
+      errorMessage
+    }
+  }
+}
+
+query getExpensesInMonth($month: MonthType!, $year: Int!, $passwordHash: String!) {
+    expensesInMonth(month: $month, year: $year, passwordHash: $passwordHash) {
+        __typename
+        ...on ExpensesSuccess {
+            expenses {
+                id
+                date
+                amount
+                category {
+                    name
+                    colourHex
+                }
+                merchant {
+                    name
+                }
+                description
+            }
+        }
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
 
 mutation copyBudget($passwordHash: String!, $month:MonthType!, $year:Int!, $id:Int!){
     copyBudget(passwordHash: $passwordHash,month: $month,year: $year, id:$id){
