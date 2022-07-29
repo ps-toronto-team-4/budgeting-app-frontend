@@ -17,8 +17,8 @@ export function ChartDisplay({ planned, actual, height, width }: ChartDisplayPro
                 <VictoryBar
                     categories={{ x: ["Planned", "Actual"] }}
                     data={[
-                        { x: "Planned", y: planned, label: "$" + planned.toFixed(2), fill: "purple" },
-                        { x: "Actual", y: actual, label: "$" + actual.toFixed(2), fill: "black" },
+                        { x: "Planned", y: planned, label: "$" + planned.toFixed(2), fill: "#4477aa" },
+                        { x: "Actual", y: actual, label: "$" + actual.toFixed(2), fill: "#aa3377" },
                     ]}
                     style={{
                         data:
