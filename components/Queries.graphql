@@ -145,6 +145,9 @@ query getExpenses ($passwordHash: String!) {
                     colourHex
                     name
                 }
+                merchant {
+                    name
+                }
             }
         }
         

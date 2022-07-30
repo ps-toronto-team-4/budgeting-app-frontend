@@ -28,6 +28,10 @@ type Expenses = {
         colourHex: string;
         name: string;
     } | null | undefined;
+    merchant?: {
+        __typename?: "Merchant" | undefined;
+        name: string;
+    } | null | undefined;
 }[];
 
 /**
@@ -49,6 +53,7 @@ function processExpenses(expenses: Expenses, onPress: (id: number) => void): Exp
             amount: expense.amount,
             onPress: onPress,
             date: expense.date,
+            merchant: expense.merchant?.name || '',
         };
     }).sort((ex1, ex2) => { // Sort by date
         if (ex1.date > ex2.date) {
