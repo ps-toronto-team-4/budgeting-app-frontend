@@ -45,7 +45,8 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 eventKey: "all",
                 mutation: (props: any) => {
                     if (id === props.datum.category.id) {
-                        return props.radius === 100 ? { radius: 120, innerRadius: 90, labelRadius: 120 } : { radius: 100, innerRadius: 70 };
+                        console.log(props.datum.category);
+                        return props = { radius: 120, innerRadius: 90, labelRadius: 120 };
                     } else {
                         return props = { radius: 100, innerRadius: 70 }
                     }
@@ -63,7 +64,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 target: "labels",
                 mutation: (props: any) => {
                     if (id === props.datum.category.id) {
-                        return props.text === props.datum.category.name.substring(0, 3) + "..." ? { text: "$" + props.datum.amountSpent.toFixed(2) } : { text: props.datum.category.name.substring(0, 3) + "..." }
+                        return props = { text: "$" + props.datum.amountSpent.toFixed(2) };
                     } else {
                         return props = { text: props.datum.category.name.substring(0, 3) + "..." };
                     }
@@ -111,7 +112,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                                     amountSpent: data.amountSpent,
                                     category: {
                                         name: "Uncategorized",
-                                        colourHex: "#757575",
+                                        colourHex: "757575",
                                     }
                                 }
                             } else {
@@ -122,9 +123,12 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                     }
                     labels={({ datum }) => datum.category.name.substring(0, 3) + "..."}
                     y={"amountSpent"}
-                    colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
                     width={900}
                     height={300}
+                    style={{
+                        data:
+                            { fill: (d) => "#" + d.datum.category.colourHex }
+                    }}
                     externalEventMutations={mutations as EventCallbackInterface<string | string[], StringOrNumberOrList>[]}
                     events={
                         [{
