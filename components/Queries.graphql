@@ -445,7 +445,6 @@ query getMonthsTotals($passwordHash: String!){
       averageSpent
       byMonth {
         amountSpent
-        year
         amountBudgeted
       }
     }

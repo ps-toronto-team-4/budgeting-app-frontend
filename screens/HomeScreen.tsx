@@ -18,19 +18,21 @@ import { Feather } from "@expo/vector-icons";
 
     const ALERT_COLOR = {
         over: {
-            backgroundColor: 'hsl(2, 50%, 75%)',
-            borderColor: 'hsl(2, 100%, 30%)'
+            backgroundColor: 'hsl(2, 50%, 80%)',
+            borderColor: 'hsl(2, 80%, 30%)'
         },
         under: {
-            backgroundColor: 'hsl(108, 50%, 75%)',
-            borderColor: 'hsl(108, 100%, 30%)'
+            backgroundColor: 'hsl(108, 50%, 80%)',
+            borderColor: 'hsl(108, 80%, 30%)'
         }
     }
 
 export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const passwordHash = useAuth();
     const [name, setName] = useState('there');
-    const [overBudget, setOverBudget] = useState([]);
+    const [overBudget, setOverBudget] = useState<string[]>([]);
+    const [monthData, setMonthData] = useState<{amountSpent: number, amountBudgeted: number}[]>([]);
+    const [expenses, setExpenses] = useState<{id: number, amount: number, category?: {name: string, colourHex: string} | null}[]>([]);
     const date = new Date();
     const month = date.getMonth();
     const monthName = MONTHS_ORDER[month].at(0) + MONTHS_ORDER[month].substring(1).toLowerCase();
@@ -45,15 +47,35 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         }
     })
 
-    const {data: monthData, loading: monthLoading} = useQuery<GetMonthsTotalsQuery>(GetMonthsTotalsDocument, {
-        variables: { passwordHash }
+    const {loading: monthLoading, data: yearData, refetch: monthRefetch} = useQuery<GetMonthsTotalsQuery>(GetMonthsTotalsDocument, {
+        variables: { passwordHash },
+        onCompleted: (data) => {
+            if (data.monthsTotals.__typename === 'MonthsTotals') {
+                setMonthData(data.monthsTotals.byMonth.filter((item) => item.year === year));
+            }
+        }
     })
+
+    useEffect(() => {
+        let diff = monthData[month]?.amountBudgeted - monthData[month]?.amountSpent || 0;
+        if (diff < 0) {
+            setOverBudget(['Total']);
+        }
+    }, [monthData]);
     
     const {data, loading, refetch} = useQuery<GetExpensesInMonthQuery>(GetExpensesInMonthDocument, {
         variables: { month: MONTHS_ORDER[month], year, passwordHash },
+        onCompleted: (data) => {
+            if (data.expensesInMonth.__typename === 'ExpensesSuccess') {
+                if (data.expensesInMonth.expenses.length) {
+                    let tempExpenses = data.expensesInMonth.expenses.slice(); // copy the data since it is read-only
+                    setExpenses(tempExpenses.sort((a, b) => b.date.localeCompare(a.date)).slice(0,3))
+                }
+            }
+        }
     })
 
-    useRefresh(refetch, [passwordHash]);
+    useRefresh(() => {refetch(); monthRefetch()}, [passwordHash]);
 
     function renderItem(item: {id: number, amount: number, category?: {name: string, colourHex: string} | null}) {
         const color = item.category?.colourHex || Colors.light.uncategorizedColor;
@@ -70,7 +92,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
 
     const FirstExpense = () => {
         return (
-            <Text>You have no expenses for {monthName} yet</Text>
+            <Text style={{textAlign: 'center', fontSize: 18, margin: '20%'}}>You have no expenses for {monthName} yet. Try adding some by presing this button:</Text>
         )
     }
 
@@ -79,26 +101,27 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
             <Text style={style.greeting}>Hello, {name}!</Text>
             { overBudget.length ? (
                 <View style={[style.alert, ALERT_COLOR.over]}>
-                    <Feather name='info' size={24} color={ALERT_COLOR.over.borderColor} style={{margin: 5}}/>
-                    <Text>Your expenses for the following categories in {monthName} are over-budget: {JSON.stringify(overBudget)}</Text>
+                    <Feather name='info' size={24} color={ALERT_COLOR.over.borderColor} style={{margin: 10}}/>
+                    <Text style={style.alertText}>Your expenses for the following categories in {monthName} are over-budget: 
+                    <strong> {overBudget.toString()}</strong></Text>
                 </View>
             ) : (
                 <View style={[style.alert, ALERT_COLOR.under]}>
-                    <Feather name='info' size={24} color={ALERT_COLOR.under.borderColor} style={{margin: 5}}/>
-                    <Text>You have no over-bugdet expenses in {monthName} so far</Text>
+                    <Feather name='info' size={24} color={ALERT_COLOR.under.borderColor} style={{margin: 10}}/>
+                    <Text style={style.alertText}>You have no over-bugdet expenses in {monthName} so far</Text>
                 </View>
             )}
             <View style={style.summary}>
                 <Text style={style.subtitle}>Your activity:</Text>
                 {monthLoading ? <ActivityIndicator size='large' /> : (
-                    monthData?.monthsTotals?.__typename === 'MonthsTotals' ? (
+                    yearData?.monthsTotals.__typename === 'MonthsTotals' ? (
                     <>
                         <View style={style.halfSummary}>
-                            <Text style={style.summaryData}>${monthData.monthsTotals.byMonth[month]?.amountSpent.toFixed(2)}</Text>
+                            <Text style={style.summaryData}>${monthData.at(month)?.amountSpent.toFixed(2)}</Text>
                             <Text>Your total spendings this month so far</Text>
                         </View>
                         <View style={style.halfSummary}>
-                            <Text style={style.summaryData}>${monthData.monthsTotals.averageSpent.toFixed(2)}</Text>
+                            <Text style={style.summaryData}>${yearData.monthsTotals.averageSpent.toFixed(2)}</Text>
                             <Text>Your average monthly spendings this year</Text>
                         </View>
                     </>
@@ -114,7 +137,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                 { loading ? <ActivityIndicator size='large' /> : (
                     data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
                         <FlatList
-                            data={data.expensesInMonth.expenses.slice(-3)}
+                            data={expenses}
                             renderItem={({item}) => renderItem(item)}
                             ListEmptyComponent={<FirstExpense/>}
                         />
@@ -139,13 +162,18 @@ const style = StyleSheet.create({
         marginBottom: 20
     },
     alert: {
-        width: '80%',
+        maxWidth: '80%',
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'center',
         padding: 10,
-        borderRadius: 30,
-        borderWidth: 2
+        borderRadius: 20,
+        borderWidth: 2,
+        fontSize: 24
+    },
+    alertText: {
+        fontSize: 16,
+        marginHorizontal: 10 
     },
     subtitle: {
         padding: 10,
