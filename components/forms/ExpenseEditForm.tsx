@@ -142,7 +142,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
             </>
             <>
                 <View>
-                    <DisplayField label="Date" value={`${month} ${day} ${year}`} onPress={() => setCalendarShown(true)} />
+                    <DisplayField label="Date" value={`${month} ${day} ${year}`} onPress={() => setCalendarShown(true)} focused={calendarShown} />
                     {
                         calendarShown &&
                         <View style={styles.calendarContainer}>
