@@ -1,6 +1,6 @@
 import { useLazyQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
-import { GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantsQueryVariables } from "../generated";
+import { GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantsQueryVariables, MerchantsAndCategoriesDocument, MerchantsAndCategoriesQuery, MerchantsAndCategoriesQueryVariables } from "../generated";
 
 import { StyleSheet, View, Text, TextInput, TouchableHighlight, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import Colors from "../../constants/Colors";
@@ -37,20 +37,12 @@ export interface ExpenseEditFormProps {
 }
 
 export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
-    const [getMerchants, { data: merchantData, refetch: refetchMerchants }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
-    const [getCategories, { data: categoryData, refetch: refetchCategories }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
-    const passwordHash = useAuth({
-        onRetrieved: (passwordHash) => {
-            getMerchants({ variables: { passwordHash } });
-            getCategories({ variables: { passwordHash } });
-        },
+    const [getMerchantsAndCategories, { data, refetch }] = useLazyQuery<MerchantsAndCategoriesQuery, MerchantsAndCategoriesQueryVariables>(MerchantsAndCategoriesDocument);
+    useAuth({
+        onRetrieved: (passwordHash) => getMerchantsAndCategories({ variables: { passwordHash } }),
     });
-    useRefresh(() => {
-        refetchMerchants({ passwordHash });
-        refetchCategories({ passwordHash });
-    });
+    useRefresh(refetch);
 
-    const nav = useNavigation();
     const [amount, setAmount] = useState(initVals?.amount || 0);
     const [merchantId, setMerchantId] = useState(initVals?.merchantId);
     const [categoryId, setCategoryId] = useState(initVals?.categoryId);
@@ -76,16 +68,16 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
             <AmountInput onChangeAmount={setAmount} defaultAmount={initVals?.amount || 0} />
             <>
                 {
-                    merchantData?.merchants.__typename === 'MerchantsSuccess' &&
+                    data?.merchants.__typename === 'MerchantsSuccess' &&
                     <DropdownField
                         label="Merchant"
                         placeholder="optional"
                         data={
-                            merchantData.merchants.merchants.map(x => { return { id: x.id.toString(), value: x.name } })
+                            data.merchants.merchants.map(x => { return { id: x.id.toString(), value: x.name } })
                         }
                         defaultValue={
                             initVals ?
-                                merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
+                                data.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
                                 : undefined
                         }
                         onFocus={() => setCalendarShown(false)}
@@ -94,14 +86,14 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
             </>
             <>
                 {
-                    categoryData?.categories.__typename === 'CategoriesSuccess' &&
+                    data?.categories.__typename === 'CategoriesSuccess' &&
                     <DropdownField
                         label="Category"
                         placeholder="optional"
-                        data={categoryData.categories.categories.map(x => { return { id: x.id.toString(), value: x.name } })}
+                        data={data.categories.categories.map(x => { return { id: x.id.toString(), value: x.name } })}
                         defaultValue={
                             initVals ?
-                                categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
+                                data.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
                                 : undefined
                         }
                         onFocus={() => setCalendarShown(false)}
