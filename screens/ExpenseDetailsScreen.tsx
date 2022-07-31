@@ -64,7 +64,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                 expenseTypename === "ExpenseSuccess" ?
                     <View>
                         <View style={styles.colHeader}>
-                            <Text>Amount</Text>
+                            <Text style={styles.amountHeading}>Amount</Text>
                         </View>
                         <View style={styles.catAndAmount}>
                             <View style={styles.catColorAndName}>
@@ -81,9 +81,10 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                             <Text style={styles.merchantLabel}>Merchant:</Text>
                             <Text style={styles.merchant}>{data?.expense.expense.merchant?.name ? data.expense.expense.merchant.name : 'None'}</Text>
                         </View>
+                        <View style={styles.separator} />
                         <View style={styles.descContainer}>
                             <Text style={styles.descLabel}>Details:</Text>
-                            <Text>{data?.expense.expense.description ? data.expense.expense.description : 'None'}</Text>
+                            <Text style={styles.desc}>{data?.expense.expense.description ? data.expense.expense.description : 'None'}</Text>
                         </View>
                         <View style={styles.separator}></View>
                     </View>
@@ -104,6 +105,9 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         marginTop: 30,
     },
+    amountHeading: {
+        fontSize: 18,
+    },
     catAndAmount: {
         paddingHorizontal: 40,
         flexDirection: "row",
@@ -121,9 +125,11 @@ const styles = StyleSheet.create({
     },
     catName: {
         fontWeight: "600",
+        fontSize: 18,
     },
     amount: {
         fontWeight: "600",
+        fontSize: 18,
     },
     dateContainer: {
         paddingHorizontal: 40,
@@ -133,6 +139,7 @@ const styles = StyleSheet.create({
     },
     date: {
         fontWeight: "600",
+        fontSize: 18,
     },
     separator: {
         alignSelf: "center",
@@ -140,24 +147,29 @@ const styles = StyleSheet.create({
         width: "80%",
         backgroundColor: '#444',
         opacity: 0.2,
-        marginTop: 8,
+        marginVertical: 20,
     },
     merchantContainer: {
         flexDirection: 'row',
         paddingHorizontal: 40,
-        marginTop: 10,
     },
     merchantLabel: {
         fontWeight: '600',
         marginRight: 10,
+        fontSize: 18,
     },
-    merchant: {},
+    merchant: {
+        fontSize: 18,
+    },
     descContainer: {
         paddingHorizontal: 40,
-        marginTop: 10,
     },
     descLabel: {
         fontWeight: '600',
-        marginBottom: 5
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    desc: {
+        fontSize: 18,
     },
 });

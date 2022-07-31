@@ -17,11 +17,11 @@ export function Row({ onPress, topBorder, bottomBorder, children, backgroundColo
     const dynamicStyles = StyleSheet.create({
         row: {
             alignItems: 'center',
-            borderTopColor: 'rgba(0,0,0,0.3)',
-            borderBottomColor: 'rgba(0,0,0,0.3)',
+            borderTopColor: 'rgba(0,0,0,0.1)',
+            borderBottomColor: 'rgba(0,0,0,0.1)',
             borderTopWidth: topBorder ? 1 : 0,
             borderBottomWidth: bottomBorder ? 1 : 0,
-            paddingVertical: 10,
+            paddingVertical: 15,
             backgroundColor: backgroundColor || 'white',
         },
     });

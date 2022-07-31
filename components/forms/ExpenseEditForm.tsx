@@ -108,8 +108,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                         expanded={merchantExpanded}
                         onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
                         onCollapse={() => setMerchantExpanded(false)}
-                        visible={!categoryExpanded}
-                        topBorder />
+                        visible={!categoryExpanded} />
                 }
             </>
             <>

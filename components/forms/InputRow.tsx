@@ -49,6 +49,8 @@ export function InputRow({ label, placeholder, value, onChangeText, wrap, error,
     );
 }
 
+const fontSize = 18;
+
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'rgba(0,0,0,0)',
@@ -62,12 +64,12 @@ const styles = StyleSheet.create({
     },
     label: {
         fontWeight: 'bold',
-        fontSize: 15,
-        width: 90,
+        fontSize: fontSize,
+        width: 85,
         textAlign: 'right',
     },
     input: {
-        fontSize: 15,
+        fontSize: fontSize,
         width: 180,
         padding: 2,
         color: 'black',

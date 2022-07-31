@@ -12,6 +12,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { Form } from "../../components/forms/Form";
 import { InputRow } from "../../components/forms/InputRow";
 import { TrashButton } from "../../components/buttons/TrashButton";
+import { DisplayField } from "../../components/forms/DisplayField";
 
 export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'EditBudget'>) {
     const passwordHash = useAuth({ redirect: 'ifUnauthorized' });
