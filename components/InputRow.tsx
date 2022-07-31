@@ -63,7 +63,8 @@ const styles = StyleSheet.create({
     label: {
         fontWeight: 'bold',
         fontSize: 15,
-        width: 100,
+        width: 90,
+        textAlign: 'right',
     },
     input: {
         fontSize: 15,

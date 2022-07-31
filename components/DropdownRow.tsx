@@ -177,6 +177,8 @@ const styles = StyleSheet.create({
     fieldLabel: {
         fontWeight: 'bold',
         fontSize: 15,
+        width: 90,
+        textAlign: 'right',
     },
     fieldInput: {
         fontSize: 15,
