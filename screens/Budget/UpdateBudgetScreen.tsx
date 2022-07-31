@@ -53,8 +53,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
     return (
         <Form>
             <AmountInput defaultAmount={amount} onChangeAmount={setAmount} />
-            <InputRow label="Category:" disabled placeholder={budgetCategory.category.name} topBorder bottomBorder />
-
+            <DisplayField label="Category:" value={budgetCategory.category.name} />
             <View style={styles.buttonContainer}>
                 <Button
                     text="Save Budget"

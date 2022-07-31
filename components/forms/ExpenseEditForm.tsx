@@ -16,6 +16,8 @@ import { InputRow } from "./InputRow";
 import { Form } from "./Form";
 import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
+import { DisplayField } from "./DisplayField";
+import { InputField } from "./InputField";
 
 export type FormValues = {
     amount: number;
@@ -56,6 +58,9 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     const [calendarShown, setCalendarShown] = useState(false);
     const [date, setDate] = useState(initVals?.date || moment().toISOString());
     const [desc, setDesc] = useState(initVals?.desc || '');
+    const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()];
+    const day = moment(date).date();
+    const year = moment(date).year();
 
     function selectMerchant(name: string) {
         if (merchantData && merchantData.merchants.__typename === 'MerchantsSuccess') {
@@ -137,20 +142,14 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
             </>
             <>
                 <View>
-                    <InputRow
-                        onPress={() => setCalendarShown(true)}
-                        label="Date"
-                        value={
-                            ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
-                            " " + moment(date).date() + " " + moment(date).year()
-                        }
-                        topBorder
-                        disabled />
+                    <DisplayField label="Date" value={`${month} ${day} ${year}`} onPress={() => setCalendarShown(true)} />
                     {
                         calendarShown &&
                         <View style={styles.calendarContainer}>
                             <CalendarPicker
                                 onDateChange={(date, type) => { setDate(date.toISOString()); setCalendarShown(false); }}
+                                initialDate={moment(date).toDate()}
+                                selectedStartDate={moment(date).toDate()}
                                 width={300} />
                         </View>
                     }
@@ -162,8 +161,8 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                         value={desc}
                         onChangeText={setDesc}
                         wrap
-                        topBorder
                         bottomBorder />
+                    <InputField label="Details" placeholder="Enter Details" onChange={setDesc} />
                 </View>
                 <View style={styles.buttonContainer}>
                     <Button

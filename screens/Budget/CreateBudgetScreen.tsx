@@ -12,6 +12,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { Form } from "../../components/forms/Form";
 import { InputRow } from "../../components/forms/InputRow";
 import { useRefresh } from "../../hooks/useRefresh";
+import { DisplayField } from "../../components/forms/DisplayField";
 
 export default function CreateBudgetScreen({ navigation, route }: RootStackScreenProps<'CreateBudget'>) {
     const [getCategories, { data: categoryData, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
@@ -96,10 +97,8 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
                 expanded={categoryExpanded}
                 onExpand={() => setCategoryExpanded(true)}
                 onCollapse={() => setCategoryExpanded(false)}
-                topBorder
                 error={categoryError} />
-
-            <InputRow label="Month:" disabled topBorder bottomBorder value={`${budget?.month} ${budget?.year}`} />
+            <DisplayField label="Month" value={`${budget?.month} ${budget?.year}`} />
             <View style={styles.buttonContainer}>
                 <Button
                     text="Create New Budget"
