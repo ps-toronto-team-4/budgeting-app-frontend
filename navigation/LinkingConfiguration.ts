@@ -24,6 +24,8 @@ const linking: LinkingOptions<RootStackParamList> = {
                     Settings: 'settings',
                 }
             },
+            CategorySettings: 'category-settings',
+            MerchantSettings: 'merchant-settings',
             CreateCategory: 'create-category',
             EditCategory: 'update-category',
             ExpenseDetails: 'expense-details',
