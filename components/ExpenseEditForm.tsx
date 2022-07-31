@@ -1,9 +1,8 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
-import { GetCategoriesDocument, GetCategoriesQuery } from "../components/generated";
+import { GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantsQueryVariables } from "../components/generated";
 
 import { StyleSheet, View, Text, TextInput, TouchableHighlight, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from "../constants/Colors";
 import { AmountInput } from "./AmountInput";
 import { AntDesign, Feather } from '@expo/vector-icons';
@@ -35,20 +34,20 @@ export interface ExpenseEditFormProps {
 }
 
 export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
-    const passwordHash = useAuth();
+    const [getMerchants, { data: merchantData, refetch: refetchMerchants }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
+    const [getCategories, { data: categoryData, refetch: refetchCategories }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
+    useAuth({
+        onRetrieved: (passwordHash) => {
+            getMerchants({ variables: { passwordHash } });
+            getCategories({ variables: { passwordHash } });
+        },
+    });
+    useRefresh(() => {
+        refetchMerchants();
+        refetchCategories();
+    });
+
     const nav = useNavigation();
-    const { data: merchantData, refetch: refetchMerchants } =
-        useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
-            variables: {
-                passwordHash: passwordHash
-            }
-        });
-    const { data: categoryData, refetch: refetchCategories } =
-        useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-            variables: {
-                passwordHash: passwordHash
-            }
-        });
     const [amount, setAmount] = useState(initVals?.amount || 0);
     const [merchantId, setMerchantId] = useState(initVals?.merchantId);
     const [categoryId, setCategoryId] = useState(initVals?.categoryId);
@@ -57,11 +56,6 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     const [calendarShown, setCalendarShown] = useState(false);
     const [date, setDate] = useState(initVals?.date || moment().toISOString());
     const [desc, setDesc] = useState(initVals?.desc || '');
-
-    useRefresh(() => {
-        refetchMerchants();
-        refetchCategories();
-    }, [passwordHash]);
 
     function selectMerchant(name: string) {
         if (merchantData && merchantData.merchants.__typename === 'MerchantsSuccess') {

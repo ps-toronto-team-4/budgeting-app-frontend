@@ -1,10 +1,9 @@
-import { useMutation, useQuery } from "@apollo/client";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import React, { useState, useEffect } from "react";
 import { RootStackScreenProps } from "../../types";
 import Colors from "../../constants/Colors";
 import moment, { Moment } from "moment";
-import { Budget, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from "../../components/generated";
+import { Budget, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../../components/Button";
 import { AmountInput } from "../../components/AmountInput";
@@ -15,12 +14,13 @@ import { InputRow } from "../../components/InputRow";
 import { useRefresh } from "../../hooks/useRefresh";
 
 export default function CreateBudgetScreen({ navigation, route }: RootStackScreenProps<'CreateBudget'>) {
-    const passwordHash = useAuth();
-    const { loading: categoryDataLoading, data: categoryData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-        variables: {
-            passwordHash: passwordHash
-        }
+    const [getCategories, { data: categoryData, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
     });
+    useRefresh(refetch);
+
     const [amount, setAmount] = useState(0);
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [budget, setBudget] = useState<Budget | null>(route.params.budget || null);
@@ -39,8 +39,6 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
             }
         })
     });
-
-    useRefresh(refetch, [passwordHash]);
 
     function selectCategory(name: string) {
         if (categoryData?.categories.__typename === 'CategoriesSuccess') {
@@ -90,11 +88,9 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
                 data={
                     categoryData?.categories.__typename === 'CategoriesSuccess' ?
                         categoryData.categories.categories.filter(filterCat => {
-                            const lookingForOverlap = budget?.budgetCategories?.find(
-                                other => other.category.name == filterCat.name
-                            )
-                            return lookingForOverlap === undefined
-                        }).map(x => { return { name: x.name, id: x.id.toString() } }) : []
+                            const lookingForOverlap = budget?.budgetCategories?.find((other) => other.category.name == filterCat.name);
+                            return lookingForOverlap === undefined;
+                        }).map(x => { return { name: x.name, id: x.id } }) : []
                 }
                 onSelect={selectCategory}
                 expanded={categoryExpanded}

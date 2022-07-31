@@ -4,11 +4,11 @@ import { Text, View } from '../../components/Themed';
 import Button from '../../components/Button';
 import React from 'react';
 import { RootStackScreenProps } from '../../types';
-import { useAuthRedirect } from '../../hooks/useAuthRedirect';
+import { useAuth } from '../../hooks/useAuth';
 
 
 export default function WelcomeScreen({ navigation }: RootStackScreenProps<'Welcome'>) {
-    useAuthRedirect();
+    useAuth({ redirect: 'ifAuthorized' });
 
     function onPressSignIn() {
         navigation.navigate('SignIn');

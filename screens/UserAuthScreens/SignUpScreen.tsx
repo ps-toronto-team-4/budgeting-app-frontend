@@ -11,7 +11,7 @@ import { styles, eyeIconSize } from './SignUpScreen.styles';
 import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
 import PhoneInput from 'react-native-phone-number-input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuthRedirect } from '../../hooks/useAuthRedirect';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignUp'>) {
 
@@ -41,7 +41,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
     const [emailRegex, setEmailRegex] = useState(true)
     const [minPhone, setMinPhone] = useState(true)
 
-    useAuthRedirect();
+    useAuth({ redirect: 'ifAuthorized' });
 
     // Create user graphql query
     const [createUser, { loading, data }] = useMutation<CreateUserMutation>(CreateUserDocument, {

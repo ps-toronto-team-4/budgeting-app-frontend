@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { useMemo, useState } from "react";
 import { GetExpensesDocument, GetExpensesQuery, GetExpensesQueryVariables } from "../components/generated";
 import { FlatList } from "react-native";
@@ -7,13 +7,11 @@ import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AddButton from "../components/AddButton";
 import { useAuth } from "../hooks/useAuth";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
 import { formatDate } from "./ExpenseDetailsScreen";
-import Button from "../components/Button";
 
 type ExpenseDisplayPropsOrDate = ExpenseDisplayProps | string;
 
@@ -95,17 +93,17 @@ function keyExtractor(item: ExpenseDisplayPropsOrDate) {
 }
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
-    const passwordHash = useAuth(); useUnauthRedirect();
-    const { data, refetch } = useQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
-        variables: { passwordHash }
+    const [getExpenses, { data, refetch }] = useLazyQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument);
+    useAuth({
+        onRetrieved: (passwordHash) => getExpenses({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
     });
+    useRefresh(refetch);
     const processedExpenses = useMemo(() => {
         if (data?.expenses.__typename === 'ExpensesSuccess')
             return processExpenses(data.expenses.expenses, (id) => navigation.navigate('ExpenseDetails', { expenseId: id }));
         return [];
     }, [data]);
-
-    useRefresh(refetch, [passwordHash]);
 
     const handleAddExpense = () => navigation.navigate('CreateExpense');
 

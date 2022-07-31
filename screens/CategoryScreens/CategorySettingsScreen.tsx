@@ -1,5 +1,5 @@
-import { useQuery } from "@apollo/client";
-import { Category, GetCategoriesDocument, GetCategoriesQuery } from "../../components/generated";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { Category, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from "../../components/generated";
 import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
@@ -14,41 +14,37 @@ import { useRefresh } from "../../hooks/useRefresh";
 import { Screen } from "../../components/Screen";
 
 export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
-    
-    const passwordHash = useAuth();
-
-    useUnauthRedirect();
-
-    const {data, loading, refetch} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-        variables: { passwordHash },
-        onError: (error => {
-          Alert.alert(error.message);
-        })
+    const [getCategories, { data, loading, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {
+        onError: (error) => Alert.alert(error.message),
     });
-    
-    useRefresh(refetch, [passwordHash]);
+    useAuth({
+        onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
+    });
+    useRefresh(refetch);
 
-      const renderCategory = ({item}: {item: Category}) => {
+    const renderCategory = ({ item }: { item: Category }) => {
         return (
-        <TouchableOpacity style={Styles.list} onPress={() => navigation.navigate("EditCategory", {id: item.id, name: item.name, color: item.colourHex, details: item.description})}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 30, marginHorizontal: 15, height: 30, backgroundColor: "#" + item.colourHex, borderRadius: 90, borderWidth: 1 }} />
-            <Text style={{ fontSize: 18, marginHorizontal: 5 }}>{item.name}</Text>
-            </View>
-            <MaterialIcons name="navigate-next" size={24} color="black" />
-        </TouchableOpacity>
-      )}
+            <TouchableOpacity style={Styles.list} onPress={() => navigation.navigate("EditCategory", { id: item.id, name: item.name, color: item.colourHex, details: item.description })}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ width: 30, marginHorizontal: 15, height: 30, backgroundColor: "#" + item.colourHex, borderRadius: 90, borderWidth: 1 }} />
+                    <Text style={{ fontSize: 18, marginHorizontal: 5 }}>{item.name}</Text>
+                </View>
+                <MaterialIcons name="navigate-next" size={24} color="black" />
+            </TouchableOpacity>
+        )
+    }
 
     return (
         <Screen>
-            <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')}/>
-                { loading ? (<ActivityIndicator size='large'/>) : (
-                    data?.categories.__typename === "CategoriesSuccess" ? (
-                        <FlatList
-                            data={data.categories.categories}
-                            renderItem={renderCategory}
-                        />
-                    ) : (
+            <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')} />
+            {loading ? (<ActivityIndicator size='large' />) : (
+                data?.categories.__typename === "CategoriesSuccess" ? (
+                    <FlatList
+                        data={data.categories.categories}
+                        renderItem={renderCategory}
+                    />
+                ) : (
                     <View>
                         <Text>{data?.categories.exceptionName}</Text>
                         <Text>{data?.categories.errorMessage}</Text>

@@ -3,8 +3,8 @@ import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import Button from "../../components/Button";
 import { Text, View } from '../../components/Themed';
 import { RootStackScreenProps } from "../../types";
-import { useMutation, useQuery } from "@apollo/client";
-import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery } from "../../components/generated";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery, GetMerchantsQueryVariables } from "../../components/generated";
 import { DropdownRow } from "../../components/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
 import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
@@ -14,16 +14,19 @@ import { useRefresh } from "../../hooks/useRefresh";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
-
-    const passwordHash = useAuth();
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => {
+            getCategories({ variables: { passwordHash } });
+            getMerchants({ variables: { passwordHash } });
+        },
+        redirect: 'ifUnauthorized',
+    });
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
     const [category, setCategory] = React.useState<{ id: number, name: string } | undefined>();
     const [check, setCheck] = React.useState(false);
     const [disabledButton, setDisabledButton] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
-
-    useUnauthRedirect();
 
     const preFillCategory = () => {
         AsyncStorage.getItem('New Category')
@@ -37,8 +40,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             })
     }
 
-    useRefresh(preFillCategory);
-
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: category?.id },
         onError: (error => {
@@ -50,27 +51,25 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     });
 
-    const { data: categoryData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-        variables: { passwordHash: passwordHash },
+    const [getCategories, { data: categoryData, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {
         onError: (error => {
             Alert.alert(error.message);
         }),
     });
 
-    const { data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
-        variables: { passwordHash: passwordHash }
-    });
+    const [getMerchants, { data: manyMerchantsData }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
 
-    useRefresh(refetch, [passwordHash]);
+    useRefresh(() => {
+        preFillCategory();
+        refetch();
+    });
 
     const merchantTaken = () => {
         if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName) {
-
             // Searches the array of merchants for the name of vendor.
             return manyMerchantsData?.merchants.merchants.find((mer) => {
                 return mer.name.toLowerCase() === merchantName.toLowerCase()
             });
-
         } else {
             return undefined;
         }
@@ -150,7 +149,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         </Screen>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {

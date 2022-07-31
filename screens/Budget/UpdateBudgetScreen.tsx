@@ -14,9 +14,9 @@ import { InputRow } from "../../components/InputRow";
 import { TrashButton } from "../../components/TrashButton";
 
 export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'EditBudget'>) {
-    const passwordHash = useAuth();
+    const passwordHash = useAuth({ redirect: 'ifUnauthorized' });
     const [amount, setAmount] = useState(route.params.budgetCategory.amount);
-    const [budgetCategory, setBudgetCategory] = useState<BudgetCategory>(route.params.budgetCategory);
+    const budgetCategory = route.params.budgetCategory;
 
     const [updateBudget] = useMutation<UpdateBudgetCategoryMutation, UpdateBudgetCategoryMutationVariables>(UpdateBudgetCategoryDocument, {
         variables: { passwordHash, id: budgetCategory?.id, amount },
