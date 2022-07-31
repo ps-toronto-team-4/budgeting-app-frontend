@@ -6,13 +6,13 @@ import { Screen } from "../components/Screen";
 import Styles from '../constants/Styles';
 import { VictoryChart, VictoryLegend, VictoryPie } from 'victory-native';
 import { GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownQueryVariables, MonthType } from '../components/generated';
-import MonthlyExpenseGraph from '../components/GraphDisplays/monthlyExpenses';
+import MonthlyExpenseGraph from '../components/graphs/MonthlyExpenses';
 import { useLazyQuery } from '@apollo/client';
 import { GetMonthBreakdownDocument, GetMonthBreakdownQuery } from '../components/generated';
-import ByCategory from '../components/GraphDisplays/byCategory';
+import ByCategory from '../components/graphs/ByCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
-import MonthlyVsBudgeted from '../components/GraphDisplays/monthlyVsBudgeted';
+import MonthlyVsBudgeted from '../components/graphs/MonthlyVsBudgeted';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useRefresh } from '../hooks/useRefresh';
 
