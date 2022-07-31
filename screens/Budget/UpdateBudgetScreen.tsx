@@ -5,13 +5,13 @@ import { RootStackScreenProps } from "../../types";
 import Colors from "../../constants/Colors";
 import { Budget, BudgetCategory, DeleteBudgetCategoryDocument, DeleteBudgetCategoryMutation, DeleteBudgetCategoryMutationVariables, UpdateBudgetCategoryDocument, UpdateBudgetCategoryMutation, UpdateBudgetCategoryMutationVariables } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
-import Button from "../../components/Button";
-import { Row } from "../../components/Row";
-import { AmountInput } from "../../components/AmountInput";
+import Button from "../../components/buttons/Button";
+import { Row } from "../../components/forms/Row";
+import { AmountInput } from "../../components/forms/AmountInput";
 import { useAuth } from "../../hooks/useAuth";
-import { Screen } from "../../components/Screen";
-import { InputRow } from "../../components/InputRow";
-import { TrashButton } from "../../components/TrashButton";
+import { Screen } from "../../components/forms/Screen";
+import { InputRow } from "../../components/forms/InputRow";
+import { TrashButton } from "../../components/buttons/TrashButton";
 
 export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'EditBudget'>) {
     const passwordHash = useAuth({ redirect: 'ifUnauthorized' });

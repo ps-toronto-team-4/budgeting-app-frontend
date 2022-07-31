@@ -4,15 +4,15 @@ import { DeleteMerchantDocument, DeleteMerchantMutation, GetCategoriesDocument, 
 import { StyleSheet, View, Text, TextInput, ActivityIndicator, SafeAreaView, Alert, TouchableOpacity, Modal } from 'react-native';
 import { RootStackScreenProps } from "../../types";
 import { AntDesign, Feather } from '@expo/vector-icons';
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../../components/generated";
-import { DropdownRow } from "../../components/DropdownRow";
+import { DropdownRow } from "../../components/forms/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
 import { useRefresh } from "../../hooks/useRefresh";
 import modalStyle from "../../constants/Modal";
 import Styles from "../../constants/Styles";
-import { Screen } from "../../components/Screen";
-import { InputRow } from "../../components/InputRow";
+import { Screen } from "../../components/forms/Screen";
+import { InputRow } from "../../components/forms/InputRow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function UpdateMerchantScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {

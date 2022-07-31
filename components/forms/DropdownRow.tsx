@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
 import { Row } from "./Row";
 

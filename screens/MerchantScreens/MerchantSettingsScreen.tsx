@@ -5,7 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text } from 'react-native';
 import { RootStackScreenProps } from "../../types";
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";

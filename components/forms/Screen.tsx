@@ -4,8 +4,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ReactElement, useEffect, useMemo } from "react";
 import { SafeAreaView, TouchableWithoutFeedback } from "react-native";
 import { Keyboard, StyleSheet } from "react-native";
-import { RootStackParamList, RootStackScreenProps, RootTabParamList } from "../types";
-import { View } from "./Themed";
+import { RootStackParamList, RootStackScreenProps, RootTabParamList } from "../../types";
+import { View } from "../Themed";
 
 export interface ScreenProps {
     children?: ReactElement<any, any> | ReactElement<any, any>[];

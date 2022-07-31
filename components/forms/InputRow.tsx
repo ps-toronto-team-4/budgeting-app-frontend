@@ -1,7 +1,7 @@
 import { ReactElement, useRef, useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { Row, RowProps } from "./Row";
-import { View, Text } from "./Themed";
+import { View, Text } from "../Themed";
 
 export type InputRowProps = Omit<RowProps, 'children'> & {
     label: string;

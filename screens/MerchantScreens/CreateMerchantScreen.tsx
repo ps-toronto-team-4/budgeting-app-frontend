@@ -1,14 +1,14 @@
 import React from "react"
 import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import { Text, View } from '../../components/Themed';
 import { RootStackScreenProps } from "../../types";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery, GetMerchantsQueryVariables } from "../../components/generated";
-import { DropdownRow } from "../../components/DropdownRow";
+import { DropdownRow } from "../../components/forms/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
-import { InputRow } from "../../components/InputRow";
-import { Screen } from "../../components/Screen";
+import { InputRow } from "../../components/forms/InputRow";
+import { Screen } from "../../components/forms/Screen";
 import { useRefresh } from "../../hooks/useRefresh";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

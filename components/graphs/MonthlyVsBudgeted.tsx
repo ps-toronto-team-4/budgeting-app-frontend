@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text } from "react-native"
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
-import ArrowButton from "../ArrowButton";
+import ArrowButton from "../buttons/ArrowButton";
 
 const dumpy = [
     {

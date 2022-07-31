@@ -8,9 +8,8 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootStackScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
-import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
-import { PencilButton } from "../components/PencilButton";
+import { PencilButton } from "../components/buttons/PencilButton";
 
 export function formatDate(date: string | null | undefined): string {
     if (!date) {
@@ -60,7 +59,7 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
     const expenseTypename = data?.expense.__typename;
 
     return (
-        <Screen>
+        <View style={styles.screen}>
             {
                 expenseTypename === "ExpenseSuccess" ?
                     <View>
@@ -91,11 +90,15 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                     :
                     <Text>{expenseTypename === "FailurePayload" ? data?.expense.exceptionName : ""}</Text>
             }
-        </Screen>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
     colHeader: {
         paddingHorizontal: 40,
         alignItems: "flex-end",

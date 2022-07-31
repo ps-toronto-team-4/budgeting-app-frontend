@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 import { ColorValue, StyleSheet, TouchableHighlight } from "react-native";
-import { View, Text } from "./Themed";
+import { View, Text } from "../Themed";
 
 export interface RowProps {
     /**

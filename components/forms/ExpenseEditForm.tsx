@@ -1,21 +1,21 @@
 import { useLazyQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
-import { GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantsQueryVariables } from "../components/generated";
+import { GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantsQueryVariables } from "../generated";
 
 import { StyleSheet, View, Text, TextInput, TouchableHighlight, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 import { AmountInput } from "./AmountInput";
 import { AntDesign, Feather } from '@expo/vector-icons';
-import Button from "../components/Button";
-import { GetMerchantsQuery, GetMerchantsDocument } from "../components/generated";
-import { DropdownRow } from "../components/DropdownRow";
+import Button from "../buttons/Button";
+import { GetMerchantsQuery, GetMerchantsDocument } from "../generated";
+import { DropdownRow } from "./DropdownRow";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 import { useNavigation } from "@react-navigation/native";
 import { InputRow } from "./InputRow";
 import { Screen } from "./Screen";
-import { useRefresh } from "../hooks/useRefresh";
-import { useAuth } from "../hooks/useAuth";
+import { useRefresh } from "../../hooks/useRefresh";
+import { useAuth } from "../../hooks/useAuth";
 
 export type FormValues = {
     amount: number;

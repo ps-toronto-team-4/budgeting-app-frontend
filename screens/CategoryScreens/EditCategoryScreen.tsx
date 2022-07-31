@@ -1,11 +1,11 @@
 import { StyleSheet, Alert, ActivityIndicator, Modal, TouchableHighlight } from 'react-native';
 
 import { Text, View, RequiredField } from '../../components/Themed';
-import Button from '../../components/Button';
+import Button from '../../components/buttons/Button';
 import React, { useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
-import TextInput from '../../components/TextInput';
+import TextInput from '../../components/forms/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
 import { useLazyQuery, useMutation } from '@apollo/client';
@@ -13,7 +13,7 @@ import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, Get
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 import modalStyle from '../../constants/Modal';
-import { Screen } from "../../components/Screen";
+import { Screen } from "../../components/forms/Screen";
 
 export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 

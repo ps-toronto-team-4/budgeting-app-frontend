@@ -5,12 +5,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text } from 'react-native';
 import { RootStackScreenProps } from "../../types";
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
 import Styles from "../../constants/Styles";
 import { useRefresh } from "../../hooks/useRefresh";
-import { Screen } from "../../components/Screen";
+import { Screen } from "../../components/forms/Screen";
 
 export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
     const [getCategories, { data, loading, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {

@@ -1,7 +1,7 @@
 import { TextInput, TextInputProps, StyleSheet, TouchableHighlight, Text, NativeSyntheticEvent, TextInputSelectionChangeEventData } from 'react-native';
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useState } from 'react';
-import { View } from './Themed';
+import { View } from '../Themed';
 import {
     useFonts,
     B612Mono_400Regular,

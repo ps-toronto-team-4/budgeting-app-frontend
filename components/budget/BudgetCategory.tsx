@@ -1,7 +1,7 @@
 import { ColorValue, StyleSheet, TouchableHighlight } from "react-native";
-import { View, Text } from "./Themed";
-import Colors from "../constants/Colors";
-import { PencilButton } from "./PencilButton";
+import { View, Text } from "../Themed";
+import Colors from "../../constants/Colors";
+import { PencilButton } from "../buttons/PencilButton";
 
 interface BudgetWarningProps {
     label?: 'Over Budget' | 'Near Budget';

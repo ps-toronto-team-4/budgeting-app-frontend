@@ -1,17 +1,17 @@
 import { Alert, ActivityIndicator, TouchableHighlight } from 'react-native';
 import { Text, View, RequiredField } from '../../components/Themed';
-import Button from '../../components/Button';
+import Button from '../../components/buttons/Button';
 import React, { useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
-import TextInput from '../../components/TextInput';
+import TextInput from '../../components/forms/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
-import { Screen } from '../../components/Screen';
+import { Screen } from '../../components/forms/Screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRefresh } from '../../hooks/useRefresh';
 

@@ -5,9 +5,9 @@ import { FlatList } from "react-native";
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/buttons/AddButton";
 import { useAuth } from "../hooks/useAuth";
-import { Screen } from "../components/Screen";
+import { Screen } from "../components/forms/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
@@ -108,12 +108,12 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     const handleAddExpense = () => navigation.navigate('CreateExpense');
 
     if (data === undefined) {
-        return <Screen><Text>Loading data...</Text></Screen>;
+        return <View style={staticStyles.screen}><Text>Loading data...</Text></View>;
     } else if (data.expenses.__typename !== 'ExpensesSuccess') {
-        return <Screen><Text>Error fetching data.</Text></Screen>;
+        return <View style={staticStyles.screen}><Text>Error fetching data.</Text></View>;
     } else {
         return (
-            <Screen>
+            <View style={staticStyles.screen}>
                 <FlatList
                     data={processedExpenses}
                     renderItem={renderItem}
@@ -122,12 +122,16 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                 <View style={staticStyles.addExpenseBtn}>
                     <AddButton size={100} onPress={handleAddExpense} />
                 </View>
-            </Screen>
+            </View>
         );
     }
 }
 
 const staticStyles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
     itemSeparator: {
         flex: 1,
         flexBasis: 2,

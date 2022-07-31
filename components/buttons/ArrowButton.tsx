@@ -25,5 +25,4 @@ function ArrowButton({ direction, onPress, marginLeft, marginRight }: HeaderButt
     );
 }
 
-
 export default ArrowButton;

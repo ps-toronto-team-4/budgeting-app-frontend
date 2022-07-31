@@ -5,12 +5,12 @@ import Colors from "../../constants/Colors";
 import moment, { Moment } from "moment";
 import { Budget, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
-import Button from "../../components/Button";
-import { AmountInput } from "../../components/AmountInput";
-import { DropdownRow } from "../../components/DropdownRow";
+import Button from "../../components/buttons/Button";
+import { AmountInput } from "../../components/forms/AmountInput";
+import { DropdownRow } from "../../components/forms/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
-import { Screen } from "../../components/Screen";
-import { InputRow } from "../../components/InputRow";
+import { Screen } from "../../components/forms/Screen";
+import { InputRow } from "../../components/forms/InputRow";
 import { useRefresh } from "../../hooks/useRefresh";
 
 export default function CreateBudgetScreen({ navigation, route }: RootStackScreenProps<'CreateBudget'>) {
