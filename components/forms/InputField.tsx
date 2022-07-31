@@ -9,27 +9,27 @@ export interface InputFieldProps {
 }
 
 export function InputField({ label, placeholder, onChange }: InputFieldProps) {
-    const [editable, setEditable] = useState(false);
+    const [focused, setFocused] = useState(false);
     const inputRef = useRef<TextInput>(null);
-    const backgroundColor = editable ? 'rgba(0,0,0,0.1)' : 'white';
+    const backgroundColor = focused ? 'rgba(0,0,0,0.1)' : 'white';
     const containerStyle = useMemo(() => {
         return [styles.container, { backgroundColor }]
     }, [backgroundColor]);
 
     useEffect(() => {
-        if (editable) inputRef.current?.focus();
-    }, [editable]);
+        if (focused) inputRef.current?.focus();
+    }, [focused]);
 
     return (
-        <TouchableHighlight style={containerStyle} onPress={() => setEditable(true)} underlayColor="rgba(0,0,0,0.1)" >
+        <TouchableHighlight style={containerStyle} onPress={() => setFocused(true)} underlayColor="rgba(0,0,0,0.1)" >
             <View style={styles.content}>
                 <Text style={styles.label}>{label}</Text>
                 <TextInput
                     style={styles.input}
                     placeholder={placeholder}
-                    editable={editable}
+                    editable={focused}
                     ref={inputRef}
-                    onBlur={() => setEditable(false)}
+                    onBlur={() => setFocused(false)}
                     onChangeText={onChange} />
             </View>
         </TouchableHighlight>

@@ -18,6 +18,7 @@ import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
 import { DisplayField } from "./DisplayField";
 import { InputField } from "./InputField";
+import { DropdownField } from "./DropdownField";
 
 export type FormValues = {
     amount: number;
@@ -53,33 +54,12 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     const [amount, setAmount] = useState(initVals?.amount || 0);
     const [merchantId, setMerchantId] = useState(initVals?.merchantId);
     const [categoryId, setCategoryId] = useState(initVals?.categoryId);
-    const [merchantExpanded, setMerchantExpanded] = useState(false);
-    const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [calendarShown, setCalendarShown] = useState(false);
     const [date, setDate] = useState(initVals?.date || moment().toISOString());
     const [desc, setDesc] = useState(initVals?.desc || '');
     const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()];
     const day = moment(date).date();
     const year = moment(date).year();
-
-    function selectMerchant(name: string) {
-        if (merchantData && merchantData.merchants.__typename === 'MerchantsSuccess') {
-            const found = merchantData.merchants.merchants.find(merchant => merchant.name === name);
-            if (found !== undefined) {
-                setMerchantId(found?.id);
-                if (found.defaultCategory) {
-                    setCategoryId(found.defaultCategory.id);
-                }
-            }
-        }
-    }
-
-    function selectCategory(name: string) {
-        if (categoryData?.categories.__typename === 'CategoriesSuccess') {
-            const found = categoryData?.categories.categories.find(cat => cat.name === name);
-            if (found !== undefined) setCategoryId(found?.id);
-        }
-    }
 
     function handleSubmit() {
         onSubmit({
@@ -92,52 +72,40 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     }
 
     return (
-        <Form onDismissKeyboard={() => { setCalendarShown(false); setMerchantExpanded(false); setCategoryExpanded(false); }}>
+        <Form onDismissKeyboard={() => { setCalendarShown(false); }}>
             <AmountInput onChangeAmount={setAmount} defaultAmount={initVals?.amount || 0} />
             <>
                 {
                     merchantData?.merchants.__typename === 'MerchantsSuccess' &&
-                    <DropdownRow
+                    <DropdownField
                         label="Merchant"
+                        placeholder="optional"
                         data={
-                            merchantData.merchants.merchants.map(x => { return { id: x.id, name: x.name } })
+                            merchantData.merchants.merchants.map(x => { return { id: x.id.toString(), value: x.name } })
                         }
-                        onSelect={selectMerchant}
                         defaultValue={
                             initVals ?
                                 merchantData.merchants.merchants.find((merch) => merch.id === initVals.merchantId)?.name
                                 : undefined
                         }
-                        onCreateNew={() => { nav.navigate('CreateMerchant'); setMerchantExpanded(false); }}
-                        placeholder={merchantExpanded ? "Start typing to search" : "Select Merchant"}
-                        expanded={merchantExpanded}
-                        onExpand={() => { setMerchantExpanded(true); setCategoryExpanded(false); setCalendarShown(false); }}
-                        onCollapse={() => setMerchantExpanded(false)}
-                        visible={!categoryExpanded} />
+                        onFocus={() => setCalendarShown(false)}
+                        onChange={id => setMerchantId(parseInt(id))} />
                 }
             </>
             <>
                 {
                     categoryData?.categories.__typename === 'CategoriesSuccess' &&
-                    <DropdownRow
+                    <DropdownField
                         label="Category"
-                        data={
-                            categoryData.categories.categories.map(x => { return { id: x.id, name: x.name } })
-                        }
-                        onSelect={selectCategory}
+                        placeholder="optional"
+                        data={categoryData.categories.categories.map(x => { return { id: x.id.toString(), value: x.name } })}
                         defaultValue={
                             initVals ?
                                 categoryData.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
                                 : undefined
                         }
-                        placeholder={categoryExpanded ? "Start typing to search" : "Uncategorized"}
-                        onCreateNew={() => { nav.navigate('CreateCategory'); setCategoryExpanded(false); }}
-                        expanded={categoryExpanded}
-                        onExpand={() => { setCategoryExpanded(true); setMerchantExpanded(false); setCalendarShown(false); }}
-                        onCollapse={() => setCategoryExpanded(false)}
-                        visible={categoryData?.categories.__typename === 'CategoriesSuccess' && !merchantExpanded}
-                        topBorder
-                        value={categoryData.categories.categories.find((cat) => cat.id === categoryId)?.name} />
+                        onFocus={() => setCalendarShown(false)}
+                        onChange={id => setCategoryId(parseInt(id))} />
                 }
             </>
             <>
@@ -155,14 +123,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                     }
                 </View>
                 <View style={styles.detailsRow}>
-                    <InputRow
-                        label="Details"
-                        placeholder="Enter Details"
-                        value={desc}
-                        onChangeText={setDesc}
-                        wrap
-                        bottomBorder />
-                    <InputField label="Details" placeholder="Enter Details" onChange={setDesc} />
+                    <InputField label="Details" placeholder="optional" onChange={setDesc} />
                 </View>
                 <View style={styles.buttonContainer}>
                     <Button
