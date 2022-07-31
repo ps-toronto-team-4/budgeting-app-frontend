@@ -8,7 +8,7 @@ import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import Styles from '../constants/Styles';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { GetUserDocument, GetUserQuery, GetUserQueryVariables } from '../components/generated';
 import { useRefresh } from '../hooks/useRefresh';
 import { SettingsBar } from '../components/profile/SettingsBar';
@@ -19,12 +19,12 @@ function formatPhoneNumber(phoneNumber: string): string {
 }
 
 export default function SettingsScreen({ navigation }: RootTabScreenProps<'Settings'>) {
-    const passwordHash = useAuth();
-    const { data, refetch } = useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {
-        variables: { passwordHash }
+    const [getUser, { data, refetch }] = useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument);
+    useAuth({
+        onRetrieved: (passwordHash) => getUser({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
     });
-    useRefresh(refetch, [passwordHash]);
-    useUnauthRedirect();
+    useRefresh(refetch);
 
     const logout = () => {
         AsyncStorage.multiRemove(['passwordHash', 'New Category']).then(() => {

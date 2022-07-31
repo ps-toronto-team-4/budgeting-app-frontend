@@ -9,7 +9,7 @@ import { useLazyQuery } from '@apollo/client';
 import { LoginDocument, LoginQuery, LoginQueryVariables } from "../../components/generated";
 import Styles from "../../constants/Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAuthRedirect } from "../../hooks/useAuthRedirect";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
     const [username, setUsername] = useState('');
@@ -18,7 +18,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
     const [passwordPayload, setPasswordPayload] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    useAuthRedirect();
+    useAuth({ redirect: 'ifAuthorized' });
 
     const setData = async () => {
         try {

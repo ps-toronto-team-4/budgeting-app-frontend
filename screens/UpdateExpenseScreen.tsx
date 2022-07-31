@@ -4,15 +4,12 @@ import { DeleteExpenseDocument, DeleteExpenseMutation, UpdateExpenseDocument, Up
 
 import { RootStackScreenProps } from "../types";
 import { ExpenseEditForm, FormValues } from "../components/ExpenseEditForm";
-import { AntDesign, Feather } from '@expo/vector-icons';
 import moment from "moment";
 import { useAuth } from "../hooks/useAuth";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { TrashButton } from "../components/TrashButton";
 
 export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateExpense'>) {
-    const passwordHash = useAuth();
+    const passwordHash = useAuth({ redirect: 'ifUnauthorized' });
     const [submit, { }] = useMutation<UpdateExpenseMutation>(UpdateExpenseDocument);
     const [deleteExpense, { }] = useMutation<DeleteExpenseMutation>(DeleteExpenseDocument, {
         variables: {
@@ -20,8 +17,6 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
             id: route.params?.id,
         }
     });
-
-    useUnauthRedirect();
 
     useEffect(() => {
         navigation.setOptions({

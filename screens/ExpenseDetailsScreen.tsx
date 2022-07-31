@@ -1,17 +1,13 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
-import { Category, GetExpenseDocument, GetExpenseQuery } from "../components/generated";
+import { Category, GetExpenseDocument, GetExpenseQuery, GetExpenseQueryVariables } from "../components/generated";
 import { ColorValue, TouchableOpacity } from "react-native"
 import Colors from "../constants/Colors";
 
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackScreenProps } from "../types";
-import { Feather } from "@expo/vector-icons";
-import moment from "moment";
 import { useAuth } from "../hooks/useAuth";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 import { PencilButton } from "../components/PencilButton";
@@ -25,15 +21,21 @@ export function formatDate(date: string | null | undefined): string {
     return `${months[parseInt(month) - 1]} ${dayOfMonth}, ${year}`;
 }
 
-export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
-    const passwordHash = useAuth();
-    const { expenseId, ...otherParams } = route.params;
-    const { loading, error, data, refetch } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
-        variables: { passwordHash: passwordHash, expenseId: expenseId }
-    });
+function formatAmount(amount: number | null | undefined): string {
+    if (!amount) {
+        return '0.00';
+    }
+    return Number(amount).toFixed(2);
+}
 
-    useUnauthRedirect();
-    useRefresh(refetch, [passwordHash]);
+export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
+    const { expenseId } = route.params;
+    const [getExpense, { data, refetch }] = useLazyQuery<GetExpenseQuery, GetExpenseQueryVariables>(GetExpenseDocument);
+    useAuth({
+        onRetrieved: ((passwordHash) => getExpense({ variables: { passwordHash, expenseId } })),
+        redirect: 'ifUnauthorized',
+    });
+    useRefresh(refetch);
 
     useEffect(() => {
         if (data) {
@@ -54,13 +56,6 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
             })
         };
     }, [data]);
-
-    function formatAmount(amount: number | null | undefined): string {
-        if (!amount) {
-            return '0.00';
-        }
-        return Number(amount).toFixed(2);
-    }
 
     const expenseTypename = data?.expense.__typename;
 
