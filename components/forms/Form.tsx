@@ -17,7 +17,7 @@ export interface ScreenProps {
     backdrop?: boolean;
 }
 
-export function Screen({ children, onDismissKeyboard, backdrop }: ScreenProps) {
+export function Form({ children, onDismissKeyboard, backdrop }: ScreenProps) {
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); onDismissKeyboard && onDismissKeyboard(); }}>
             <SafeAreaView style={styles.screen}>

@@ -10,7 +10,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
 import Styles from "../../constants/Styles";
 import { useRefresh } from "../../hooks/useRefresh";
-import { Screen } from "../../components/forms/Screen";
+import { Form } from "../../components/forms/Form";
 
 export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
     const [getCategories, { data, loading, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {
@@ -35,7 +35,7 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
     }
 
     return (
-        <Screen>
+        <Form>
             <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')} />
             {loading ? (<ActivityIndicator size='large' />) : (
                 data?.categories.__typename === "CategoriesSuccess" ? (
@@ -49,6 +49,6 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
                         <Text>{data?.categories.errorMessage}</Text>
                     </View>
                 ))}
-        </Screen>
+        </Form>
     );
 }

@@ -13,7 +13,7 @@ import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, Get
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 import modalStyle from '../../constants/Modal';
-import { Screen } from "../../components/forms/Screen";
+import { Form } from "../../components/forms/Form";
 
 export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 
@@ -85,7 +85,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
   }
 
   return (
-    <Screen backdrop={confirmDelete}>
+    <Form backdrop={confirmDelete}>
       <View style={Styles.container}>
         {loading ? (
           <ActivityIndicator size={'large'} />
@@ -151,7 +151,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
           </View>
         </Modal>
       </View>
-    </Screen>
+    </Form>
   );
 }
 

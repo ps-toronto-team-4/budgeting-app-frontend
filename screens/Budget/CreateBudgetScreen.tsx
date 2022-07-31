@@ -9,7 +9,7 @@ import Button from "../../components/buttons/Button";
 import { AmountInput } from "../../components/forms/AmountInput";
 import { DropdownRow } from "../../components/forms/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
-import { Screen } from "../../components/forms/Screen";
+import { Form } from "../../components/forms/Form";
 import { InputRow } from "../../components/forms/InputRow";
 import { useRefresh } from "../../hooks/useRefresh";
 
@@ -77,7 +77,7 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
     }
 
     return (
-        <Screen onDismissKeyboard={() => setCategoryExpanded(false)}>
+        <Form onDismissKeyboard={() => setCategoryExpanded(false)}>
             <AmountInput
                 defaultAmount={0}
                 onChangeAmount={handleChangeAmount}
@@ -106,7 +106,7 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
                     accessibilityLabel="Button to Create New Budget"
                     onPress={() => handleBudgetCreation()} />
             </View>
-        </Screen>
+        </Form>
     );
 }
 

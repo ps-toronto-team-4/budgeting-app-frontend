@@ -13,7 +13,7 @@ import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 import { useNavigation } from "@react-navigation/native";
 import { InputRow } from "./InputRow";
-import { Screen } from "./Screen";
+import { Form } from "./Form";
 import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -87,7 +87,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     }
 
     return (
-        <Screen onDismissKeyboard={() => { setCalendarShown(false); setMerchantExpanded(false); setCategoryExpanded(false); }}>
+        <Form onDismissKeyboard={() => { setCalendarShown(false); setMerchantExpanded(false); setCategoryExpanded(false); }}>
             <AmountInput onChangeAmount={setAmount} defaultAmount={initVals?.amount || 0} />
             <>
                 {
@@ -173,7 +173,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                         onPress={handleSubmit} />
                 </View>
             </>
-        </Screen>
+        </Form>
     );
 }
 

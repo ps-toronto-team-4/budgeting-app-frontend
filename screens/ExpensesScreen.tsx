@@ -7,7 +7,6 @@ import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AddButton from "../components/buttons/AddButton";
 import { useAuth } from "../hooks/useAuth";
-import { Screen } from "../components/forms/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";

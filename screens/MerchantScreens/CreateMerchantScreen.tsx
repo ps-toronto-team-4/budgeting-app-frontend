@@ -8,7 +8,7 @@ import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, 
 import { DropdownRow } from "../../components/forms/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
 import { InputRow } from "../../components/forms/InputRow";
-import { Screen } from "../../components/forms/Screen";
+import { Form } from "../../components/forms/Form";
 import { useRefresh } from "../../hooks/useRefresh";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -98,7 +98,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     };
 
     return (
-        <Screen>
+        <Form>
             <View style={styles.container}>
                 <InputRow
                     label="Merchant"
@@ -145,7 +145,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     <ActivityIndicator size='large' />
                 )}
             </View>
-        </Screen>
+        </Form>
     );
 }
 

@@ -9,7 +9,7 @@ import Button from "../../components/buttons/Button";
 import { Row } from "../../components/forms/Row";
 import { AmountInput } from "../../components/forms/AmountInput";
 import { useAuth } from "../../hooks/useAuth";
-import { Screen } from "../../components/forms/Screen";
+import { Form } from "../../components/forms/Form";
 import { InputRow } from "../../components/forms/InputRow";
 import { TrashButton } from "../../components/buttons/TrashButton";
 
@@ -50,7 +50,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
     }
 
     return (
-        <Screen>
+        <Form>
             <AmountInput defaultAmount={amount} onChangeAmount={setAmount} />
             <InputRow label="Category:" disabled placeholder={budgetCategory.category.name} topBorder bottomBorder />
 
@@ -60,7 +60,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
                     accessibilityLabel="Button to Save Budget"
                     onPress={handleSubmit} />
             </View>
-        </Screen>
+        </Form>
     );
 }
 

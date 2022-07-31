@@ -11,7 +11,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useRefresh } from "../../hooks/useRefresh";
 import modalStyle from "../../constants/Modal";
 import Styles from "../../constants/Styles";
-import { Screen } from "../../components/forms/Screen";
+import { Form } from "../../components/forms/Form";
 import { InputRow } from "../../components/forms/InputRow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -128,7 +128,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     }
 
     return (
-        <Screen>
+        <Form>
             <View style={styles.container}>
                 <InputRow
                     label="Merchant"
@@ -187,7 +187,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                     </View>
                 </Modal>
             </View>
-        </Screen>
+        </Form>
     );
 }
 

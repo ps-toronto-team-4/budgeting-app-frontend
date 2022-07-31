@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
-import { Screen } from "../components/forms/Screen";
 import Styles from '../constants/Styles';
 import { VictoryChart, VictoryLegend, VictoryPie } from 'victory-native';
 import { GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownQueryVariables, MonthType } from '../components/generated';

@@ -11,7 +11,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
-import { Screen } from '../../components/forms/Screen';
+import { Form } from '../../components/forms/Form';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRefresh } from '../../hooks/useRefresh';
 
@@ -73,7 +73,7 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
   }
 
   return (
-    <Screen>
+    <Form>
       <View style={Styles.container}>
         {
           loading ?
@@ -112,6 +112,6 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
         </TouchableHighlight>
         <Button text="Save Category" onPress={onSubmit} accessibilityLabel={'Save Category Button'}></Button>
       </View>
-    </Screen>
+    </Form>
   );
 }
