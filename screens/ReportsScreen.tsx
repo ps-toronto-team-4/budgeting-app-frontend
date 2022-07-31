@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import Styles from '../constants/Styles';
@@ -12,7 +12,6 @@ import ByCategory from '../components/graphs/ByCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
 import MonthlyVsBudgeted from '../components/graphs/MonthlyVsBudgeted';
-import { ScrollView } from 'react-native-gesture-handler';
 import { useRefresh } from '../hooks/useRefresh';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {

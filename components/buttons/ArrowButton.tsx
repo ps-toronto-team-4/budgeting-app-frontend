@@ -1,5 +1,5 @@
 
-import { TouchableHighlight } from "react-native-gesture-handler";
+import { TouchableHighlight } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 
 interface HeaderButtonProps {
