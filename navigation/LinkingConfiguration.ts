@@ -21,7 +21,7 @@ const linking: LinkingOptions<RootStackParamList> = {
                     Expenses: 'expenses-list',
                     Reports: 'reports',
                     Budget: 'budget',
-                    Settings: 'Settings',
+                    Settings: 'settings',
                 }
             },
             CreateCategory: 'create-category',
@@ -29,7 +29,7 @@ const linking: LinkingOptions<RootStackParamList> = {
             ExpenseDetails: 'expense-details',
             CreateExpense: 'create-expense',
             UpdateExpense: 'update-expense',
-            ForgotPasswordModal: 'ForgotPassword',
+            ForgotPasswordModal: 'forgot-password',
             NotFound: '*',
             CreateMerchant: 'create-merchant',
             CreateBudget: 'create-budget',
