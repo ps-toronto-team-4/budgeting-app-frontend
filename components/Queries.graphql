@@ -472,3 +472,20 @@ mutation deleteMerchant($passwordHash: String!, $id: Int!){
     }
 
 }
+
+query getMonthTotals($passwordHash: String!){
+    monthsTotals(passwordHash: $passwordHash){
+        ... on MonthsTotals{
+            byMonth{
+                amountBudgeted
+                amountSpent
+                month
+                year
+            }
+        } 
+        ... on FailurePayload {
+            errorMessage
+            exceptionName
+        }
+    }
+}
