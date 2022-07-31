@@ -75,7 +75,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
         }
     })
 
-    useRefresh(refetch);
+    useRefresh(() => refetch({ passwordHash }));
 
     const DeleteButton = () => {
         return (

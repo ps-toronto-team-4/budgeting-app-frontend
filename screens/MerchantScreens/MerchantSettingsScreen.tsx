@@ -18,8 +18,8 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
             Alert.alert(error.message);
         })
     });
-    useAuth({ onRetrieved: (passwordHash) => getMerchants({ variables: { passwordHash } }), redirect: 'ifUnauthorized' });
-    useRefresh(refetch);
+    const passwordHash = useAuth({ onRetrieved: (passwordHash) => getMerchants({ variables: { passwordHash } }), redirect: 'ifUnauthorized' });
+    useRefresh(() => refetch({ passwordHash }));
 
     const renderMerchant = ({ item }: { item: Merchant }) => {
         return (

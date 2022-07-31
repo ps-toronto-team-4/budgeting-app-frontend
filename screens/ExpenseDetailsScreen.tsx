@@ -31,11 +31,11 @@ function formatAmount(amount: number | null | undefined): string {
 export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
     const { expenseId } = route.params;
     const [getExpense, { data, refetch }] = useLazyQuery<GetExpenseQuery, GetExpenseQueryVariables>(GetExpenseDocument);
-    useAuth({
+    const passwordHash = useAuth({
         onRetrieved: ((passwordHash) => getExpense({ variables: { passwordHash, expenseId } })),
         redirect: 'ifUnauthorized',
     });
-    useRefresh(refetch);
+    useRefresh(() => refetch({ passwordHash, expenseId }), [expenseId]);
 
     useEffect(() => {
         if (data) {

@@ -19,7 +19,7 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
         onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
     });
-    useRefresh(refetch);
+    useRefresh(() => refetch({ passwordHash }));
 
     const [amount, setAmount] = useState(0);
     const [categoryId, setCategoryId] = useState<number | null>(null);

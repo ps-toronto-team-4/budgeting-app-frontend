@@ -55,9 +55,9 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
         redirect: 'ifUnauthorized',
     });
     useRefresh(() => {
-        budgetRefetch();
-        monthRefetch();
-    });
+        budgetRefetch({ passwordHash });
+        monthRefetch({ passwordHash, month: month as MonthType, year });
+    }, [month, year]);
 
     const [createBudget] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
         variables: { passwordHash, month, year },

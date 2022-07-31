@@ -30,7 +30,7 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
     onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
     redirect: 'ifUnauthorized',
   });
-  useRefresh(refetch);
+  useRefresh(() => refetch({ passwordHash }));
 
   // Create category graphql query
   const [createCategory, { loading, data }] = useMutation<CreateCategoryMutation>(CreateCategoryDocument, {

@@ -9,7 +9,6 @@ import Button from "../../components/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
 import Styles from "../../constants/Styles";
-import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 import { useRefresh } from "../../hooks/useRefresh";
 import { Screen } from "../../components/Screen";
 
@@ -17,11 +16,11 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
     const [getCategories, { data, loading, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {
         onError: (error) => Alert.alert(error.message),
     });
-    useAuth({
+    const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
     });
-    useRefresh(refetch);
+    useRefresh(() => refetch({ passwordHash }));
 
     const renderCategory = ({ item }: { item: Category }) => {
         return (

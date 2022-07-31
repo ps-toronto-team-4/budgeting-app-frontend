@@ -36,15 +36,15 @@ export interface ExpenseEditFormProps {
 export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     const [getMerchants, { data: merchantData, refetch: refetchMerchants }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
     const [getCategories, { data: categoryData, refetch: refetchCategories }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
-    useAuth({
+    const passwordHash = useAuth({
         onRetrieved: (passwordHash) => {
             getMerchants({ variables: { passwordHash } });
             getCategories({ variables: { passwordHash } });
         },
     });
     useRefresh(() => {
-        refetchMerchants();
-        refetchCategories();
+        refetchMerchants({ passwordHash });
+        refetchCategories({ passwordHash });
     });
 
     const nav = useNavigation();

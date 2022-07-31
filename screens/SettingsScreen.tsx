@@ -4,7 +4,6 @@ import { RootTabScreenProps } from "../types";
 import Button from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import Styles from '../constants/Styles';
@@ -20,11 +19,11 @@ function formatPhoneNumber(phoneNumber: string): string {
 
 export default function SettingsScreen({ navigation }: RootTabScreenProps<'Settings'>) {
     const [getUser, { data, refetch }] = useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument);
-    useAuth({
+    const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getUser({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
     });
-    useRefresh(refetch);
+    useRefresh(() => refetch({ passwordHash }));
 
     const logout = () => {
         AsyncStorage.multiRemove(['passwordHash', 'New Category']).then(() => {

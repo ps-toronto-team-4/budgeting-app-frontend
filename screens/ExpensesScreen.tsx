@@ -94,11 +94,11 @@ function keyExtractor(item: ExpenseDisplayPropsOrDate) {
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
     const [getExpenses, { data, refetch }] = useLazyQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument);
-    useAuth({
+    const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getExpenses({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
     });
-    useRefresh(refetch);
+    useRefresh(() => refetch({ passwordHash }));
     const processedExpenses = useMemo(() => {
         if (data?.expenses.__typename === 'ExpensesSuccess')
             return processExpenses(data.expenses.expenses, (id) => navigation.navigate('ExpenseDetails', { expenseId: id }));

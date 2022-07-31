@@ -18,14 +18,14 @@ import { useRefresh } from '../hooks/useRefresh';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const [getMonthlyBreakdown, { data, refetch }] = useLazyQuery<GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables>(GetMonthBreakdownDocument);
-    useAuth({
+    const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getMonthlyBreakdown({ variables: { passwordHash, month: month as MonthType, year } }),
         redirect: 'ifUnauthorized',
     });
-    useRefresh(refetch);
     const date = new Date();
     const [month, setMonth] = useState(MONTHS_ORDER[date.getMonth()]);
     const [year, setYear] = useState(date.getFullYear());
+    useRefresh(() => refetch({ passwordHash, month: month as MonthType, year }), [month, year]);
 
     return (
         <Screen>

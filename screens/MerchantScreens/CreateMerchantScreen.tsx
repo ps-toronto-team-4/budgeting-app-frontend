@@ -7,7 +7,6 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery, GetMerchantsQueryVariables } from "../../components/generated";
 import { DropdownRow } from "../../components/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
-import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 import { InputRow } from "../../components/InputRow";
 import { Screen } from "../../components/Screen";
 import { useRefresh } from "../../hooks/useRefresh";
@@ -61,7 +60,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 
     useRefresh(() => {
         preFillCategory();
-        refetch();
+        refetch({ passwordHash });
     });
 
     const merchantTaken = () => {
