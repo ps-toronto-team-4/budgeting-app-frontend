@@ -140,7 +140,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                 <View>
                     <InputRow
                         onPress={() => setCalendarShown(true)}
-                        label="Date:"
+                        label="Date"
                         value={
                             ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()] +
                             " " + moment(date).date() + " " + moment(date).year()
@@ -158,7 +158,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                 </View>
                 <View style={styles.detailsRow}>
                     <InputRow
-                        label="Details:"
+                        label="Details"
                         placeholder="Enter Details"
                         value={desc}
                         onChangeText={setDesc}

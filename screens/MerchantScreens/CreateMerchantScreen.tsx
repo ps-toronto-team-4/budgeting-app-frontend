@@ -101,14 +101,14 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         <Screen>
             <View style={styles.container}>
                 <InputRow
-                    label="Merchant:"
+                    label="Merchant"
                     placeholder="(mandatory)"
                     value={merchantName}
                     onChangeText={setMerchantName}
                     error={merchantError}
                     topBorder />
                 <InputRow
-                    label="Details:"
+                    label="Details"
                     placeholder="(optional)"
                     value={details}
                     onChangeText={setDetails}

@@ -131,14 +131,14 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
         <Screen>
             <View style={styles.container}>
                 <InputRow
-                    label="Merchant:"
+                    label="Merchant"
                     placeholder="(mandatory)"
                     value={newName}
                     onChangeText={setNewName}
                     error={merchantError}
                     topBorder />
                 <InputRow
-                    label="Details:"
+                    label="Details"
                     placeholder="(optional)"
                     value={newDescription || ""}
                     onChangeText={setNewDescription}

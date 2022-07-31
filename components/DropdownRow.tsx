@@ -115,7 +115,7 @@ export function DropdownRow({
                 <View style={styles.fieldAndErrorContainer}>
                     <View style={styles.fieldLabelAndInputAndArrowContainer}>
                         <View style={styles.fieldLabelAndInputContainer}>
-                            <Text style={styles.fieldLabel}>{label}:</Text>
+                            <Text style={styles.fieldLabel}>{label}</Text>
                             <TextInput
                                 style={styles.fieldInput}
                                 editable={expanded}
