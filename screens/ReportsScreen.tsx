@@ -5,8 +5,8 @@ import { useAuth } from "../hooks/useAuth";
 import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
 import { Screen } from "../components/Screen";
 import MonthlyExpenseGraph from '../components/GraphDisplays/monthlyExpenses';
-import { useQuery } from '@apollo/client';
-import { GetMonthBreakdownDocument, GetMonthBreakdownQuery } from '../components/generated';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import { GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from '../components/generated';
 import ByCategory from '../components/GraphDisplays/byCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
@@ -25,6 +25,10 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
     const { loading: monthlyBreakdownLoading, data: monthlyBreakdownData, refetch: monthlyBreakdownRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument,
         { variables: { passwordHash: passwordHash, month: month, year: year } }
     )
+
+    const [startQuery, { }] = useLazyQuery<GetMonthTotalsQuery>(GetMonthTotalsDocument)
+
+
 
 
     return (
