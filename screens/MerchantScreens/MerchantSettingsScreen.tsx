@@ -29,8 +29,8 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
                 onPress={() => navigation.navigate("UpdateMerchant", { id: item.id, name: item.name, description: item.description, category: item.defaultCategory || undefined })}
                 underlayColor="rgba(0,0,0,0.1)">
                 <View style={styles.itemContainer}>
-                    <Text style={{ fontSize: 24, marginHorizontal: 5, fontWeight: 'bold', width: 250 }}>{item.name}</Text>
-                    <MaterialIcons name="navigate-next" size={32} color="black" />
+                    <Text style={{ fontSize: 22, marginHorizontal: 5, fontWeight: 'bold', width: 250 }}>{item.name}</Text>
+                    <MaterialIcons name="navigate-next" size={28} color="black" />
                 </View>
             </TouchableHighlight>
         )

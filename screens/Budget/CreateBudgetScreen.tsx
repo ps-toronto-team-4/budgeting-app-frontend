@@ -26,9 +26,8 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
     const [amount, setAmount] = useState(0);
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [budget, setBudget] = useState<Budget | null>(route.params.budget || null);
-    const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [amountError, setAmountError] = useState('');
-    const [categoryError, setCategoryError] = useState('');
+    const [check, setCheck] = useState(false);
 
     const [createBudget] = useMutation<CreateBudgetCategoryMutation>(CreateBudgetCategoryDocument, {
         variables: { passwordHash, budgetId: budget?.id, categoryId, amount },
@@ -47,7 +46,6 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
             const found = data?.categories.categories.find(cat => cat.name === name);
             if (found !== undefined) {
                 setCategoryId(found?.id);
-                setCategoryError('');
             }
         }
     }
@@ -64,7 +62,7 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
             noErrors = false;
         }
         if (categoryId == null) {
-            setCategoryError("This field is required.");
+            setCheck(true);
             noErrors = false;
         }
 
@@ -79,11 +77,10 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
     }
 
     return (
-        <Form onDismissKeyboard={() => setCategoryExpanded(false)}>
+        <Form>
             <AmountInput
                 defaultAmount={0}
                 onChangeAmount={handleChangeAmount}
-                onSelect={() => setCategoryExpanded(false)}
                 error={amountError} />
             <DropdownField
                 label="Category"
@@ -96,7 +93,8 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
                         }).map(x => { return { value: x.name, id: x.id.toString() } }) : []
                 }
                 onChange={(id) => setCategoryId(parseInt(id))}
-                required />
+                required
+                check={check} />
             <DisplayField label="Month" value={`${budget?.month} ${budget?.year}`} />
             <View style={styles.buttonContainer}>
                 <Button

@@ -11,6 +11,7 @@ import { InputRow } from "../../components/forms/InputRow";
 import { Form } from "../../components/forms/Form";
 import { useRefresh } from "../../hooks/useRefresh";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DropdownField } from "../../components/forms/DropdownField";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
     const passwordHash = useAuth({
@@ -82,9 +83,9 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     })();
 
-    function handleCategorySelect(categoryName: String) {
+    function handleCategorySelect(categoryId: string) {
         if (categoryData?.categories.__typename == "CategoriesSuccess") {
-            const foundCategory = categoryData.categories.categories.find(x => x.name == categoryName);
+            const foundCategory = categoryData.categories.categories.find(x => x.id === parseInt(categoryId));
 
             if (foundCategory !== undefined) {
                 setCategory(foundCategory);
@@ -129,6 +130,15 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     onCreateNew={() => navigation.navigate("CreateCategory")}
                     createLabel="Category"
                     defaultValue={category?.name} />
+                <DropdownField
+                    label="Default Category"
+                    placeholder="optional"
+                    data={
+                        categoryData?.categories.__typename == "CategoriesSuccess" ?
+                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), value: x.name } }) : []
+                    }
+                    defaultValue={category?.name}
+                    onChange={handleCategorySelect} />
                 <View style={styles.buttonContainer}>
                     <Button text="Save Merchant"
                         accessibilityLabel="Save Merchant"
@@ -152,23 +162,13 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        marginTop: 50,
     },
     alert: {
         color: 'red',
     },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        paddingVertical: 10,
-        paddingHorizontal: 30,
-    },
     buttonContainer: {
         alignSelf: 'center',
-        justifyContent: 'flex-end',
-        position: 'absolute',
-        bottom: '5%'
+        marginTop: 50,
     },
 });

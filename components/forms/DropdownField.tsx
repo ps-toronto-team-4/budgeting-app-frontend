@@ -29,13 +29,18 @@ export interface DropdownFieldProps {
     onChange: (id: string) => void;
     onFocus?: () => void;
     required?: boolean;
+    /**
+     * Only does anything if `required` is true. Tells this component to check whether the field
+     * is empty and, if so, display error.
+     */
+    check?: boolean;
 }
 
 /**
  * This component has a lot of moving parts. Modification can result in unexpected behaviour and is
  * done at your own risk. If you need any changes to this component, ask Hark.
  */
-export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required }: DropdownFieldProps) {
+export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required, check }: DropdownFieldProps) {
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const scrollViewStartRef = useRef<View>(null);
@@ -58,6 +63,10 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
             setKeyboardScreenY(e.endCoordinates.screenY);
         });
     }, []);
+
+    useEffect(() => {
+        if (required && check && !cachedValue) setErrorMessage('This field is required.');
+    }, [check]);
 
     useEffect(() => {
         if (focused) {
