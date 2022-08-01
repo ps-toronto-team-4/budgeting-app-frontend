@@ -68,18 +68,17 @@ export function AmountInput({ onChangeAmount, defaultAmount, onSelect, error }: 
                         selectTextOnFocus />
                 </>
             </TouchableHighlight>
-            <Text style={styles.error}>
-                {
-                    error || ''
-                }
-            </Text>
+            {
+                error !== undefined && error.length > 0 &&
+                <Text style={styles.error}>{error}</Text>
+            }
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        height: 200,
+        height: 150,
         alignItems: 'center',
         justifyContent: 'center',
     },

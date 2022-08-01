@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, TouchableHighlight, View, Text, TextInput, ScrollView, Keyboard, KeyboardAvoidingView } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import Forms from "../../constants/Forms";
+import { useRefresh } from "../../hooks/useRefresh";
 
 export type DropdownFieldDatum = { id: string, value: string }
 
@@ -27,13 +28,14 @@ export interface DropdownFieldProps {
     defaultValue?: string;
     onChange: (id: string) => void;
     onFocus?: () => void;
+    required?: boolean;
 }
 
 /**
  * This component has a lot of moving parts. Modification can result in unexpected behaviour and is
  * done at your own risk. If you need any changes to this component, ask Hark.
  */
-export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus }: DropdownFieldProps) {
+export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required }: DropdownFieldProps) {
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const scrollViewStartRef = useRef<View>(null);
@@ -49,6 +51,7 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
     const [keyboardScreenY, setKeyboardScreenY] = useState(0);
     const [scrollViewScreenY, setScrollViewScreenY] = useState(0);
     const maxScrollViewHeight = keyboardScreenY - scrollViewScreenY - 25;
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         Keyboard.addListener('keyboardDidShow', (e) => {
@@ -63,13 +66,21 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
             setValue('');
         } else {
             setValue(cachedValue);
+            if (required && !cachedValue) {
+                setErrorMessage('This field is required.');
+            } else {
+                setErrorMessage('');
+            }
         }
     }, [focused]);
+
+    useRefresh(() => {
+        setErrorMessage('');
+    });
 
     const handleItemPress = useCallback((itemId: string, itemValue: string) => {
         onChange(itemId);
         setCachedValue(itemValue);
-        setValue(itemValue);
         setFocused(false);
     }, []);
 
@@ -83,21 +94,27 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
     return (
         <View>
             <TouchableHighlight style={containerStyle} onPress={handlePress} underlayColor="rgba(0,0,0,0.1)">
-                <View style={styles.content}>
-                    <Text style={styles.label}>{label}</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder={!focused ? placeholder : 'start typing to search'}
-                        editable={focused}
-                        ref={inputRef}
-                        onBlur={() => setFocused(false)}
-                        value={value}
-                        onChangeText={setValue} />
-                    <AntDesign
-                        name={focused ? 'up' : 'down'}
-                        size={20}
-                        color="black" />
-                </View>
+                <>
+                    <View style={styles.content}>
+                        <Text style={styles.label}>{label}</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder={!focused ? placeholder : 'start typing to search'}
+                            editable={focused}
+                            ref={inputRef}
+                            onBlur={() => setFocused(false)}
+                            value={value}
+                            onChangeText={setValue} />
+                        <AntDesign
+                            name={focused ? 'up' : 'down'}
+                            size={20}
+                            color="black" />
+                    </View>
+                    {
+                        errorMessage.length > 0 && !focused &&
+                        <Text style={styles.error}>{errorMessage}</Text>
+                    }
+                </>
             </TouchableHighlight>
             <View ref={scrollViewStartRef} onLayout={() => scrollViewStartRef.current?.measureInWindow((x, y) => setScrollViewScreenY(y))} />
             <View>
@@ -151,5 +168,11 @@ const styles = StyleSheet.create({
         elevation: 1,
         top: 0,
         left: 0,
+    },
+    error: {
+        paddingTop: 10,
+        color: 'red',
+        alignSelf: 'center',
+        fontSize: Forms.errorFontSize,
     },
 });

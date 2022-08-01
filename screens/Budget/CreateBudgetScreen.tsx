@@ -13,9 +13,10 @@ import { Form } from "../../components/forms/Form";
 import { InputRow } from "../../components/forms/InputRow";
 import { useRefresh } from "../../hooks/useRefresh";
 import { DisplayField } from "../../components/forms/DisplayField";
+import { DropdownField } from "../../components/forms/DropdownField";
 
 export default function CreateBudgetScreen({ navigation, route }: RootStackScreenProps<'CreateBudget'>) {
-    const [getCategories, { data: categoryData, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
+    const [getCategories, { data, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
@@ -42,8 +43,8 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
     });
 
     function selectCategory(name: string) {
-        if (categoryData?.categories.__typename === 'CategoriesSuccess') {
-            const found = categoryData?.categories.categories.find(cat => cat.name === name);
+        if (data?.categories.__typename === 'CategoriesSuccess') {
+            const found = data?.categories.categories.find(cat => cat.name === name);
             if (found !== undefined) {
                 setCategoryId(found?.id);
                 setCategoryError('');
@@ -84,20 +85,18 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
                 onChangeAmount={handleChangeAmount}
                 onSelect={() => setCategoryExpanded(false)}
                 error={amountError} />
-            <DropdownRow
+            <DropdownField
                 label="Category"
+                placeholder="required"
                 data={
-                    categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                        categoryData.categories.categories.filter(filterCat => {
+                    data?.categories.__typename === 'CategoriesSuccess' ?
+                        data.categories.categories.filter(filterCat => {
                             const lookingForOverlap = budget?.budgetCategories?.find((other) => other.category.name == filterCat.name);
                             return lookingForOverlap === undefined;
-                        }).map(x => { return { name: x.name, id: x.id } }) : []
+                        }).map(x => { return { value: x.name, id: x.id.toString() } }) : []
                 }
-                onSelect={selectCategory}
-                expanded={categoryExpanded}
-                onExpand={() => setCategoryExpanded(true)}
-                onCollapse={() => setCategoryExpanded(false)}
-                error={categoryError} />
+                onChange={(id) => setCategoryId(parseInt(id))}
+                required />
             <DisplayField label="Month" value={`${budget?.month} ${budget?.year}`} />
             <View style={styles.buttonContainer}>
                 <Button
