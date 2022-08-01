@@ -55,24 +55,24 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                         data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
                         monthSelector={month}
                         yearSelector={year} />
-                    <Button text='View More'></Button>
+                    <Button text='View More' onPress={() => navigation.navigate('ExpandExpenses', { year, month })}></Button>
                 </View>
                 <View>
                     <MonthlyVsBudgeted
                         data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
                         monthSelector={month}
                         yearSelector={year} />
-                    <Button text='View More'></Button>
+                    <Button text='View More' onPress={() => navigation.navigate('ExpandBudget', { year, month })}></Button>
                 </View>
 
                 <View>
 
-
+                    <Button text='View More' onPress={() => navigation.navigate('ExpandBarCat', { year, month })}></Button>
                 </View>
 
                 <View>
                     <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []} month={month} year={year}></ByCategory>
-                    <Button text='View More'></Button>
+                    <Button text='View More' onPress={() => navigation.navigate('ExpandWheel', { year, month })}></Button>
                 </View>
 
             </ScrollView>
