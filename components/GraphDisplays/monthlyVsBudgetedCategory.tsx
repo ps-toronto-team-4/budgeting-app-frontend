@@ -3,50 +3,16 @@ import { View, Text } from "react-native"
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
 import ArrowButton from "../ArrowButton";
 
-const dumpy = [
-    {
-        "amountBudgeted": 2022.2800000000002,
-        "amountSpent": 828.16,
-        "month": "JANUARY",
-        "year": 2018
-    },
-    {
-        "amountBudgeted": 1866.24,
-        "amountSpent": 1906.82,
-        "month": "FEBRUARY",
-        "year": 2018
-    },
-    {
-        "amountBudgeted": 2948.75,
-        "amountSpent": 1170.39,
-        "month": "MARCH",
-        "year": 2018
-    },
-    {
-        "amountBudgeted": 1994.26,
-        "amountSpent": 1801.86,
-        "month": "APRIL",
-        "year": 2018
-    },
-    {
-        "amountBudgeted": 936.7900000000001,
-        "amountSpent": 1084.96,
-        "month": "MAY",
-        "year": 2018
-    },
-    {
-        "amountBudgeted": 768.9599914550781,
-        "amountSpent": 1764.0000000000002,
-        "month": "JUNE",
-        "year": 2018
-    },
-]
+
+
 
 interface GraphDatum {
-    amountBudgeted: number,
-    amountSpent: number,
-    month: string,
-    year: number
+    "amountSpent": number,
+    "amountBudgeted": number,
+    "category": {
+        "colourHex": string,
+        "name": string
+    }
 }
 
 interface GraphParameters {
@@ -59,7 +25,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
         return {
             ...ele,
             id: index,
-            shortMonth: ele.month.substring(0, 3)
+            shortCat: ele.category.name.substring(0, 3) + '..'
         }
     })
 
@@ -131,7 +97,7 @@ interface MonthlyVsBudgetedParameters {
 const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data }: MonthlyVsBudgetedParameters) => {
     const displayAmountNumber = displayAmount ? displayAmount : 5
     const jumpAmountNumber = jumpAmount ? jumpAmount : 1
-    const inputData = data ? data : dumpy as GraphDatum[]
+    const inputData = data
 
     const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
 
