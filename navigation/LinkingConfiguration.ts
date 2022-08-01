@@ -35,6 +35,10 @@ const linking: LinkingOptions<RootStackParamList> = {
             CreateBudget: 'create-budget',
             EditBudget: 'update-budget',
             UpdateMerchant: 'update-merchant',
+            ExpandExpenses: 'reports-expand-expense',
+            ExpandBudget: 'reports-expand-budget',
+            ExpandWheel: 'reports-expand-wheel',
+            ExpandBarCat: 'reports-expand-bar-cat',
         },
     },
 };
