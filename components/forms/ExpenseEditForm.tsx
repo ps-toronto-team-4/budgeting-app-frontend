@@ -103,8 +103,8 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                 }
             </>
             <>
-                <View style={styles.dateRow}>
-                    <DisplayField label="Date" value={`${month} ${day} ${year}`} onPress={() => setCalendarShown(true)} focused={calendarShown} />
+                <DisplayField label="Date" value={`${month} ${day} ${year}`} onPress={() => setCalendarShown(true)} focused={calendarShown} />
+                <View>
                     {
                         calendarShown &&
                         <View style={styles.calendarContainer}>
@@ -135,10 +135,6 @@ const styles = StyleSheet.create({
         zIndex: -1,
         elevation: -1,
     },
-    dateRow: {
-        zIndex: -1,
-        elevation: -1,
-    },
     detailsRow: {
         zIndex: -1,
         elevation: -1,
@@ -158,7 +154,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'black',
         position: 'absolute',
-        top: 43,
+        top: -5,
         left: '50%',
         transform: [{ translateX: -150 }],
     },

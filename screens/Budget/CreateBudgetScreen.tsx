@@ -144,19 +144,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         width: 180
     },
-    detailsRow: {
-        flexDirection: 'row',
-        paddingHorizontal: 27,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingVertical: 10,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
-        zIndex: -1,
-        elevation: -1,
-    },
     detailsIconAndLabel: {
         flexDirection: 'row',
         paddingHorizontal: 0,

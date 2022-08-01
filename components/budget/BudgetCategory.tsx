@@ -14,9 +14,11 @@ function BudgetWarning({ label }: BudgetWarningProps) {
 
     return (
         <View style={staticStyles.warningRow}>
-            <Text style={staticStyles.warningText}>
-                {label}
-            </Text>
+            <View style={staticStyles.warningContainer}>
+                <Text style={staticStyles.warningText}>
+                    {label}
+                </Text>
+            </View>
         </View>
     );
 }
@@ -111,14 +113,18 @@ const staticStyles = StyleSheet.create({
         alignItems: 'center',
     },
     warningRow: {
+        paddingTop: 8,
+        alignItems: 'center',
+    },
+    warningContainer: {
+        borderRadius: 20,
+        backgroundColor: Colors.light.btnBackground,
+        padding: 10,
+        width: 110,
         alignItems: 'center',
     },
     warningText: {
         color: 'white',
-        borderRadius: 20,
-        backgroundColor: Colors.light.btnBackground,
-        padding: 10,
-        width: 100,
     },
     body: {
         flexDirection: 'row',
