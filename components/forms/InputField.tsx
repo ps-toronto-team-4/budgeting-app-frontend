@@ -5,10 +5,15 @@ import Forms from "../../constants/Forms";
 export interface InputFieldProps {
     label: string;
     placeholder: string;
+    defaultValue?: string;
     onChange: (value: string) => void;
+    /**
+     * The error message is fully controlled by the parent.
+     */
+    errorMessage?: string;
 }
 
-export function InputField({ label, placeholder, onChange }: InputFieldProps) {
+export function InputField({ label, placeholder, defaultValue, onChange, errorMessage }: InputFieldProps) {
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const backgroundColor = focused ? 'rgba(0,0,0,0.1)' : 'white';
@@ -22,16 +27,23 @@ export function InputField({ label, placeholder, onChange }: InputFieldProps) {
 
     return (
         <TouchableHighlight style={containerStyle} onPress={() => setFocused(true)} underlayColor="rgba(0,0,0,0.1)" >
-            <View style={styles.content}>
-                <Text style={styles.label}>{label}</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder={placeholder}
-                    editable={focused}
-                    ref={inputRef}
-                    onBlur={() => setFocused(false)}
-                    onChangeText={onChange} />
-            </View>
+            <>
+                <View style={styles.content}>
+                    <Text style={styles.label}>{label}</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder={placeholder}
+                        defaultValue={defaultValue || ''}
+                        editable={focused}
+                        ref={inputRef}
+                        onBlur={() => setFocused(false)}
+                        onChangeText={onChange} />
+                </View>
+                {
+                    errorMessage !== undefined && errorMessage.length > 0 &&
+                    <Text style={styles.error}>{errorMessage}</Text>
+                }
+            </>
         </TouchableHighlight>
     );
 }
@@ -59,5 +71,11 @@ const styles = StyleSheet.create({
         width: 220,
         fontSize: Forms.fontSize,
         color: 'black',
+    },
+    error: {
+        paddingTop: 10,
+        color: 'red',
+        alignSelf: 'center',
+        fontSize: Forms.errorFontSize,
     },
 });

@@ -14,7 +14,10 @@ export interface AmountInputProps {
     onChangeAmount: (amount: number) => void;
     defaultAmount: number;
     onSelect?: () => void;
-    error?: string;
+    /**
+     * The error message is fully controlled by the parent.
+     */
+    errorMessage?: string;
 };
 
 function amountToValue(amount: number): string {
@@ -25,7 +28,7 @@ function valueToAmount(value: string): number {
     return parseFloat(value);
 }
 
-export function AmountInput({ onChangeAmount, defaultAmount, onSelect, error }: AmountInputProps) {
+export function AmountInput({ onChangeAmount, defaultAmount, onSelect, errorMessage }: AmountInputProps) {
     const [fontLoaded] = useFonts({ B612Mono_700Bold });
     const [value, setValue] = useState(amountToValue(defaultAmount));
     const charWidth = 30;
@@ -69,8 +72,8 @@ export function AmountInput({ onChangeAmount, defaultAmount, onSelect, error }: 
                 </>
             </TouchableHighlight>
             {
-                error !== undefined && error.length > 0 &&
-                <Text style={styles.error}>{error}</Text>
+                errorMessage !== undefined && errorMessage.length > 0 &&
+                <Text style={styles.error}>{errorMessage}</Text>
             }
         </View>
     );

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { StyleSheet, TouchableHighlight, View, Text, TextInput, ScrollView, Keyboard, KeyboardAvoidingView } from "react-native";
+import { StyleSheet, TouchableHighlight, View, Text, TextInput, ScrollView, Keyboard, KeyboardAvoidingView, Platform } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import Forms from "../../constants/Forms";
 import { useRefresh } from "../../hooks/useRefresh";
@@ -51,11 +51,11 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
     }, [data, value]);
     const backgroundColor = focused ? 'rgba(0,0,0,0.1)' : 'white';
     const containerStyle = useMemo(() => {
-        return [styles.container, { backgroundColor }]
+        return [styles.container, { backgroundColor, zIndex: -1, elevation: -1 }]
     }, [backgroundColor]);
     const [keyboardScreenY, setKeyboardScreenY] = useState(0);
     const [scrollViewScreenY, setScrollViewScreenY] = useState(0);
-    const maxScrollViewHeight = keyboardScreenY - scrollViewScreenY - 25;
+    const maxScrollViewHeight = keyboardScreenY - scrollViewScreenY - (Platform.OS === 'android' ? 25 : 0);
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
@@ -87,11 +87,11 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         setErrorMessage('');
     });
 
-    const handleItemPress = useCallback((itemId: string, itemValue: string) => {
+    const handleItemPress = (itemId: string, itemValue: string) => {
         onChange(itemId);
         setCachedValue(itemValue);
         setFocused(false);
-    }, []);
+    };
 
     const handlePress = useCallback(() => {
         setFocused(true);
@@ -101,7 +101,7 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
     }, []);
 
     return (
-        <View>
+        <>
             <TouchableHighlight style={containerStyle} onPress={handlePress} underlayColor="rgba(0,0,0,0.1)">
                 <>
                     <View style={styles.content}>
@@ -134,7 +134,7 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                     </ScrollView>
                 }
             </View>
-        </View>
+        </>
     );
 }
 

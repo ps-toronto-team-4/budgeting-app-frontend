@@ -12,6 +12,7 @@ import { Form } from "../../components/forms/Form";
 import { useRefresh } from "../../hooks/useRefresh";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DropdownField } from "../../components/forms/DropdownField";
+import { InputField } from "../../components/forms/InputField";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
     const passwordHash = useAuth({
@@ -101,35 +102,15 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     return (
         <Form>
             <View style={styles.container}>
-                <InputRow
+                <InputField
                     label="Merchant"
-                    placeholder="(mandatory)"
-                    value={merchantName}
-                    onChangeText={setMerchantName}
-                    error={merchantError}
-                    topBorder />
-                <InputRow
+                    placeholder="required"
+                    onChange={setMerchantName}
+                    errorMessage={merchantError} />
+                <InputField
                     label="Details"
-                    placeholder="(optional)"
-                    value={details}
-                    onChangeText={setDetails}
-                    topBorder />
-                <DropdownRow
-                    label="Default Category"
-                    data={
-                        categoryData?.categories.__typename == "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => { return { id: x.id, name: x.name } }) : []
-                    }
-                    onSelect={handleCategorySelect}
-                    expanded={categoryOpen}
-                    onExpand={() => setCategoryOpen(true)}
-                    onCollapse={() => setCategoryOpen(false)}
-                    topBorder
-                    placeholder={categoryOpen ? "Start typing to search" : "Select Category"}
-                    bottomBorder={!categoryOpen}
-                    onCreateNew={() => navigation.navigate("CreateCategory")}
-                    createLabel="Category"
-                    defaultValue={category?.name} />
+                    placeholder="optional"
+                    onChange={setDetails} />
                 <DropdownField
                     label="Default Category"
                     placeholder="optional"
@@ -170,5 +151,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         alignSelf: 'center',
         marginTop: 50,
+        zIndex: -1,
+        elevation: -1,
     },
 });

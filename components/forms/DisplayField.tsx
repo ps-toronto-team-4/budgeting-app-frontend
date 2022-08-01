@@ -29,15 +29,17 @@ export function DisplayField({ label, value, onPress, ...otherProps }: DisplayFi
     }, [otherProps.focused]);
 
     return (
-        <TouchableHighlight
-            style={containerStyle}
-            onPress={() => { setFocused(true); onPress && onPress(); }}
-            underlayColor="rgba(0,0,0,0.1)">
-            <View style={styles.content}>
-                <Text style={styles.label}>{label}</Text>
-                <Text style={styles.value}>{value}</Text>
-            </View>
-        </TouchableHighlight>
+        <>
+            <TouchableHighlight
+                style={containerStyle}
+                onPress={() => { setFocused(true); onPress && onPress(); }}
+                underlayColor="rgba(0,0,0,0.1)">
+                <View style={styles.content}>
+                    <Text style={styles.label}>{label}</Text>
+                    <Text style={styles.value}>{value}</Text>
+                </View>
+            </TouchableHighlight>
+        </>
     );
 }
 
@@ -47,6 +49,8 @@ const styles = StyleSheet.create({
         borderBottomColor: 'rgba(0,0,0,0.1)',
         paddingVertical: Forms.verticalSpacing,
         alignItems: 'center',
+        zIndex: -1,
+        elevation: -1,
     },
     content: {
         width: 320,

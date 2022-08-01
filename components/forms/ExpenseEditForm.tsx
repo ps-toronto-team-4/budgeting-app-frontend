@@ -37,7 +37,9 @@ export interface ExpenseEditFormProps {
 }
 
 export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
-    const [getMerchantsAndCategories, { data, refetch }] = useLazyQuery<MerchantsAndCategoriesQuery, MerchantsAndCategoriesQueryVariables>(MerchantsAndCategoriesDocument);
+    const [getMerchantsAndCategories, { data, refetch }] = useLazyQuery<MerchantsAndCategoriesQuery, MerchantsAndCategoriesQueryVariables>(MerchantsAndCategoriesDocument, {
+        onError: () => alert('Error occurred while fetching merchants and categories.'),
+    });
     useAuth({
         onRetrieved: (passwordHash) => getMerchantsAndCategories({ variables: { passwordHash } }),
     });
@@ -101,7 +103,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                 }
             </>
             <>
-                <View>
+                <View style={styles.dateRow}>
                     <DisplayField label="Date" value={`${month} ${day} ${year}`} onPress={() => setCalendarShown(true)} focused={calendarShown} />
                     {
                         calendarShown &&
@@ -129,6 +131,14 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
 }
 
 const styles = StyleSheet.create({
+    categoriesRow: {
+        zIndex: -1,
+        elevation: -1,
+    },
+    dateRow: {
+        zIndex: -1,
+        elevation: -1,
+    },
     detailsRow: {
         zIndex: -1,
         elevation: -1,

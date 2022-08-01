@@ -81,7 +81,7 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
             <AmountInput
                 defaultAmount={0}
                 onChangeAmount={handleChangeAmount}
-                error={amountError} />
+                errorMessage={amountError} />
             <DropdownField
                 label="Category"
                 placeholder="required"
