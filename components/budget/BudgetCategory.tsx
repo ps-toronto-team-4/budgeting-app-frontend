@@ -4,7 +4,7 @@ import Colors from "../../constants/Colors";
 import { PencilButton } from "../buttons/PencilButton";
 
 interface BudgetWarningProps {
-    label?: 'Over Budget' | 'Near Budget';
+    label?: 'Over Budget' | 'Near Budget' | 'At Budget';
 }
 
 function BudgetWarning({ label }: BudgetWarningProps) {
@@ -48,6 +48,7 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
     });
     const overBudget = actual > planned;
     const nearBudget = !overBudget && actual > planned * 0.75
+    const atBudget = actual === planned;
 
     return (
         <View style={dynamicStyles.container}>
@@ -60,7 +61,7 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
                         </Text>
                         <PencilButton onPress={onPressDots} paddingRight={0} color="black" />
                     </View>
-                    <BudgetWarning label={(overBudget && 'Over Budget') || (nearBudget && 'Near Budget') || undefined} />
+                    <BudgetWarning label={(atBudget && 'At Budget') || (overBudget && 'Over Budget') || (nearBudget && 'Near Budget') || undefined} />
                     <View style={staticStyles.body}>
                         <View style={staticStyles.amntDisplayContainer}>
                             <View style={staticStyles.amntTitleContainer}>
