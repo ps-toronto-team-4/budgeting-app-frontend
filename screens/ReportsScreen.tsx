@@ -34,7 +34,6 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
         <Screen>
             <ScrollView>
                 <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
-                <Text></Text>
                 <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : [{ "category": null, "amountSpent": 0 }]} month={month} year={year}></ByCategory>
                 <MonthlyExpenseGraph />
                 <MonthlyVsBudgeted />

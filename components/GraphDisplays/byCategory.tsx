@@ -28,6 +28,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
     const [category, setCategory] = useState<{ id: number, name: string } | undefined>();
     const [categoryOpen, setCategoryOpen] = useState(false);
     const [mutations, setMutations] = useState<Array<ExternalMutation>>([])
+    const [selectedMonth, setSelectedMonth] = useState("");
 
 
     const { data: categoriesData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
@@ -37,7 +38,6 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
         }),
     });
 
-
     const handleCategory = (id: number) => {
         setMutations([
             {
@@ -45,7 +45,6 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 eventKey: "all",
                 mutation: (props: any) => {
                     if (id === props.datum.category.id) {
-                        console.log(props.datum.category);
                         return props = { radius: 120, innerRadius: 90, labelRadius: 120 };
                     } else {
                         return props = { radius: 100, innerRadius: 70 }
@@ -54,7 +53,6 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 },
                 callback: () => {
                     if (mutations.length === 0) {
-                        // console.log("I was in callback.")
                         setMutations([])
                     }
                 }
@@ -69,6 +67,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                         return props = { text: props.datum.category.name.substring(0, 3) + "..." };
                     }
 
+
                 },
                 callback: () => {
                     if (mutations.length === 0) {
@@ -79,13 +78,23 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
         ])
     }
 
+    // const onPressClickHandler = () => {
+    //     return [{
+    //         target: "data",
+    //         mutation: (props: any) => {
+    //             setSelectedMonth(props.datum.id);
+    //             handleCategory(props.datum.id);
+    //             return null;
+    //         }
+    //     }]
+    // }
+
     function handleCategorySelect(categoryName: string | undefined) {
         if (categoriesData?.categories.__typename == "CategoriesSuccess") {
             const foundCategory = categoriesData.categories.categories.find(x => x.name == categoryName);
 
             if (foundCategory !== undefined) {
                 setCategory(foundCategory);
-                setMutations([]);
                 handleCategory(foundCategory.id);
             }
         }
@@ -220,7 +229,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 bottomBorder={!categoryOpen}
                 createLabel="Category"
                 defaultValue={category?.name}
-            ></GraphDropdownRow>
+            />
 
         </View>
 
