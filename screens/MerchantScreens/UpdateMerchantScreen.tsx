@@ -37,8 +37,6 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     const [newCategory, setNewCategory] = useState<{ id: number, name: string } | undefined>(category)
     const [check, setCheck] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
-    const [categoryOpen, setCategoryOpen] = useState(false);
-    const [preFill, setPreFill] = useState(false)
 
     const [deleteMerchant] = useMutation<DeleteMerchantMutation>(DeleteMerchantDocument, {
         variables: { passwordHash: passwordHash, id: route.params?.id },
@@ -62,8 +60,6 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     })
 
     useRefresh(() => refetch({ passwordHash }));
-
-    useEffect(() => console.log(categoryData), [categoryData]);
 
     const DeleteButton = () => {
         return (
@@ -99,13 +95,10 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     })();
 
     function handleCategorySelect(categoryId: string) {
-        console.log(categoryData);
         if (categoryData?.categories.__typename === "CategoriesSuccess") {
-            console.log('entered if statement');
             const foundCategory = categoryData.categories.categories.find(x => x.id === parseInt(categoryId));
 
             if (foundCategory !== undefined) {
-                console.log('found category');
                 setNewCategory(foundCategory);
             } else {
                 Alert.alert("Category hasn't been created yet.")
@@ -125,13 +118,13 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                     label="Merchant"
                     placeholder="required"
                     defaultValue={newName}
-                    onChange={(name) => { setNewName(name); console.log(categoryData) }}
+                    onChange={setNewName}
                     errorMessage={merchantError} />
                 <InputField
                     label="Details"
                     placeholder="optional"
                     defaultValue={newDescription || ''}
-                    onChange={(desc) => { console.log(categoryData); setNewDescription(desc) }} />
+                    onChange={setNewDescription} />
                 <DropdownField
                     label="Default Category"
                     placeholder="optional"
@@ -142,9 +135,9 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                                 return { id: cat.id.toString(), value: cat.name }
                             }) : []
                     }
-                    onChange={() => console.log(categoryData)} />
+                    onChange={handleCategorySelect} />
                 <View style={styles.buttonContainer}>
-                    <Button text={"Update Merchant"} disabled={confirmDelete} accessibilityLabel={"Button to Update Merchant"} onPress={() => { console.log(categoryData); handleMerchant() }} />
+                    <Button text={"Update Merchant"} disabled={confirmDelete} accessibilityLabel={"Button to Update Merchant"} onPress={handleMerchant} />
                 </View>
                 {!merchantLoading ? (
                     merchantData?.updateMerchant.__typename === "MerchantSuccess" ? (
