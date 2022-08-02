@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
-import { Screen } from "../components/Screen";
-import MonthlyExpenseGraph from '../components/GraphDisplays/monthlyExpenses';
-import { useLazyQuery } from '@apollo/client';
 import { Budget, BudgetCategory, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, MonthType } from '../components/generated';
-import ByCategory from '../components/GraphDisplays/byCategory';
+import MonthlyExpenseGraph from '../components/graphs/MonthlyExpenses';
+import { useLazyQuery } from '@apollo/client';
+import ByCategory from '../components/graphs/ByCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
-import MonthlyVsBudgeted from '../components/GraphDisplays/monthlyVsBudgeted';
-import { ScrollView } from 'react-native-gesture-handler';
+import MonthlyVsBudgeted from '../components/graphs/MonthlyVsBudgeted';
 import { useRefresh } from '../hooks/useRefresh';
-import Button from '../components/Button';
-import MonthlyVsBudgetedCategory from '../components/GraphDisplays/monthlyVsBudgetedCategory';
+import Button from '../components/buttons/Button';
+import MonthlyVsBudgetedCategory from '../components/graphs/monthlyVsBudgetedCategory';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
 
@@ -46,7 +44,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
 
 
     return (
-        <Screen>
+        <View style={styles.screen}>
             <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
             <ScrollView>
 
@@ -81,10 +79,13 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                 </View>
 
             </ScrollView>
-        </Screen>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
 });

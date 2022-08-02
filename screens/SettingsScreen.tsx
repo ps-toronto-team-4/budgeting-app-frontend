@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, TouchableHighlight, SafeAreaView, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import Button from "../components/Button";
+import Button from "../components/buttons/Button";
 import { useAuth } from "../hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Screen } from "../components/Screen";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import Styles from '../constants/Styles';
 import { useLazyQuery, useQuery } from '@apollo/client';
@@ -42,9 +41,9 @@ export default function SettingsScreen({ navigation }: RootTabScreenProps<'Setti
     }, []);
 
     if (!data) {
-        return <Screen></Screen>
+        return <View style={styles.screen}></View>;
     } else if (data?.user.__typename !== 'User') {
-        return <Text>Error fetching user data.</Text>;
+        return <View style={styles.screen}><Text>Error fetching user data.</Text></View>;
     } else {
         const user = data.user;
 

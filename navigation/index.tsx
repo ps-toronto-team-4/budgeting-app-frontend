@@ -77,18 +77,18 @@ function RootNavigator() {
         <Stack.Screen name="CreateMerchant" component={CreateMerchant} options={{ title: 'Create Merchant' }} />
         <Stack.Screen name="CreateExpense" component={CreateExpenseScreen} options={{ title: 'Create Expense' }} />
         <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{ title: 'Expense Details' }} />
-        <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{ title: 'Category Settings' }} />
+        <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{ title: 'Categories' }} />
         <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{ title: 'Edit Category' }} />
         <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerTitle: 'Create Category' }} />
         <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: 'Edit Expense' }} />
         <Stack.Screen name="EditBudget" component={UpdateBudgetScreen} options={{ headerTitle: 'Edit Budget' }} />
         <Stack.Screen name="CreateBudget" component={CreateBudgetScreen} options={{ headerTitle: 'Create Budget' }} />
-        <Stack.Screen name="MerchantSettings" component={MerchantSettingsScreen} options={{ headerTitle: 'Merchant Settings' }} />
-        <Stack.Screen name="UpdateMerchant" component={UpdateMerchantScreen} options={{ headerTitle: 'Update Merchant' }} />
         <Stack.Screen name="ExpandExpenses" component={ExpandExpenseScreen} options={{ headerTitle: 'Expand Expenses' }} />
         <Stack.Screen name="ExpandBudget" component={ExpandBudgetScreen} options={{ headerTitle: 'Expand Budget' }} />
         <Stack.Screen name="ExpandWheel" component={ExpandWheelScreen} options={{ headerTitle: 'Expand Wheel' }} />
         <Stack.Screen name="ExpandBarCat" component={ExpandBarCatScreen} options={{ headerTitle: 'Expand BarCat' }} />
+        <Stack.Screen name="MerchantSettings" component={MerchantSettingsScreen} options={{ headerTitle: 'Merchants' }} />
+        <Stack.Screen name="UpdateMerchant" component={UpdateMerchantScreen} options={{ headerTitle: 'Update Merchant' }} />
       </Stack.Group>
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>

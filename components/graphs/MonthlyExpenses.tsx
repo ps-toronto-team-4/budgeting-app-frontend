@@ -1,7 +1,7 @@
 import { AntDesign } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
-import { TouchableHighlight } from "react-native-gesture-handler";
+import { TouchableHighlight } from "react-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
 

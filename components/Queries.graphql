@@ -489,3 +489,42 @@ query getMonthTotals($passwordHash: String!){
         }
     }
 }
+# Used by ExpenseEditForm. Do not change.
+query merchantsAndCategories($passwordHash: String!) {
+    __typename
+
+    merchants(passwordHash: $passwordHash) {
+        __typename
+        ...on MerchantsSuccess {
+            __typename
+            merchants {
+                id
+                name
+            }
+        }
+
+        ...on FailurePayload {
+            __typename
+            exceptionName
+            errorMessage
+        }
+    }
+
+    categories(passwordHash: $passwordHash) {
+        __typename
+        ...on CategoriesSuccess {
+            __typename
+            categories {
+                id
+                name
+                colourHex
+            }
+        }
+
+        ...on FailurePayload {
+            __typename
+            exceptionName
+            errorMessage
+        }
+    }
+}

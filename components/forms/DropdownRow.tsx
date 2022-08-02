@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
 import { Row } from "./Row";
 
@@ -115,7 +115,7 @@ export function DropdownRow({
                 <View style={styles.fieldAndErrorContainer}>
                     <View style={styles.fieldLabelAndInputAndArrowContainer}>
                         <View style={styles.fieldLabelAndInputContainer}>
-                            <Text style={styles.fieldLabel}>{label}:</Text>
+                            <Text style={styles.fieldLabel}>{label}</Text>
                             <TextInput
                                 style={styles.fieldInput}
                                 editable={expanded}
@@ -157,6 +157,8 @@ export function DropdownRow({
     );
 };
 
+const fontSize = 18;
+
 const styles = StyleSheet.create({
     fieldAndErrorContainer: {
         backgroundColor: 'rgba(0,0,0,0)',
@@ -176,10 +178,12 @@ const styles = StyleSheet.create({
     },
     fieldLabel: {
         fontWeight: 'bold',
-        fontSize: 15,
+        fontSize: fontSize,
+        width: 85,
+        textAlign: 'right',
     },
     fieldInput: {
-        fontSize: 15,
+        fontSize: fontSize,
         width: 180, // TODO test 160
         color: 'black',
     },
@@ -187,7 +191,7 @@ const styles = StyleSheet.create({
         height: 150,
     },
     listItem: {
-        fontSize: 15,
+        fontSize: fontSize,
         paddingLeft: 40,
     },
     error: {

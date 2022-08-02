@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import Button from "../../components/Button";
-import TextInput from "../../components/TextInput";
+import Button from "../../components/buttons/Button";
+import TextInput from "../../components/forms/TextInput";
 import Colors from '../../constants/Colors';
 import { Text, View } from '../../components/Themed';
 import { RootStackScreenProps } from "../../types";

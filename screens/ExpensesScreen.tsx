@@ -5,9 +5,8 @@ import { FlatList } from "react-native";
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/buttons/AddButton";
 import { useAuth } from "../hooks/useAuth";
-import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
@@ -50,7 +49,7 @@ function processExpenses(expenses: Expenses, onPress: (id: number) => void): Exp
             color: `#${expense.category?.colourHex || Colors.light.uncategorizedColor}`,
             amount: expense.amount,
             onPress: onPress,
-            date: expense.date,
+            date: expense.date.split(' ')[0], // ignore the time
             merchant: expense.merchant?.name || '',
         };
     }).sort((ex1, ex2) => { // Sort by date
@@ -108,12 +107,12 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     const handleAddExpense = () => navigation.navigate('CreateExpense');
 
     if (data === undefined) {
-        return <Screen><Text>Loading data...</Text></Screen>;
+        return <View style={staticStyles.screen}><Text>Loading data...</Text></View>;
     } else if (data.expenses.__typename !== 'ExpensesSuccess') {
-        return <Screen><Text>Error fetching data.</Text></Screen>;
+        return <View style={staticStyles.screen}><Text>Error fetching data.</Text></View>;
     } else {
         return (
-            <Screen>
+            <View style={staticStyles.screen}>
                 <FlatList
                     data={processedExpenses}
                     renderItem={renderItem}
@@ -122,12 +121,16 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                 <View style={staticStyles.addExpenseBtn}>
                     <AddButton size={100} onPress={handleAddExpense} />
                 </View>
-            </Screen>
+            </View>
         );
     }
 }
 
 const staticStyles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
     itemSeparator: {
         flex: 1,
         flexBasis: 2,

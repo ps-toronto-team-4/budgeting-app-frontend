@@ -1,11 +1,11 @@
 import { StyleSheet, Alert, ActivityIndicator, Modal, TouchableHighlight } from 'react-native';
 
 import { Text, View, RequiredField } from '../../components/Themed';
-import Button from '../../components/Button';
+import Button from '../../components/buttons/Button';
 import React, { useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
-import TextInput from '../../components/TextInput';
+import TextInput from '../../components/forms/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
 import { useLazyQuery, useMutation } from '@apollo/client';
@@ -13,7 +13,7 @@ import { UpdateCategoryDocument, UpdateCategoryMutation, GetCategoriesQuery, Get
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 import modalStyle from '../../constants/Modal';
-import { Screen } from "../../components/Screen";
+import { Form } from "../../components/forms/Form";
 
 export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 
@@ -85,7 +85,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
   }
 
   return (
-    <Screen backdrop={confirmDelete}>
+    <Form backdrop={confirmDelete}>
       <View style={Styles.container}>
         {loading ? (
           <ActivityIndicator size={'large'} />
@@ -151,7 +151,7 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
           </View>
         </Modal>
       </View>
-    </Screen>
+    </Form>
   );
 }
 

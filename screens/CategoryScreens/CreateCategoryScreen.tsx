@@ -1,22 +1,22 @@
 import { Alert, ActivityIndicator, TouchableHighlight } from 'react-native';
 import { Text, View, RequiredField } from '../../components/Themed';
-import Button from '../../components/Button';
+import Button from '../../components/buttons/Button';
 import React, { useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
-import TextInput from '../../components/TextInput';
+import TextInput from '../../components/forms/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
-import { Screen } from '../../components/Screen';
+import { Form } from '../../components/forms/Form';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRefresh } from '../../hooks/useRefresh';
 
-export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
-  const [name, setName] = useState('')
+export default function CreateCategoryScreen({ navigation, route }: RootStackScreenProps<'CreateCategory'>) {
+  const [name, setName] = useState(route.params?.name || '')
   const [color, setColor] = useState('')
   const [details, setDetails] = useState('')
   const [check, setCheck] = useState(false) // true if need to check required fields
@@ -73,7 +73,7 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
   }
 
   return (
-    <Screen>
+    <Form>
       <View style={Styles.container}>
         {
           loading ?
@@ -112,6 +112,6 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
         </TouchableHighlight>
         <Button text="Save Category" onPress={onSubmit} accessibilityLabel={'Save Category Button'}></Button>
       </View>
-    </Screen>
+    </Form>
   );
 }

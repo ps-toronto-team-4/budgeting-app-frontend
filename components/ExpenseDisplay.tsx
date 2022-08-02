@@ -7,7 +7,7 @@ export interface ExpenseDisplayProps {
     color: ColorValue;
     name: string;
     amount: number;
-    merchant: string;
+    merchant?: string;
     onPress: (id: number) => void;
 }
 
@@ -30,9 +30,12 @@ export function ExpenseDisplay({ id, color, name, amount, merchant, onPress }: E
                         <Text style={staticStyles.itemName}>{name}</Text>
                         <Text style={staticStyles.amount}>${amount.toFixed(2)}</Text>
                     </View>
-                    <View style={staticStyles.merchantContainer}>
-                        <Text style={staticStyles.merchant}>{merchant}</Text>
-                    </View>
+                    {
+                        merchant !== undefined && merchant.length > 0 &&
+                        <View style={staticStyles.merchantContainer}>
+                            <Text style={staticStyles.merchant}>{merchant}</Text>
+                        </View>
+                    }
                 </View>
             </>
         </TouchableHighlight>

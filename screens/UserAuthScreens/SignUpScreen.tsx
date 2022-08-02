@@ -4,8 +4,8 @@ import { ActivityIndicator, Alert, ScrollView, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Text, View, RequiredField } from '../../components/Themed';
 import { RootStackScreenProps } from '../../types';
-import TextInput from '../../components/TextInput';
-import Button from '../../components/Button';
+import TextInput from '../../components/forms/TextInput';
+import Button from '../../components/buttons/Button';
 import Styles from "../../constants/Styles";
 import { styles, eyeIconSize } from './SignUpScreen.styles';
 import { CreateUserMutation, CreateUserDocument } from '../../components/generated';
@@ -182,6 +182,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
                     <RequiredField check={check} input={username} />
                     <UsernameRules />
                     <TextInput
+                        keyboardType='email-address'
                         style={styles.formField}
                         onChangeText={(email) => { setEmail(email.replace(/\s+/g, "")); setEmailCheck(false) }}
                         onBlur={() => setEmailCheck(true)}
