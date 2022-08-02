@@ -5,10 +5,8 @@ import { VictoryLegend, VictoryPie } from "victory-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { useAuth } from "../../hooks/useAuth";
 import { RootStackScreenProps } from "../../types";
-import Button from "../Button";
 import { GetCategoriesDocument, GetCategoriesQuery, MonthBreakdownCategory } from "../generated";
-import { GraphDropdownRow } from "../GraphDropdownRow";
-import { DropdownRow } from "../DropdownRow";
+import { DropdownRow } from "../forms/DropdownRow";
 
 type byCategoryProps = {
     categoryData: MonthBreakdownCategory[];
@@ -261,7 +259,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                     categoriesData?.categories.__typename == "CategoriesSuccess" ?
                         categoriesData.categories.categories.map(x => { return { id: x.id, name: x.name } }) : []
                 }
-                onSelect={month === selectedMonth ? handleCategorySelect : (name: string) => { }}
+                onSelect={(month === selectedMonth) ? handleCategorySelect : (name: string) => { }}
                 expanded={categoryOpen}
                 onExpand={() => setCategoryOpen(true)}
                 onCollapse={() => setCategoryOpen(false)}
