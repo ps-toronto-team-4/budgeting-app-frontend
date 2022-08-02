@@ -25,7 +25,10 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
 
     const renderCategory = ({ item }: { item: Category }) => {
         return (
-            <TouchableHighlight style={styles.row} onPress={() => navigation.navigate("EditCategory", { id: item.id, name: item.name, color: item.colourHex, details: item.description })}>
+            <TouchableHighlight
+                style={styles.row}
+                onPress={() => navigation.navigate("EditCategory", { id: item.id, name: item.name, color: item.colourHex, details: item.description })}
+                underlayColor="rgba(0,0,0,0.1)">
                 <View style={styles.itemContainer}>
                     <View style={styles.colorAndNameContainer}>
                         <View style={{ width: 24, height: 24, marginRight: 10, backgroundColor: "#" + item.colourHex, borderRadius: 12, borderWidth: 0.5 }} />
