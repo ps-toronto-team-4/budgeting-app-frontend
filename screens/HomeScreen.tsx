@@ -13,6 +13,7 @@ import { MONTHS_ORDER } from "../constants/Months";
 import { ExpenseDisplay } from "../components/ExpenseDisplay";
 import Colors from "../constants/Colors";
 import { Feather } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
     const ALERT_COLOR = {
         over: {
@@ -34,7 +35,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const date = new Date();
     const day = date.getDate();
     const month = date.getMonth();
-    const monthName = MONTHS_ORDER[month].at(0) + MONTHS_ORDER[month].substring(1).toLowerCase();
+    const monthName = MONTHS_ORDER[month][0] + MONTHS_ORDER[month].substring(1).toLowerCase();
     const year = date.getFullYear();
 
     const [getUser, {}] = useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {
@@ -62,7 +63,9 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     })
 
     const passwordHash = useAuth({
-        onRetrieved: (passwordHash) => getUser({ variables: { passwordHash } }),
+        onRetrieved: (passwordHash) => {
+            getUser({ variables: { passwordHash } }),
+            getMonth({ variables: { passwordHash} })},
         redirect: 'ifUnauthorized',
       });
       useRefresh(() => refetch({ passwordHash }));
@@ -94,7 +97,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     }
 
     return (
-        <View style={{flex: 1}}>
+        <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
             <Text style={style.greeting}>Hello, {name}!</Text>
             { overBudget.length ? (
                 <View style={[style.alert, ALERT_COLOR.over]}>
@@ -129,9 +132,17 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
-            
+            <Text>{MONTHS_ORDER[month]}</Text>
+            <View style={{borderTopWidth: 1, borderBottomWidth: 1}}>
+                <Text>Upcoming Expenses</Text>
+                <FlatList
+                    data={upcoming}
+                    renderItem={({item}) => renderItem(item)}
+                    ListEmptyComponent={<Text>You have no upcoming expenses for this month.</Text>}
+                />
+            </View>
             <View>
-                <Text style={style.subtitle}>Latest {MONTHS_ORDER[month]} expenses:</Text>
+                <Text style={style.subtitle}>Latest expenses:</Text>
                 { loading ? <ActivityIndicator size='large' /> : (
                     data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
                         <FlatList
@@ -147,7 +158,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
             <View style={style.addBtn}>
                 <AddButton size={70} onPress={() => navigation.navigate('CreateExpense')}/>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -171,7 +182,8 @@ const style = StyleSheet.create({
     },
     alertText: {
         fontSize: 16,
-        marginHorizontal: 10 
+        marginHorizontal: 10,
+        maxWidth: '90%'
     },
     subtitle: {
         padding: 10,
