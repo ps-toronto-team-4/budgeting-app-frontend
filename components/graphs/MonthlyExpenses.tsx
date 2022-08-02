@@ -1,15 +1,15 @@
 import { AntDesign } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
-import { TouchableHighlight } from "react-native-gesture-handler";
+import { TouchableHighlight } from "react-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
 
 interface MonthlyDatum {
     month: string,
     year: number,
-    amount: number,
-    id: number,
+    amountSpent: number,
+    id?: number,
 }
 
 interface MonthlyExpenseGraphProps {
@@ -25,21 +25,6 @@ interface ExteralMutation {
     mutation: Function,
     callback: Function
 }
-
-const dumpy = [
-    { year: 2020, amount: 13000, month: "JAN", id: 1 },
-    { year: 2020, amount: 16500, month: "FEB", id: 2 },
-    { year: 2020, amount: 14250, month: "MAR", id: 3 },
-    { year: 2020, amount: 19000, month: "APR", id: 4 },
-    { year: 2020, amount: 16000, month: "MAY", id: 5 },
-    { year: 2020, amount: 14000, month: "JUN", id: 6 },
-    { year: 2020, amount: 12000, month: "JUL", id: 7 },
-    { year: 2020, amount: 16000, month: "AUG", id: 8 },
-    { year: 2020, amount: 14000, month: "SEP", id: 9 },
-    { year: 2020, amount: 17000, month: "OCT", id: 10 },
-    { year: 2020, amount: 21000, month: "NOV", id: 11 },
-    { year: 2020, amount: 19000, month: "DEC", id: 12 },
-];
 
 const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highlightColour }: MonthlyExpenseGraphProps) => {
 
@@ -59,7 +44,6 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                     if (id == props.datum.id) {
                         return {
                             barRatio: 1,
-                            label: 'hi',
                             style: {
                                 fill: highlightColour ? highlightColour : "#3dbf60",
                             }
@@ -74,7 +58,7 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                     }
                 },
                 callback: () => {
-                    if (mutations !== []) {
+                    if (mutations.length !== 0) {
                         setMutations([])
                     }
                 }
@@ -84,21 +68,19 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                 target: "labels",
                 mutation: (props: any) => {
                     if (id === props.datum.id) {
-                        return { text: props.datum.amount.toFixed(2) }
+                        return { text: props.datum.amountSpent.toFixed(2) }
                     } else {
                         return { text: "" }
                     }
                 },
                 callback: () => {
-                    if (mutations !== []) {
+                    if (mutations.length !== 0) {
                         setMutations([])
                     }
                 }
             }
         ])
     }
-
-    // const [data, setData] = useState(dumpy)
 
     const onPressClickHandler = () => {
         return [{
@@ -120,12 +102,12 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
             width={400}
             theme={VictoryTheme.material}
             domainPadding={30}>
-            <VictoryAxis
+            {/* <VictoryAxis
                 style={{
                     grid: { stroke: "none" },
                 }}
                 dependentAxis={true}
-            />
+            /> */}
             <VictoryAxis
                 style={{
                     grid: { stroke: "none" },
@@ -135,14 +117,9 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                 externalEventMutations={mutations as unknown as EventCallbackInterface<string | string[], StringOrNumberOrList>[]}
                 name="Bar-1"
                 data={data}
-                x="month"
-                y="amount"
-                // animate={{
-                //     onLoad: { duration: 1000 },
-                //     duration: 500,
-                //     easing: "bounce"
-                // }}
-                labels={({ datum }) => datum.amount}
+                x={(d: any) => { return d?.month.slice(0, 3) }}
+                y="amountSpent"
+                labels={({ datum }) => datum.amountSpent}
                 barRatio={0.5}
                 style={{ data: { fill: mainColour ? mainColour : "#2e8f48" } }}
                 events={[
@@ -164,7 +141,9 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
 interface MonthlyExpenses {
     displayAmount?: number,
     jumpAmount?: number,
-    data: MonthlyDatum[]
+    data: MonthlyDatum[],
+    monthSelector?: string,
+    yearSelector?: number,
 }
 
 //TODO - this is repeating in budget, make it is into a component and re-use it
@@ -191,30 +170,44 @@ function HeaderButton({ direction, onPress, marginLeft, marginRight }: HeaderBut
     );
 }
 
-const monthlyExpenses = ({ displayAmount, jumpAmount, data }: MonthlyExpenses) => {
+const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearSelector }: MonthlyExpenses) => {
     const displayAmountNumber = displayAmount ? displayAmount : 5
     const jumpAmountNumber = jumpAmount ? jumpAmount : 3
-    const [sliceEnd, setSliceEnd] = useState(dumpy.length - displayAmountNumber)
+    const inputData = data.map((ele, index) => { return { ...ele, id: index } })
+    const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
 
-    const inputData = data ? data : dumpy as MonthlyDatum[]
+    useEffect(
+        () => {
+            setSliceEnd(inputData.length - displayAmountNumber)
+        }
+        , [data])
+
+
+    useEffect(
+        () => {
+            const indexOfFoundSelectedTime = data.findIndex(ele => {
+                return ele.month == monthSelector && ele.year == yearSelector
+            })
+            if (indexOfFoundSelectedTime != -1) {
+                setSliceEnd(Math.max(0, Math.min(data.length - displayAmountNumber,
+                    indexOfFoundSelectedTime - Math.floor(displayAmountNumber / 2))))
+            }
+        }, [monthSelector, yearSelector])
 
 
     return (<>
-        <MonthlyExpenseGraph
-            data={inputData.length <= displayAmountNumber ? inputData :
-                inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
-
-        <View style={{ flexDirection: 'row', maxHeight: 50 }}>
-            <View style={{ flexBasis: 50 }}>
+        <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <HeaderButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
                 }} />
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>stuff</Text>
+                <MonthlyExpenseGraph
+                    data={inputData.length <= displayAmountNumber ? inputData :
+                        inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
             </View>
-
-            <View style={{ flexBasis: 50 }}>
+            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <HeaderButton direction="right" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.min(inputData.length - displayAmountNumber, sliceEnd + jumpAmountNumber))
                 }} />

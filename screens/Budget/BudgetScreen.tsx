@@ -1,20 +1,20 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { useEffect, useMemo, useState } from "react";
 import { Budget, BudgetCategory, CopyBudgetDocument, CopyBudgetMutation, CopyBudgetMutationVariables, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, CreateBudgetCategoryMutationVariables, CreateBudgetDocument, CreateBudgetMutation, CreateBudgetMutationVariables, GetBudgetsDocument, GetBudgetsQuery, GetBudgetsQueryVariables, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, MonthType } from "../../components/generated";
 import { TouchableHighlight } from "react-native"
 import { AntDesign } from "@expo/vector-icons";
 
 import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, Text } from 'react-native';
 import { RootTabScreenProps } from "../../types";
 import { ChartDisplay } from "../../components/budget/ChartDisplay";
 import { BudgetList } from "../../components/budget/BudgetList";
 import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
 import { MONTHS_ORDER } from "../../constants/Months"
-import { Screen } from "../../components/Screen";
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import moment from "moment";
+import { Feather } from '@expo/vector-icons';
 
 interface HeaderButtonProps {
     direction: 'left' | 'right';
@@ -40,31 +40,29 @@ function HeaderButton({ direction, onPress, marginLeft, marginRight }: HeaderBut
 }
 
 export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'Budget'>) {
-    const passwordHash = useAuth();
     const now = moment();
     const [month, setMonth] = useState(MONTHS_ORDER[now.month()]);
     const [year, setYear] = useState(now.year());
 
-    const { data: budgetData, refetch: budgetRefetch } = useQuery<GetBudgetsQuery, GetBudgetsQueryVariables>(GetBudgetsDocument, {
-        variables: { passwordHash },
+    const [getBudgets, { data: budgetData, refetch: budgetRefetch }] = useLazyQuery<GetBudgetsQuery, GetBudgetsQueryVariables>(GetBudgetsDocument);
+    const [getMonthlyBreakdown, { data: monthData, refetch: monthRefetch }] = useLazyQuery<GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables>(GetMonthBreakdownDocument);
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => {
+            getBudgets({ variables: { passwordHash } });
+            getMonthlyBreakdown({ variables: { passwordHash, month: month as MonthType, year } });
+        },
+        redirect: 'ifUnauthorized',
     });
-    const { data: monthData, refetch: monthRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument, {
-        variables: {
-            passwordHash,
-            month,
-            year
-        }
-    });
+    useRefresh(() => {
+        budgetRefetch({ passwordHash });
+        monthRefetch({ passwordHash, month: month as MonthType, year });
+    }, [month, year]);
+
     const [createBudget] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
         variables: { passwordHash, month, year },
     });
     const [createBudgetCategory] = useMutation<CreateBudgetCategoryMutation, CreateBudgetCategoryMutationVariables>(CreateBudgetCategoryDocument);
     const [copyBudget] = useMutation<CopyBudgetMutation, CopyBudgetMutationVariables>(CopyBudgetDocument);
-
-    useRefresh(() => {
-        budgetRefetch();
-        monthRefetch();
-    }, [passwordHash]);
 
     const selectedBudget = useMemo(() => {
         if (budgetData?.budgets.__typename == 'BudgetsSuccess') {
@@ -103,6 +101,28 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
             return selectedBudget.budgetCategories?.reduce((previousValue, currentValue) => previousValue + currentValue.amount, 0);
         }
     }, [month, year, budgetData]);
+
+    const actualAmount = useMemo(() => {
+        if (selectedBudget !== undefined && monthData?.monthBreakdown.__typename === 'MonthBreakdown') {
+            const calculated = { budgeted: 0, unbudgeted: 0 };
+            monthData.monthBreakdown.byCategory.filter((monthBreakdownCat) => {
+                if (monthBreakdownCat.category && selectedBudget.budgetCategories) {
+                    return !!selectedBudget.budgetCategories?.find((cat) => {
+                        return cat.category.name === monthBreakdownCat.category?.name;
+                    });
+                } else {
+                    return false;
+                }
+            }).forEach((applicableMonthBreakdownCat) => {
+                calculated.budgeted += applicableMonthBreakdownCat.amountSpent;
+            });
+            monthData.monthBreakdown.byCategory.forEach((monthBreakdownCat) => {
+                calculated.unbudgeted += monthBreakdownCat.amountSpent;
+            });
+            calculated.unbudgeted = calculated.unbudgeted - calculated.budgeted;
+            return calculated
+        }
+    }, [month, year, monthData, selectedBudget]);
 
     const months = MONTHS_ORDER;
 
@@ -184,14 +204,24 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
     }
 
     return (
-        <Screen>
+        <View style={styles.screen}>
             <ChartDisplay
                 planned={plannedAmount || 0}
-                actual={monthData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthData.monthBreakdown.totalSpent : 0} />
+                actualBudgeted={actualAmount?.budgeted || 0}
+                actualUnbudgeted={actualAmount?.unbudgeted || 0} />
+            <>
+                {
+                    actualAmount && actualAmount.unbudgeted > 0 &&
+                    <View style={styles.warningContainer}>
+                        <Feather name="info" size={21} color="red" style={styles.warningIcon} />
+                        <Text style={styles.warningText}>${actualAmount?.unbudgeted.toFixed(2)} of expenses are unplanned.</Text>
+                    </View>
+                }
+            </>
             {
                 (selectedBudget && selectedBudget.budgetCategories && selectedBudget.budgetCategories.length > 0 &&
                     <>
-                        <View style={{ alignSelf: 'center', marginBottom: 10, }}>
+                        <View style={{ alignSelf: 'center', marginBottom: 20, }}>
                             <Button text="Add Budget" onPress={handleAddBudget} />
                         </View>
                         <View style={styles.itemSeparator}></View>
@@ -216,13 +246,32 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                     </View>
                 )
             }
-        </Screen>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
     itemSeparator: {
         height: 1,
         backgroundColor: 'rgba(0,0,0,0.2)',
+    },
+    warningContainer: {
+        alignItems: 'center',
+        paddingTop: 8,
+        paddingBottom: 10,
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    warningIcon: {
+        marginRight: 8,
+    },
+    warningText: {
+        color: 'red',
+        fontSize: 18,
+        fontWeight: '700',
     },
 });

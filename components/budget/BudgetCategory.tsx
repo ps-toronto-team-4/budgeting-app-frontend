@@ -1,10 +1,10 @@
 import { ColorValue, StyleSheet, TouchableHighlight } from "react-native";
-import { View, Text } from "./Themed";
-import { Entypo } from '@expo/vector-icons';
-import Colors from "../constants/Colors";
+import { View, Text } from "../Themed";
+import Colors from "../../constants/Colors";
+import { PencilButton } from "../buttons/PencilButton";
 
 interface BudgetWarningProps {
-    label?: 'Over Budget' | 'Near Budget';
+    label?: 'Over Budget' | 'Near Budget' | 'At Budget';
 }
 
 function BudgetWarning({ label }: BudgetWarningProps) {
@@ -14,9 +14,11 @@ function BudgetWarning({ label }: BudgetWarningProps) {
 
     return (
         <View style={staticStyles.warningRow}>
-            <Text style={staticStyles.warningText}>
-                {label}
-            </Text>
+            <View style={staticStyles.warningContainer}>
+                <Text style={staticStyles.warningText}>
+                    {label}
+                </Text>
+            </View>
         </View>
     );
 }
@@ -46,6 +48,7 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
     });
     const overBudget = actual > planned;
     const nearBudget = !overBudget && actual > planned * 0.75
+    const atBudget = actual === planned;
 
     return (
         <View style={dynamicStyles.container}>
@@ -56,11 +59,9 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
                         <Text style={staticStyles.headerText}>
                             {category}
                         </Text>
-                        <TouchableHighlight onPress={onPressDots} style={staticStyles.iconContainer} underlayColor="rgba(0,0,0,0.2)">
-                            <Entypo name="dots-three-horizontal" size={16} color="black" />
-                        </TouchableHighlight>
+                        <PencilButton onPress={onPressDots} paddingRight={0} color="black" />
                     </View>
-                    <BudgetWarning label={(overBudget && 'Over Budget') || (nearBudget && 'Near Budget') || undefined} />
+                    <BudgetWarning label={(atBudget && 'At Budget') || (overBudget && 'Over Budget') || (nearBudget && 'Near Budget') || undefined} />
                     <View style={staticStyles.body}>
                         <View style={staticStyles.amntDisplayContainer}>
                             <View style={staticStyles.amntTitleContainer}>
@@ -113,14 +114,18 @@ const staticStyles = StyleSheet.create({
         alignItems: 'center',
     },
     warningRow: {
+        paddingTop: 8,
+        alignItems: 'center',
+    },
+    warningContainer: {
+        borderRadius: 20,
+        backgroundColor: Colors.light.btnBackground,
+        padding: 10,
+        width: 110,
         alignItems: 'center',
     },
     warningText: {
         color: 'white',
-        borderRadius: 20,
-        backgroundColor: Colors.light.btnBackground,
-        padding: 10,
-        width: 100,
     },
     body: {
         flexDirection: 'row',

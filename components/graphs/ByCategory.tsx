@@ -224,7 +224,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
 
             </View>
             {
-                categoryData != [] && <VictoryLegend
+                categoryData.length !== 0 && <VictoryLegend
                     centerTitle={true}
                     orientation="horizontal"
                     colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}

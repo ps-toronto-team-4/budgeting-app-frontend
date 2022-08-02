@@ -1,29 +1,33 @@
 import React from "react"
 import { StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import { Text, View } from '../../components/Themed';
 import { RootStackScreenProps } from "../../types";
-import { useMutation, useQuery } from "@apollo/client";
-import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery } from "../../components/generated";
-import { DropdownRow } from "../../components/DropdownRow";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { CreateMerchantDocument, CreateMerchantMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantDocument, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery, GetMerchantsQueryVariables } from "../../components/generated";
+import { DropdownRow } from "../../components/forms/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
-import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
-import { InputRow } from "../../components/InputRow";
-import { Screen } from "../../components/Screen";
+import { InputRow } from "../../components/forms/InputRow";
+import { Form } from "../../components/forms/Form";
 import { useRefresh } from "../../hooks/useRefresh";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DropdownField } from "../../components/forms/DropdownField";
+import { InputField } from "../../components/forms/InputField";
 
 export default function CreateMerchant({ navigation }: RootStackScreenProps<'CreateMerchant'>) {
-
-    const passwordHash = useAuth();
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => {
+            getCategories({ variables: { passwordHash } });
+            getMerchants({ variables: { passwordHash } });
+        },
+        redirect: 'ifUnauthorized',
+    });
     const [merchantName, setMerchantName] = React.useState("");
     const [details, setDetails] = React.useState("");
     const [category, setCategory] = React.useState<{ id: number, name: string } | undefined>();
     const [check, setCheck] = React.useState(false);
     const [disabledButton, setDisabledButton] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
-
-    useUnauthRedirect();
 
     const preFillCategory = () => {
         AsyncStorage.getItem('New Category')
@@ -37,8 +41,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             })
     }
 
-    useRefresh(preFillCategory);
-
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: category?.id },
         onError: (error => {
@@ -50,27 +52,25 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     });
 
-    const { data: categoryData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-        variables: { passwordHash: passwordHash },
+    const [getCategories, { data: categoryData, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {
         onError: (error => {
             Alert.alert(error.message);
         }),
     });
 
-    const { data: manyMerchantsData } = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
-        variables: { passwordHash: passwordHash }
-    });
+    const [getMerchants, { data: manyMerchantsData }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
 
-    useRefresh(refetch, [passwordHash]);
+    useRefresh(() => {
+        preFillCategory();
+        refetch({ passwordHash });
+    });
 
     const merchantTaken = () => {
         if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName) {
-
             // Searches the array of merchants for the name of vendor.
             return manyMerchantsData?.merchants.merchants.find((mer) => {
                 return mer.name.toLowerCase() === merchantName.toLowerCase()
             });
-
         } else {
             return undefined;
         }
@@ -84,9 +84,9 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         }
     })();
 
-    function handleCategorySelect(categoryName: String) {
+    function handleCategorySelect(categoryId: string) {
         if (categoryData?.categories.__typename == "CategoriesSuccess") {
-            const foundCategory = categoryData.categories.categories.find(x => x.name == categoryName);
+            const foundCategory = categoryData.categories.categories.find(x => x.id === parseInt(categoryId));
 
             if (foundCategory !== undefined) {
                 setCategory(foundCategory);
@@ -100,36 +100,26 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     };
 
     return (
-        <Screen>
+        <Form>
             <View style={styles.container}>
-                <InputRow
-                    label="Merchant:"
-                    placeholder="(mandatory)"
-                    value={merchantName}
-                    onChangeText={setMerchantName}
-                    error={merchantError}
-                    topBorder />
-                <InputRow
-                    label="Details:"
-                    placeholder="(optional)"
-                    value={details}
-                    onChangeText={setDetails}
-                    topBorder />
-                <DropdownRow
+                <InputField
+                    label="Merchant"
+                    placeholder="required"
+                    onChange={setMerchantName}
+                    errorMessage={merchantError} />
+                <InputField
+                    label="Details"
+                    placeholder="optional"
+                    onChange={setDetails} />
+                <DropdownField
                     label="Default Category"
+                    placeholder="optional"
                     data={
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
-                            categoryData.categories.categories.map(x => { return { id: x.id, name: x.name } }) : []
+                            categoryData.categories.categories.map(x => { return { id: x.id.toString(), value: x.name, color: '#' + x.colourHex } }) : []
                     }
-                    onSelect={handleCategorySelect}
-                    expanded={categoryOpen}
-                    onExpand={() => setCategoryOpen(true)}
-                    onCollapse={() => setCategoryOpen(false)}
-                    topBorder
-                    bottomBorder={!categoryOpen}
-                    onCreateNew={() => navigation.navigate("CreateCategory")}
-                    createLabel="Category"
-                    defaultValue={category?.name} />
+                    defaultValue={category?.name}
+                    onChange={handleCategorySelect} />
                 <View style={styles.buttonContainer}>
                     <Button text="Save Merchant"
                         accessibilityLabel="Save Merchant"
@@ -146,31 +136,22 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                     <ActivityIndicator size='large' />
                 )}
             </View>
-        </Screen>
+        </Form>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        marginTop: 50,
     },
     alert: {
         color: 'red',
     },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        paddingVertical: 10,
-        paddingHorizontal: 30,
-    },
     buttonContainer: {
         alignSelf: 'center',
-        justifyContent: 'flex-end',
-        position: 'absolute',
-        bottom: '5%'
+        marginTop: 50,
+        zIndex: -1,
+        elevation: -1,
     },
 });

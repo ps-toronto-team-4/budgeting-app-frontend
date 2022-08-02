@@ -5,6 +5,17 @@ export const eyeIconMarginRight = 13;
 
 
 export const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
+    scrollView: {
+        width: '100%',
+    },
+    formContainer: {
+        width: '100%',
+        alignItems: 'center'
+    },
     codeText: {
         marginRight: 5
     },
@@ -15,7 +26,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 15,
         borderColor: 'black',
         borderRadius: 7,
-        marginVertical:7
+        marginVertical: 7
     },
     textField: {
         height: 50,
@@ -54,5 +65,9 @@ export const styles = StyleSheet.create({
     },
     pwordinput: {
         paddingRight: 20 + eyeIconMarginRight,
-    }
+    },
+    btnContainer: {
+        marginTop: 20,
+        marginBottom: 40,
+    },
 });
