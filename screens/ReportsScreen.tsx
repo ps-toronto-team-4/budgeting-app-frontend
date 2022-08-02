@@ -5,7 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 import { Screen } from "../components/Screen";
 import MonthlyExpenseGraph from '../components/GraphDisplays/monthlyExpenses';
 import { useLazyQuery } from '@apollo/client';
-import { GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, MonthType } from '../components/generated';
+import { Budget, BudgetCategory, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, MonthType } from '../components/generated';
 import ByCategory from '../components/GraphDisplays/byCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
@@ -13,6 +13,7 @@ import MonthlyVsBudgeted from '../components/GraphDisplays/monthlyVsBudgeted';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useRefresh } from '../hooks/useRefresh';
 import Button from '../components/Button';
+import MonthlyVsBudgetedCategory from '../components/GraphDisplays/monthlyVsBudgetedCategory';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
 
@@ -44,7 +45,6 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
 
 
 
-
     return (
         <Screen>
             <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
@@ -66,7 +66,12 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                 </View>
 
                 <View>
-
+                    <MonthlyVsBudgetedCategory
+                        data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
+                        budgetReferenceData={budgetsData?.budgets.__typename === 'BudgetsSuccess' ?
+                            budgetsData.budgets.budgets.find(ele => {
+                                return ele.month == month && ele.year == year
+                            }) as Budget : undefined} />
                     <Button text='View More' onPress={() => navigation.navigate('ExpandBarCat', { year, month })}></Button>
                 </View>
 
