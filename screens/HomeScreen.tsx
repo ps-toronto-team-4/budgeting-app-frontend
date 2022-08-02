@@ -1,8 +1,8 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { useState, useEffect, useMemo } from "react";
-import { GetExpensesInMonthDocument, GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, GetMonthTotalsQueryVariables, GetUserDocument, GetUserQuery, GetUserQueryVariables } from "../components/generated";
+import { GetExpensesInMonthDocument, GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, GetMonthTotalsQueryVariables, GetUserDocument, GetUserQuery, GetUserQueryVariables, MonthType } from "../components/generated";
 import React from 'react';
-import { View, Text, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, ActivityIndicator, FlatList, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import Styles from "../constants/Styles";
@@ -12,7 +12,7 @@ import AddButton from "../components/buttons/AddButton";
 import { MONTHS_ORDER } from "../constants/Months";
 import { ExpenseDisplay } from "../components/ExpenseDisplay";
 import Colors from "../constants/Colors";
-import { Feather } from "@expo/vector-icons";
+import { AntDesign, Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const ALERT_COLOR = {
@@ -32,6 +32,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const [monthData, setMonthData] = useState<{ amountSpent: number, amountBudgeted: number }[]>([]);
     const [expenses, setExpenses] = useState<{ id: number, amount: number, category?: { name: string, colourHex: string } | null }[]>([]);
     const [upcoming, setUpcoming] = useState<{ id: number, amount: number, category?: { name: string, colourHex: string } | null }[]>([]);
+    const [expanded, setExpanded] = useState(false);
     const date = new Date();
     const day = date.getDate();
     const month = date.getMonth();
@@ -52,12 +53,16 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         }
     })
 
-    const { data, loading, refetch } = useQuery<GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables>(GetExpensesInMonthDocument, {
+    const [getExpenses, { data, loading, refetch }] = useLazyQuery<GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables>(GetExpensesInMonthDocument, {
         onCompleted: (data) => {
             if (data.expensesInMonth.__typename === 'ExpensesSuccess') {
                 if (data.expensesInMonth.expenses.length) {
                     let tempExpenses = data.expensesInMonth.expenses.slice(); // copy the data since it is read-only
-                    setExpenses(tempExpenses.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3))
+                    tempExpenses.sort((a, b) => b.date.localeCompare(a.date))
+
+                    tempExpenses.filter((item) => {
+                        //item.date > date
+                    })
                 }
             }
         }
@@ -66,10 +71,11 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => {
             getUser({ variables: { passwordHash } }),
-            getMonth({ variables: { passwordHash} })},
+            getMonth({ variables: { passwordHash} }),
+            getExpenses({variables: {passwordHash, month: MonthType.August, year} })},
         redirect: 'ifUnauthorized',
     });
-    useRefresh(() => refetch({ passwordHash }));
+    useRefresh(() => {refetch({ passwordHash }); monthRefetch({passwordHash})});
 
     useEffect(() => {
         let diff = monthData[month]?.amountBudgeted - monthData[month]?.amountSpent || 0;
@@ -83,6 +89,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         const name = item.category?.name || 'Uncategorized';
 
         return <ExpenseDisplay
+            key={item.id}
             id={item.id}
             name={name}
             color={'#' + color}
@@ -133,15 +140,31 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
-            <Text>{MONTHS_ORDER[month]}</Text>
-            <View style={{borderTopWidth: 1, borderBottomWidth: 1}}>
-                <Text>Upcoming Expenses</Text>
-                <FlatList
-                    data={upcoming}
-                    renderItem={({item}) => renderItem(item)}
-                    ListEmptyComponent={<Text>You have no upcoming expenses for this month.</Text>}
-                />
+            <Text style={{fontWeight: 'bold', fontSize: 24, paddingLeft: 20}}>{MONTHS_ORDER[month]}</Text>
+            <ScrollView style={{}}>
+            <View style={{borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(0, 0, 0, 0.1)', padding: 20}}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 5}}>
+                    <Text style={style.subtitle}>Upcoming Expenses:</Text>
+                    <AntDesign
+                        name={expanded ? 'up' : 'down'}
+                        size={20}
+                        color="black"
+                        onPress={() => setExpanded(!expanded)} />
+                </View>
+                {expanded &&
+                    expenses.length ? (
+                            expenses.map((item) => renderItem(item))
+                        ) : (
+                            <Text style={{padding: 5, }}>You have no upcoming expenses for this month.</Text>
+                        )
+                }
             </View>
+            {/* <Text>{date.toUTCString}</Text>
+            <Text>{date.toTimeString}</Text>
+            <Text>{date.toString}</Text>
+            <Text>{date.toDateString}</Text>
+            <Text>{date.toJSON}</Text>
+            <Text>{date.toISOString}</Text> */}
             <View>
                 <Text style={style.subtitle}>Latest expenses:</Text>
                 { loading ? <ActivityIndicator size='large' /> : (
@@ -156,6 +179,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
+            </ScrollView>
             <View style={style.addBtn}>
                 <AddButton size={70} onPress={() => navigation.navigate('CreateExpense')} />
             </View>
@@ -184,11 +208,11 @@ const style = StyleSheet.create({
     alertText: {
         fontSize: 16,
         marginHorizontal: 10,
-        maxWidth: '90%'
+        maxWidth: '80%'
     },
     subtitle: {
         padding: 10,
-        textAlign: 'center',
+        //textAlign: 'center',
         fontWeight: 'bold',
         fontSize: 18
     },

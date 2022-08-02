@@ -104,11 +104,12 @@ function Root() {
     return (
         <Tab.Navigator initialRouteName='Home'>
             <Tab.Group screenOptions={{
+                
                 headerShadowVisible: false,
                 headerTitleAlign: 'center',
                 headerTitleStyle: { fontWeight: 'bold', fontSize: 24 },
                 tabBarLabelStyle: {fontSize: 12},
-                tabBarStyle: {paddingBottom: 25, paddingTop: 5},
+                tabBarStyle: {paddingBottom: 25, paddingTop: 5, height: 70},
                 tabBarAllowFontScaling: true,
                 tabBarActiveTintColor: Colors.light.tabIconSelected,
                 tabBarInactiveTintColor: Colors.light.btnBackground
