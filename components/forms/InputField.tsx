@@ -26,7 +26,7 @@ export function InputField({ label, placeholder, defaultValue, onChange, errorMe
     }, [focused]);
 
     return (
-        <TouchableHighlight style={containerStyle} onPress={() => setFocused(true)} underlayColor="rgba(0,0,0,0.1)" >
+        <TouchableHighlight style={containerStyle} onPress={() => setFocused(true)} underlayColor="rgba(0,0,0,0.1)">
             <>
                 <View style={styles.content}>
                     <Text style={styles.label}>{label}</Text>
@@ -37,7 +37,8 @@ export function InputField({ label, placeholder, defaultValue, onChange, errorMe
                         editable={focused}
                         ref={inputRef}
                         onBlur={() => setFocused(false)}
-                        onChangeText={onChange} />
+                        onChangeText={onChange}
+                        pointerEvents="none" />
                 </View>
                 {
                     errorMessage !== undefined && errorMessage.length > 0 &&
