@@ -197,21 +197,21 @@ const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearS
 
     return (<>
         <View style={{ flexDirection: 'row' }}>
-            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
+            {/* <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <HeaderButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
                 }} />
-            </View>
+            </View> */}
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <MonthlyExpenseGraph
                     data={inputData.length <= displayAmountNumber ? inputData :
                         inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
             </View>
-            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
+            {/* <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <HeaderButton direction="right" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.min(inputData.length - displayAmountNumber, sliceEnd + jumpAmountNumber))
                 }} />
-            </View>
+            </View> */}
         </View>
 
     </>)

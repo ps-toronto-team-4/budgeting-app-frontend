@@ -433,7 +433,39 @@ query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
                     id
                 }
             }
+            topMerchant{
+        merchant{
+          id
+          name
+          defaultCategory{
+            id
+            name
+          }
+          expenses{
+            id
+            amount
+          }
+        }
+        amountSpent
+      }
+      
+      topCategory{
+        category{
+          id
+          name
+          colourHex
+          expenses{
+            id
+            amount
+          }
+          merchants{
+            id
+            name
+          }
+        }
+      }
             totalSpent
+            
         }
         ... on FailurePayload{
             errorMessage
