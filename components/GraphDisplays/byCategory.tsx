@@ -39,7 +39,9 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
     });
 
     useEffect(() => {
-        clearMutations();
+        if (selectedMonth === month) {
+            clearMutations();
+        }
     }, [categoryData])
 
     const clearMutations = () => {
@@ -51,9 +53,9 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                     return props = { radius: 100, innerRadius: 70 }
                 },
                 callback: () => {
-                    if (mutations.length === 0) {
-                        setMutations([])
-                    }
+                    // if (mutations.length === 0) {
+                    //     setMutations([])
+                    // }
                 }
             },
             {
@@ -64,21 +66,23 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
 
                 },
                 callback: () => {
-                    if (mutations.length === 0) {
-                        setMutations([])
-                    }
+                    // if (mutations.length === 0) {
+                    //     setMutations([])
+                    // }
                 }
             }
         ])
     }
 
-    const handleCategory = (id: number) => {
+    const handleCategory = (id: number | undefined) => {
+        console.log("I was here");
         setMutations([
             {
                 target: "data",
                 eventKey: "all",
                 mutation: (props: any) => {
                     if (id === props.datum.category.id) {
+                        console.log("I get into the if statement");
                         return props = { radius: 120, innerRadius: 90, labelRadius: 120 };
                     } else {
                         return props = { radius: 100, innerRadius: 70 }
@@ -112,22 +116,23 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
         ])
     }
 
-    // const onPressClickHandler = () => {
-    //     return [{
-    //         target: "data",
-    //         mutation: (props: any) => {
-    //             setSelectedMonth(props.datum.id);
-    //             handleCategory(props.datum.id);
-    //             return null;
-    //         }
-    //     }]
-    // }
+    const onPressClickHandler = () => {
+        return [{
+            target: "data",
+            mutation: (props: any) => {
+                handleCategory(props.datum.category.id);
+                return null;
+            }
+        }]
+    }
 
     function handleCategorySelect(categoryName: string | undefined) {
         if (categoriesData?.categories.__typename == "CategoriesSuccess") {
             const foundCategory = categoriesData.categories.categories.find(x => x.name == categoryName);
 
             if (foundCategory !== undefined) {
+                console.log(foundCategory.id)
+                setSelectedMonth(month);
                 setCategory(foundCategory);
                 handleCategory(foundCategory.id);
             }
@@ -164,7 +169,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                         }).filter((data) => data.amountSpent != 0)
 
                     }
-                    labels={({ datum }) => datum.category.name.substring(0, 3) + "..."}
+                    labels={({ datum }) => (datum.category.name.length < 5) ? datum.category.name : datum.category.name.substring(0, 4) + "..."}
                     y={"amountSpent"}
                     width={900}
                     height={300}
@@ -177,40 +182,8 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                         [{
                             target: "data",
                             eventHandlers: {
-                                onPressIn: () => {
-                                    return (
-                                        [{
-                                            target: "labels",
-                                            mutation: (props) => {
-                                                return props.text.charAt(0) === "$" ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
-                                            }
-                                        },
-                                        {
-                                            target: "data",
-                                            mutation: (props) => {
-                                                return props.radius === 100 ? { radius: 120, innerRadius: 90 } : { radius: 100, innerRadius: 70 };
-                                            }
-                                        }
-                                        ]
-                                    );
-                                },
-                                onClick: () => {
-                                    return (
-                                        [{
-                                            target: "labels",
-                                            mutation: (props) => {
-                                                return props.text === "$" + props.datum.amountSpent ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
-                                            }
-                                        },
-                                        {
-                                            target: "data",
-                                            mutation: (props) => {
-                                                return props.radius === 100 ? { radius: 120, innerRadius: 90, labelRadius: 120 } : { radius: 100 };
-                                            }
-                                        }
-                                        ]
-                                    );
-                                }
+                                onPressIn: onPressClickHandler,
+                                onClick: onPressClickHandler
                             }
                         }
                         ]}
