@@ -1,8 +1,6 @@
-import { Screen } from "../../components/Screen";
-import { Text, View } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import { RootStackScreenProps } from "../../types";
 import { useState } from "react";
-
 
 
 export default function ExpandExpense({ navigation, route }: RootStackScreenProps<'ExpandExpenses'>) {
@@ -10,7 +8,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     const [month, setMonth] = useState(route.params.month)
     const [year, setYear] = useState(route.params.year)
 
-    return <Screen>
+    return <View style={staticStyles.screen}>
         <View>
 
             <Text>
@@ -24,5 +22,12 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 Your year is :{year}
             </Text>
         </View>
-    </Screen >
+    </View >
 }
+
+const staticStyles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
+})
