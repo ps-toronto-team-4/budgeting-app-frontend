@@ -182,6 +182,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
                     <RequiredField check={check} input={username} />
                     <UsernameRules />
                     <TextInput
+                        keyboardType='email-address'
                         style={styles.formField}
                         onChangeText={(email) => { setEmail(email.replace(/\s+/g, "")); setEmailCheck(false) }}
                         onBlur={() => setEmailCheck(true)}
