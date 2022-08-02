@@ -38,6 +38,40 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
         }),
     });
 
+    useEffect(() => {
+        clearMutations();
+    }, [categoryData])
+
+    const clearMutations = () => {
+        setMutations([
+            {
+                target: "data",
+                eventKey: "all",
+                mutation: (props: any) => {
+                    return props = { radius: 100, innerRadius: 70 }
+                },
+                callback: () => {
+                    if (mutations.length === 0) {
+                        setMutations([])
+                    }
+                }
+            },
+            {
+                eventKey: "all",
+                target: "labels",
+                mutation: (props: any) => {
+                    return props = { text: props.datum.category.name.substring(0, 3) + "..." };
+
+                },
+                callback: () => {
+                    if (mutations.length === 0) {
+                        setMutations([])
+                    }
+                }
+            }
+        ])
+    }
+
     const handleCategory = (id: number) => {
         setMutations([
             {
