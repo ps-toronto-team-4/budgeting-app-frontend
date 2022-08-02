@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
-import { Screen } from "../components/Screen";
 import Styles from '../constants/Styles';
 import { VictoryChart, VictoryLegend, VictoryPie } from 'victory-native';
 import { GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownQueryVariables, MonthType } from '../components/generated';
-import MonthlyExpenseGraph from '../components/GraphDisplays/monthlyExpenses';
+import MonthlyExpenseGraph from '../components/graphs/MonthlyExpenses';
 import { useLazyQuery } from '@apollo/client';
 import { GetMonthBreakdownDocument, GetMonthBreakdownQuery } from '../components/generated';
-import ByCategory from '../components/GraphDisplays/byCategory';
+import ByCategory from '../components/graphs/ByCategory';
 import { TopBar } from '../components/budget/TopBar';
 import { MONTHS_ORDER } from '../constants/Months';
-import MonthlyVsBudgeted from '../components/GraphDisplays/monthlyVsBudgeted';
-import { ScrollView } from 'react-native-gesture-handler';
+import MonthlyVsBudgeted from '../components/graphs/MonthlyVsBudgeted';
 import { useRefresh } from '../hooks/useRefresh';
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
@@ -28,7 +26,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
     useRefresh(() => refetch({ passwordHash, month: month as MonthType, year }), [month, year]);
 
     return (
-        <Screen>
+        <View style={styles.screen}>
             <ScrollView>
                 <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
                 <Text></Text>
@@ -36,10 +34,13 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                 <MonthlyExpenseGraph />
                 <MonthlyVsBudgeted />
             </ScrollView>
-        </Screen>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
 });

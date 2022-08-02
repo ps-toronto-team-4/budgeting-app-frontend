@@ -12,8 +12,7 @@ import { BudgetList } from "../../components/budget/BudgetList";
 import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
 import { MONTHS_ORDER } from "../../constants/Months"
-import { Screen } from "../../components/Screen";
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import moment from "moment";
 import { Feather } from '@expo/vector-icons';
 
@@ -205,7 +204,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
     }
 
     return (
-        <Screen>
+        <View style={styles.screen}>
             <ChartDisplay
                 planned={plannedAmount || 0}
                 actualBudgeted={actualAmount?.budgeted || 0}
@@ -247,11 +246,15 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                     </View>
                 )
             }
-        </Screen>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
     itemSeparator: {
         height: 1,
         backgroundColor: 'rgba(0,0,0,0.2)',

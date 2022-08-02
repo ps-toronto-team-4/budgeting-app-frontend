@@ -5,16 +5,18 @@ import Colors from "../../constants/Colors";
 import moment, { Moment } from "moment";
 import { Budget, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
-import Button from "../../components/Button";
-import { AmountInput } from "../../components/AmountInput";
-import { DropdownRow } from "../../components/DropdownRow";
+import Button from "../../components/buttons/Button";
+import { AmountInput } from "../../components/forms/AmountInput";
+import { DropdownRow } from "../../components/forms/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
-import { Screen } from "../../components/Screen";
-import { InputRow } from "../../components/InputRow";
+import { Form } from "../../components/forms/Form";
+import { InputRow } from "../../components/forms/InputRow";
 import { useRefresh } from "../../hooks/useRefresh";
+import { DisplayField } from "../../components/forms/DisplayField";
+import { DropdownField } from "../../components/forms/DropdownField";
 
 export default function CreateBudgetScreen({ navigation, route }: RootStackScreenProps<'CreateBudget'>) {
-    const [getCategories, { data: categoryData, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
+    const [getCategories, { data, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument);
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
@@ -24,9 +26,8 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
     const [amount, setAmount] = useState(0);
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [budget, setBudget] = useState<Budget | null>(route.params.budget || null);
-    const [categoryExpanded, setCategoryExpanded] = useState(false);
     const [amountError, setAmountError] = useState('');
-    const [categoryError, setCategoryError] = useState('');
+    const [check, setCheck] = useState(false);
 
     const [createBudget] = useMutation<CreateBudgetCategoryMutation>(CreateBudgetCategoryDocument, {
         variables: { passwordHash, budgetId: budget?.id, categoryId, amount },
@@ -41,11 +42,10 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
     });
 
     function selectCategory(name: string) {
-        if (categoryData?.categories.__typename === 'CategoriesSuccess') {
-            const found = categoryData?.categories.categories.find(cat => cat.name === name);
+        if (data?.categories.__typename === 'CategoriesSuccess') {
+            const found = data?.categories.categories.find(cat => cat.name === name);
             if (found !== undefined) {
                 setCategoryId(found?.id);
-                setCategoryError('');
             }
         }
     }
@@ -62,7 +62,7 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
             noErrors = false;
         }
         if (categoryId == null) {
-            setCategoryError("This field is required.");
+            setCheck(true);
             noErrors = false;
         }
 
@@ -76,37 +76,39 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
         setAmount(newAmount);
     }
 
+    function handleCreateCategory(value: string) {
+        navigation.navigate('CreateCategory', { name: value });
+        setCheck(false);
+    }
+
     return (
-        <Screen onDismissKeyboard={() => setCategoryExpanded(false)}>
+        <Form>
             <AmountInput
                 defaultAmount={0}
                 onChangeAmount={handleChangeAmount}
-                onSelect={() => setCategoryExpanded(false)}
-                error={amountError} />
-            <DropdownRow
+                errorMessage={amountError} />
+            <DropdownField
                 label="Category"
+                placeholder="required"
                 data={
-                    categoryData?.categories.__typename === 'CategoriesSuccess' ?
-                        categoryData.categories.categories.filter(filterCat => {
+                    data?.categories.__typename === 'CategoriesSuccess' ?
+                        data.categories.categories.filter(filterCat => {
                             const lookingForOverlap = budget?.budgetCategories?.find((other) => other.category.name == filterCat.name);
                             return lookingForOverlap === undefined;
-                        }).map(x => { return { name: x.name, id: x.id } }) : []
+                        }).map(x => { return { value: x.name, id: x.id.toString(), color: '#' + x.colourHex } }) : []
                 }
-                onSelect={selectCategory}
-                expanded={categoryExpanded}
-                onExpand={() => setCategoryExpanded(true)}
-                onCollapse={() => setCategoryExpanded(false)}
-                topBorder
-                error={categoryError} />
-
-            <InputRow label="Month:" disabled topBorder bottomBorder value={`${budget?.month} ${budget?.year}`} />
+                onChange={(id) => setCategoryId(parseInt(id))}
+                onCreateNew={handleCreateCategory}
+                required
+                check={check} />
+            <DisplayField label="Month" value={`${budget?.month} ${budget?.year}`} />
             <View style={styles.buttonContainer}>
                 <Button
                     text="Create New Budget"
                     accessibilityLabel="Button to Create New Budget"
                     onPress={() => handleBudgetCreation()} />
             </View>
-        </Screen>
+        </Form>
     );
 }
 
@@ -147,19 +149,6 @@ const styles = StyleSheet.create({
     fieldInput: {
         fontSize: 15,
         width: 180
-    },
-    detailsRow: {
-        flexDirection: 'row',
-        paddingHorizontal: 27,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingVertical: 10,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,0.3)',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.3)',
-        zIndex: -1,
-        elevation: -1,
     },
     detailsIconAndLabel: {
         flexDirection: 'row',

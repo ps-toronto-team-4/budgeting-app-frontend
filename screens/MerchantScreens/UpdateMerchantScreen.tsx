@@ -4,16 +4,18 @@ import { DeleteMerchantDocument, DeleteMerchantMutation, GetCategoriesDocument, 
 import { StyleSheet, View, Text, TextInput, ActivityIndicator, SafeAreaView, Alert, TouchableOpacity, Modal } from 'react-native';
 import { RootStackScreenProps } from "../../types";
 import { AntDesign, Feather } from '@expo/vector-icons';
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import { GetMerchantsQuery, GetMerchantsDocument } from "../../components/generated";
-import { DropdownRow } from "../../components/DropdownRow";
+import { DropdownRow } from "../../components/forms/DropdownRow";
 import { useAuth } from "../../hooks/useAuth";
 import { useRefresh } from "../../hooks/useRefresh";
 import modalStyle from "../../constants/Modal";
 import Styles from "../../constants/Styles";
-import { Screen } from "../../components/Screen";
-import { InputRow } from "../../components/InputRow";
+import { Form } from "../../components/forms/Form";
+import { InputRow } from "../../components/forms/InputRow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { InputField } from "../../components/forms/InputField";
+import { DropdownField } from "../../components/forms/DropdownField";
 
 export default function UpdateMerchantScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
     const [getMerchants, { data: manyMerchantsData }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
@@ -35,24 +37,6 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     const [newCategory, setNewCategory] = useState<{ id: number, name: string } | undefined>(category)
     const [check, setCheck] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
-    const [categoryOpen, setCategoryOpen] = useState(false);
-    const [preFill, setPreFill] = useState(false)
-
-    const preFillCategory = () => {
-        if (!newCategory && preFill) {
-            AsyncStorage.getItem('New Category')
-                .then((val) => {
-                    if (val) {
-                        setNewCategory(JSON.parse(val));
-                    }
-                })
-                .catch((err) => {
-                    console.log("Couldn't retrieve new category: " + err)
-                })
-        }
-    }
-
-    useRefresh(preFillCategory, [preFill]);
 
     const [deleteMerchant] = useMutation<DeleteMerchantMutation>(DeleteMerchantDocument, {
         variables: { passwordHash: passwordHash, id: route.params?.id },
@@ -110,9 +94,9 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
         }
     })();
 
-    function handleCategorySelect(categoryName: String) {
+    function handleCategorySelect(categoryId: string) {
         if (categoryData?.categories.__typename === "CategoriesSuccess") {
-            const foundCategory = categoryData.categories.categories.find(x => x.name === categoryName);
+            const foundCategory = categoryData.categories.categories.find(x => x.id === parseInt(categoryId));
 
             if (foundCategory !== undefined) {
                 setNewCategory(foundCategory);
@@ -128,41 +112,32 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
     }
 
     return (
-        <Screen>
+        <Form>
             <View style={styles.container}>
-                <InputRow
-                    label="Merchant:"
-                    placeholder="(mandatory)"
-                    value={newName}
-                    onChangeText={setNewName}
-                    error={merchantError}
-                    topBorder />
-                <InputRow
-                    label="Details:"
-                    placeholder="(optional)"
-                    value={newDescription || ""}
-                    onChangeText={setNewDescription}
-                    topBorder
-                    bottomBorder />
-                <View>
-                    <DropdownRow
-                        label="Default Category"
-                        data={
-                            categoryData?.categories.__typename === "CategoriesSuccess" ?
-                                categoryData.categories.categories : []
-                        }
-                        onSelect={handleCategorySelect}
-                        expanded={categoryOpen}
-                        placeholder={categoryOpen ? "Start typing to search" : "Select Category"}
-                        onExpand={() => setCategoryOpen(true)}
-                        onCollapse={() => setCategoryOpen(false)}
-                        defaultValue={newCategory?.name}
-                        onCreateNew={() => { navigation.navigate("CreateCategory"); setPreFill(true) }}
-                        createLabel="Category"
-                    />
-                </View>
+                <InputField
+                    label="Merchant"
+                    placeholder="required"
+                    defaultValue={newName}
+                    onChange={setNewName}
+                    errorMessage={merchantError} />
+                <InputField
+                    label="Details"
+                    placeholder="optional"
+                    defaultValue={newDescription || ''}
+                    onChange={setNewDescription} />
+                <DropdownField
+                    label="Default Category"
+                    placeholder="optional"
+                    defaultValue={newCategory?.name}
+                    data={
+                        categoryData?.categories.__typename === "CategoriesSuccess" ?
+                            categoryData.categories.categories.map(cat => {
+                                return { id: cat.id.toString(), value: cat.name, color: '#' + cat.colourHex }
+                            }) : []
+                    }
+                    onChange={handleCategorySelect} />
                 <View style={styles.buttonContainer}>
-                    <Button text={"Update Merchant"} disabled={confirmDelete} accessibilityLabel={"Button to Update Merchant"} onPress={() => handleMerchant()} />
+                    <Button text={"Update Merchant"} disabled={confirmDelete} accessibilityLabel={"Button to Update Merchant"} onPress={handleMerchant} />
                 </View>
                 {!merchantLoading ? (
                     merchantData?.updateMerchant.__typename === "MerchantSuccess" ? (
@@ -187,14 +162,14 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                     </View>
                 </Modal>
             </View>
-        </Screen>
+        </Form>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        marginTop: 50,
     },
     row: {
         flexDirection: 'row',
@@ -206,9 +181,9 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         alignSelf: 'center',
-        justifyContent: 'flex-end',
-        position: 'absolute',
-        bottom: '5%'
+        marginTop: 50,
+        zIndex: -1,
+        elevation: -1,
     },
     fieldLabel: {
         fontWeight: 'bold',
@@ -220,8 +195,5 @@ const styles = StyleSheet.create({
         width: 180
     },
     deleteButton: {
-        paddingRight: 30,
     },
-
-
 });    

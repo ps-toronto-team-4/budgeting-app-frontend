@@ -3,10 +3,10 @@ import { useEffect } from "react";
 import { DeleteExpenseDocument, DeleteExpenseMutation, UpdateExpenseDocument, UpdateExpenseMutation } from "../components/generated";
 
 import { RootStackScreenProps } from "../types";
-import { ExpenseEditForm, FormValues } from "../components/ExpenseEditForm";
+import { ExpenseEditForm, FormValues } from "../components/forms/ExpenseEditForm";
 import moment from "moment";
 import { useAuth } from "../hooks/useAuth";
-import { TrashButton } from "../components/TrashButton";
+import { TrashButton } from "../components/buttons/TrashButton";
 
 export default function UpdateExpenseScreen({ navigation, route }: RootStackScreenProps<'UpdateExpense'>) {
     const passwordHash = useAuth({ redirect: 'ifUnauthorized' });
