@@ -54,8 +54,13 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][moment(date).month()];
     const day = moment(date).date();
     const year = moment(date).year();
+    const [amountError, setAmountError] = useState('');
 
     function handleSubmit() {
+        if (amount === 0) {
+            setAmountError('Please enter a non-zero amount.');
+            return;
+        }
         onSubmit({
             amount: amount,
             merchantId: merchantId,
@@ -65,9 +70,16 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
         });
     }
 
+    function handleAmountChange(newAmount: number) {
+        if (newAmount !== 0) {
+            setAmountError('');
+        }
+        setAmount(newAmount);
+    }
+
     return (
         <Form onDismissKeyboard={() => { setCalendarShown(false); }}>
-            <AmountInput onChangeAmount={setAmount} defaultAmount={initVals?.amount || 0} />
+            <AmountInput onChangeAmount={handleAmountChange} defaultAmount={initVals?.amount || 0} errorMessage={amountError} />
             <>
                 {
                     data?.merchants.__typename === 'MerchantsSuccess' &&

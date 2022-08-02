@@ -18,6 +18,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
     const passwordHash = useAuth({ redirect: 'ifUnauthorized' });
     const [amount, setAmount] = useState(route.params.budgetCategory.amount);
     const budgetCategory = route.params.budgetCategory;
+    const [amountError, setAmountError] = useState('');
 
     const [updateBudget] = useMutation<UpdateBudgetCategoryMutation, UpdateBudgetCategoryMutationVariables>(UpdateBudgetCategoryDocument, {
         variables: { passwordHash, id: budgetCategory?.id, amount },
@@ -47,12 +48,23 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
     }, []);
 
     function handleSubmit() {
+        if (amount === 0) {
+            setAmountError('Please enter a non-zero amount.');
+            return;
+        }
         updateBudget();
+    }
+
+    function handleChangeAmount(newAmount: number) {
+        if (newAmount !== 0) {
+            setAmountError('');
+        }
+        setAmount(newAmount);
     }
 
     return (
         <Form>
-            <AmountInput defaultAmount={amount} onChangeAmount={setAmount} />
+            <AmountInput defaultAmount={amount} onChangeAmount={handleChangeAmount} errorMessage={amountError} />
             <DisplayField label="Category" value={budgetCategory.category.name} />
             <View style={styles.buttonContainer}>
                 <Button
