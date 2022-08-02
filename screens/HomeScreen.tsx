@@ -1,16 +1,14 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { useState, useEffect, useMemo } from "react";
-import { GetExpensesInMonthDocument, GetExpensesInMonthQuery, GetMonthsTotalsDocument, GetMonthsTotalsQuery, GetUserDocument, GetUserQuery } from "../components/generated";
+import { GetExpensesInMonthDocument, GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, GetMonthTotalsQueryVariables, GetUserDocument, GetUserQuery, GetUserQueryVariables } from "../components/generated";
 import React from 'react';
 import { View, Text, ActivityIndicator, FlatList } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
-import { Screen } from "../components/Screen";
 import Styles from "../constants/Styles";
 import { StyleSheet } from 'react-native';
 import { useRefresh } from "../hooks/useRefresh";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/buttons/AddButton";
 import { MONTHS_ORDER } from "../constants/Months";
 import { ExpenseDisplay } from "../components/ExpenseDisplay";
 import Colors from "../constants/Colors";
@@ -28,43 +26,31 @@ import { Feather } from "@expo/vector-icons";
     }
 
 export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
-    const passwordHash = useAuth();
     const [name, setName] = useState('there');
     const [overBudget, setOverBudget] = useState<string[]>([]);
     const [monthData, setMonthData] = useState<{amountSpent: number, amountBudgeted: number}[]>([]);
     const [expenses, setExpenses] = useState<{id: number, amount: number, category?: {name: string, colourHex: string} | null}[]>([]);
+    const [upcoming, setUpcoming] = useState<{id: number, amount: number, category?: {name: string, colourHex: string} | null}[]>([]);
     const date = new Date();
+    const day = date.getDate();
     const month = date.getMonth();
     const monthName = MONTHS_ORDER[month].at(0) + MONTHS_ORDER[month].substring(1).toLowerCase();
     const year = date.getFullYear();
 
-    useUnauthRedirect();
-
-    useQuery<GetUserQuery>(GetUserDocument, {
-        variables: { passwordHash },
+    const [getUser, {}] = useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {
         onCompleted: (data) => {
             setName(data?.user.__typename === 'User' ? data.user.firstName : 'there');
         }
     })
 
-    const {loading: monthLoading, data: yearData, refetch: monthRefetch} = useQuery<GetMonthsTotalsQuery>(GetMonthsTotalsDocument, {
-        variables: { passwordHash },
-        onCompleted: (data) => {
+    const[getMonth, {loading: monthLoading, data: yearData, refetch: monthRefetch}] = useLazyQuery<GetMonthTotalsQuery, GetMonthTotalsQueryVariables>(GetMonthTotalsDocument, {
+        onCompleted(data) {
             if (data.monthsTotals.__typename === 'MonthsTotals') {
                 setMonthData(data.monthsTotals.byMonth.filter((item) => item.year === year));
-            }
-        }
+        }}
     })
 
-    useEffect(() => {
-        let diff = monthData[month]?.amountBudgeted - monthData[month]?.amountSpent || 0;
-        if (diff < 0) {
-            setOverBudget(['Total']);
-        }
-    }, [monthData]);
-    
-    const {data, loading, refetch} = useQuery<GetExpensesInMonthQuery>(GetExpensesInMonthDocument, {
-        variables: { month: MONTHS_ORDER[month], year, passwordHash },
+    const {data, loading, refetch} = useQuery<GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables>(GetExpensesInMonthDocument, {
         onCompleted: (data) => {
             if (data.expensesInMonth.__typename === 'ExpensesSuccess') {
                 if (data.expensesInMonth.expenses.length) {
@@ -75,7 +61,18 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         }
     })
 
-    useRefresh(() => {refetch(); monthRefetch()}, [passwordHash]);
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => getUser({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
+      });
+      useRefresh(() => refetch({ passwordHash }));
+
+    useEffect(() => {
+        let diff = monthData[month]?.amountBudgeted - monthData[month]?.amountSpent || 0;
+        if (diff < 0) {
+            setOverBudget(['Total']);
+        }
+    }, [monthData]);
 
     function renderItem(item: {id: number, amount: number, category?: {name: string, colourHex: string} | null}) {
         const color = item.category?.colourHex || Colors.light.uncategorizedColor;
@@ -92,12 +89,12 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
 
     const FirstExpense = () => {
         return (
-            <Text style={{textAlign: 'center', fontSize: 18, margin: '20%'}}>You have no expenses for {monthName} yet. Try adding some by presing this button:</Text>
+            <Text style={{textAlign: 'center', fontSize: 18, margin: '20%'}}>You have no expenses for {monthName} yet. Try adding some by pressing this button:</Text>
         )
     }
 
     return (
-        <Screen>
+        <View style={{flex: 1}}>
             <Text style={style.greeting}>Hello, {name}!</Text>
             { overBudget.length ? (
                 <View style={[style.alert, ALERT_COLOR.over]}>
@@ -132,8 +129,9 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
+            
             <View>
-                <Text style={style.subtitle}>Your latest {monthName} expenses:</Text>
+                <Text style={style.subtitle}>Latest {MONTHS_ORDER[month]} expenses:</Text>
                 { loading ? <ActivityIndicator size='large' /> : (
                     data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
                         <FlatList
@@ -149,7 +147,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
             <View style={style.addBtn}>
                 <AddButton size={70} onPress={() => navigation.navigate('CreateExpense')}/>
             </View>
-        </Screen>
+        </View>
     );
 }
 
