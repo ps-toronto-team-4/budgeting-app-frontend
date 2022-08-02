@@ -72,7 +72,7 @@ function RootNavigator() {
         <Stack.Screen name="CreateMerchant" component={CreateMerchant} options={{ title: 'Create Merchant' }} />
         <Stack.Screen name="CreateExpense" component={CreateExpenseScreen} options={{ title: 'Create Expense' }} />
         <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{ title: 'Expense Details' }} />
-        <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{ title: 'Category Settings' }} />
+        <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{ title: 'Categories' }} />
         <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{ title: 'Edit Category' }} />
         <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerTitle: 'Create Category' }} />
         <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: 'Edit Expense' }} />
