@@ -48,14 +48,14 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
             <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
             <ScrollView>
 
-                <View>
+                <View style={{ alignItems: 'center' }}>
                     <MonthlyExpenseGraph
                         data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
                         monthSelector={month}
                         yearSelector={year} />
                     <Button text='View More' onPress={() => navigation.navigate('ExpandExpenses', { year, month })}></Button>
                 </View>
-                <View>
+                <View style={{ alignItems: 'center' }}>
                     <MonthlyVsBudgeted
                         data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
                         monthSelector={month}
@@ -63,7 +63,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                     <Button text='View More' onPress={() => navigation.navigate('ExpandBudget', { year, month })}></Button>
                 </View>
 
-                <View>
+                <View style={{ alignItems: 'center' }}>
                     <MonthlyVsBudgetedCategory
                         data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
                         budgetReferenceData={budgetsData?.budgets.__typename === 'BudgetsSuccess' ?
@@ -73,7 +73,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                     <Button text='View More' onPress={() => navigation.navigate('ExpandBarCat', { year, month })}></Button>
                 </View>
 
-                <View>
+                <View style={{ alignItems: 'center' }}>
                     <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []} month={month} year={year}></ByCategory>
                     <Button text='View More' onPress={() => navigation.navigate('ExpandWheel', { year, month })}></Button>
                 </View>
