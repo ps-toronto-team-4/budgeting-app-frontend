@@ -76,6 +76,11 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
         setAmount(newAmount);
     }
 
+    function handleCreateCategory(value: string) {
+        navigation.navigate('CreateCategory', { name: value });
+        setCheck(false);
+    }
+
     return (
         <Form>
             <AmountInput
@@ -90,9 +95,10 @@ export default function CreateBudgetScreen({ navigation, route }: RootStackScree
                         data.categories.categories.filter(filterCat => {
                             const lookingForOverlap = budget?.budgetCategories?.find((other) => other.category.name == filterCat.name);
                             return lookingForOverlap === undefined;
-                        }).map(x => { return { value: x.name, id: x.id.toString() } }) : []
+                        }).map(x => { return { value: x.name, id: x.id.toString(), color: '#' + x.colourHex } }) : []
                 }
                 onChange={(id) => setCategoryId(parseInt(id))}
+                onCreateNew={handleCreateCategory}
                 required
                 check={check} />
             <DisplayField label="Month" value={`${budget?.month} ${budget?.year}`} />

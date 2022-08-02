@@ -83,6 +83,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     function handleCreateMerchant(value: string) {
         if (!value) {
             nav.navigate('CreateMerchant');
+            return;
         }
         createMerchant({
             variables: { passwordHash, name: value },
@@ -95,6 +96,10 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                 }
             },
         });
+    }
+
+    function handleCreateCategory(value: string) {
+        nav.navigate('CreateCategory', { name: value });
     }
 
     return (
@@ -132,7 +137,8 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                                 : undefined
                         }
                         onFocus={() => setCalendarShown(false)}
-                        onChange={id => setCategoryId(parseInt(id))} />
+                        onChange={id => setCategoryId(parseInt(id))}
+                        onCreateNew={handleCreateCategory} />
                 }
             </>
             <>

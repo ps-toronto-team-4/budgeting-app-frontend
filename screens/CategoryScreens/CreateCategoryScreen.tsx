@@ -15,8 +15,8 @@ import { Form } from '../../components/forms/Form';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRefresh } from '../../hooks/useRefresh';
 
-export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
-  const [name, setName] = useState('')
+export default function CreateCategoryScreen({ navigation, route }: RootStackScreenProps<'CreateCategory'>) {
+  const [name, setName] = useState(route.params?.name || '')
   const [color, setColor] = useState('')
   const [details, setDetails] = useState('')
   const [check, setCheck] = useState(false) // true if need to check required fields
