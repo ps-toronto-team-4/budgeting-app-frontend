@@ -32,7 +32,7 @@ export function ColorField({ label, defaultColor }: ColorFieldProps) {
                 <View style={styles.colorsContainer}>
                     {
                         colorsList.map((color, i) =>
-                            <ColorItem color={color === defaultColor ?  :} key={i} />
+                            <ColorItem color={color} key={i} selected={color === defaultColor} />
                         )
                     }
                 </View>
