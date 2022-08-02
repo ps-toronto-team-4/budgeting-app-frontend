@@ -1,6 +1,6 @@
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { useState, useEffect } from "react";
-import { GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantsQueryVariables, MerchantsAndCategoriesDocument, MerchantsAndCategoriesQuery, MerchantsAndCategoriesQueryVariables } from "../generated";
+import { CreateMerchantDocument, CreateMerchantMutation, CreateMerchantMutationVariables, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables, GetMerchantsQueryVariables, MerchantsAndCategoriesDocument, MerchantsAndCategoriesQuery, MerchantsAndCategoriesQueryVariables } from "../generated";
 
 import { StyleSheet, View, Text, TextInput, TouchableHighlight, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import Colors from "../../constants/Colors";
@@ -40,10 +40,12 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     const [getMerchantsAndCategories, { data, refetch }] = useLazyQuery<MerchantsAndCategoriesQuery, MerchantsAndCategoriesQueryVariables>(MerchantsAndCategoriesDocument, {
         onError: () => alert('Error occurred while fetching merchants and categories.'),
     });
-    useAuth({
+    const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getMerchantsAndCategories({ variables: { passwordHash } }),
     });
     useRefresh(refetch);
+
+    const [createMerchant, { }] = useMutation<CreateMerchantMutation, CreateMerchantMutationVariables>(CreateMerchantDocument);
 
     const [amount, setAmount] = useState(initVals?.amount || 0);
     const [merchantId, setMerchantId] = useState(initVals?.merchantId);
@@ -55,6 +57,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     const day = moment(date).date();
     const year = moment(date).year();
     const [amountError, setAmountError] = useState('');
+    const nav = useNavigation();
 
     function handleSubmit() {
         if (amount === 0) {
@@ -77,6 +80,23 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
         setAmount(newAmount);
     }
 
+    function handleCreateMerchant(value: string) {
+        if (!value) {
+            nav.navigate('CreateMerchant');
+        }
+        createMerchant({
+            variables: { passwordHash, name: value },
+            onCompleted: (response) => {
+                if (response.createMerchant.__typename === 'MerchantSuccess') {
+                    refetch();
+                    setMerchantId(response.createMerchant.merchant.id);
+                } else {
+                    alert('Failed to create merchant.');
+                }
+            },
+        });
+    }
+
     return (
         <Form onDismissKeyboard={() => { setCalendarShown(false); }}>
             <AmountInput onChangeAmount={handleAmountChange} defaultAmount={initVals?.amount || 0} errorMessage={amountError} />
@@ -95,7 +115,8 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                                 : undefined
                         }
                         onFocus={() => setCalendarShown(false)}
-                        onChange={id => setMerchantId(parseInt(id))} />
+                        onChange={id => setMerchantId(parseInt(id))}
+                        onCreateNew={handleCreateMerchant} />
                 }
             </>
             <>

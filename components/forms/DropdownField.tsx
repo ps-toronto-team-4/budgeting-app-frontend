@@ -46,13 +46,14 @@ export interface DropdownFieldProps {
      * is empty and, if so, display error.
      */
     check?: boolean;
+    onCreateNew?: (value: string) => void;
 }
 
 /**
  * This component has a lot of moving parts. Modification can result in unexpected behaviour and is
  * done at your own risk. If you need any changes to this component, ask Hark.
  */
-export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required, check }: DropdownFieldProps) {
+export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required, check, onCreateNew }: DropdownFieldProps) {
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const scrollViewStartRef = useRef<View>(null);
@@ -112,6 +113,12 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         });
     }, []);
 
+    function handlePressCreateNew() {
+        onCreateNew && onCreateNew(value);
+        setCachedValue(value);
+        setFocused(false);
+    }
+
     return (
         <>
             <TouchableHighlight style={containerStyle} onPress={handlePress} underlayColor="rgba(0,0,0,0.1)">
@@ -143,6 +150,12 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                     focused &&
                     <ScrollView style={[styles.scrollView, { maxHeight: maxScrollViewHeight }]} keyboardShouldPersistTaps="always">
                         {filteredData.map(datum => <DropdownItem item={datum} onPress={handleItemPress} key={datum.id} />)}
+                        {
+                            onCreateNew &&
+                            <DropdownItem
+                                item={{ id: 'new', value: value ? `Add "${value}"` : `Create new ${label.toLowerCase()}`, color: 'plus' }}
+                                onPress={handlePressCreateNew} />
+                        }
                     </ScrollView>
                 }
             </View>
