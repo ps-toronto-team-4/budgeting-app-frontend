@@ -32,6 +32,10 @@ export type RootStackParamList = {
     EditBudget: { budgetCategory: BudgetCategory };
     UpdateMerchant: { id: number, name: string, description?: string | null, category?: { id: number, name: string } };
     MerchantSettings: undefined;
+    ExpandExpenses: { year: number, month: string };
+    ExpandBudget: { year: number, month: string };
+    ExpandWheel: { year: number, month: string };
+    ExpandBarCat: { year: number, month: string };
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<

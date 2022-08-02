@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { View, Text } from "react-native"
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
 import ArrowButton from "../buttons/ArrowButton";
+import { Budget, BudgetCategory } from "../generated";
+
+
 
 
 interface GraphDatum {
-    amountBudgeted: number,
-    amountSpent: number,
-    month: string,
-    year: number
+    "amountSpent": number,
+    "amountBudgeted": number,
+    "category": {
+        "colourHex": string,
+        "name": string
+    }
 }
 
 interface GraphParameters {
@@ -21,7 +26,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
         return {
             ...ele,
             id: index,
-            shortMonth: ele.month.substring(0, 3)
+            shortCat: ele.category.name.substring(0, 5) + '..'
         }
     })
 
@@ -29,7 +34,6 @@ const RenderGraph = ({ data }: GraphParameters) => {
         return [{
             target: "data",
             mutation: (props: any) => {
-                console.log(props.datum)
                 return null
             }
         }];
@@ -51,7 +55,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                 barWidth={20}
                 data={filteredData}
                 y="amountSpent"
-                x="shortMonth"
+                x="shortCat"
                 events={[
                     {
                         target: "data",
@@ -68,7 +72,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                 barWidth={20}
                 data={filteredData}
                 y="amountBudgeted"
-                x="shortMonth"
+                x="shortCat"
                 events={[
                     {
                         target: "data",
@@ -87,53 +91,70 @@ const RenderGraph = ({ data }: GraphParameters) => {
 interface MonthlyVsBudgetedParameters {
     displayAmount?: number,
     jumpAmount?: number,
-    data: GraphDatum[],
-    monthSelector?: string,
-    yearSelector?: number,
+    data: {
+        "amountSpent": number,
+        "category"?: {
+            "colourHex": string,
+            "name": string
+        } | null
+    }[],
+    budgetReferenceData: Budget | undefined,
 }
 
-const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yearSelector }: MonthlyVsBudgetedParameters) => {
+const MonthlyVsBudgetedCategory = ({ displayAmount, jumpAmount, data, budgetReferenceData }: MonthlyVsBudgetedParameters) => {
     const displayAmountNumber = displayAmount ? displayAmount : 5
-    const jumpAmountNumber = jumpAmount ? jumpAmount : 1
-    const inputData = data
+    const jumpAmountNumber = jumpAmount ? jumpAmount : 3
+    const inputData = data.map((ele, index) => {
+        const curCat = ele.category?.name
+        const curBud: BudgetCategory | undefined = budgetReferenceData?.budgetCategories?.find(ele => ele.category.name == curCat)
+        return {
+            amountSpent: ele.amountSpent,
+            category: ele.category ? ele.category : {
+                colourHex: "gray",
+                name: "Uncategorized"
+            },
+            index,
+            amountBudgeted: curBud ? curBud.amount : 0
+        }
+    }) as GraphDatum[]
 
     const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
 
-    useEffect(() => {
-        setSliceEnd(inputData.length - displayAmountNumber)
-    }, [data])
-
     useEffect(
         () => {
-            const indexOfFoundSelectedTime = data.findIndex(ele => {
-                return ele.month == monthSelector && ele.year == yearSelector
-            })
-            if (indexOfFoundSelectedTime != -1) {
-                setSliceEnd(Math.max(0, Math.min(data.length - displayAmountNumber,
-                    indexOfFoundSelectedTime - Math.floor(displayAmountNumber / 2))))
-            }
-        }, [monthSelector, yearSelector])
+            setSliceEnd(inputData.length - displayAmountNumber)
+        }
+        , [data])
+
 
     return (<View>
 
         <View style={{ flexDirection: 'row' }}>
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <ArrowButton direction="left" marginLeft={10} onPress={() => {
-                    setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
+                    const newSpot = sliceEnd - jumpAmountNumber
+                    setSliceEnd(newSpot < 0 ? newSpot + inputData.length : newSpot)
                 }} />
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
-                    inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
+                    sliceEnd + displayAmountNumber > inputData.length ? inputData.slice(sliceEnd).concat(
+                        (inputData.slice(0, (sliceEnd + displayAmountNumber) - (inputData.length)))
+                    ) :
+                        inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)
+
+
+                } />
             </View>
 
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <ArrowButton direction="right" marginLeft={10} onPress={() => {
-                    setSliceEnd(Math.min(inputData.length - displayAmountNumber, sliceEnd + jumpAmountNumber))
+                    const newSpot = sliceEnd + jumpAmountNumber
+                    setSliceEnd(newSpot % inputData.length)
                 }} />
             </View>
         </View>
     </View >)
 }
 
-export default MonthlyVsBudgeted;
+export default MonthlyVsBudgetedCategory;
