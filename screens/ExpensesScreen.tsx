@@ -49,7 +49,7 @@ function processExpenses(expenses: Expenses, onPress: (id: number) => void): Exp
             color: `#${expense.category?.colourHex || Colors.light.uncategorizedColor}`,
             amount: expense.amount,
             onPress: onPress,
-            date: expense.date,
+            date: expense.date.split(' ')[0], // ignore the time
             merchant: expense.merchant?.name || '',
         };
     }).sort((ex1, ex2) => { // Sort by date
