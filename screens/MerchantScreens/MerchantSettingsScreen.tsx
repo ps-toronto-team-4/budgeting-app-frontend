@@ -43,6 +43,7 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
                     <FlatList
                         data={data.merchants.merchants}
                         renderItem={renderMerchant}
+                        ListFooterComponent={<View style={{ height: 20 }} />}
                     />
                 ) : (
                     <View>

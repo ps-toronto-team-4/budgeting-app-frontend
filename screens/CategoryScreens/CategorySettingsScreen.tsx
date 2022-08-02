@@ -48,6 +48,7 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
                     <FlatList
                         data={data.categories.categories}
                         renderItem={renderCategory}
+                        ListFooterComponent={<View style={{ height: 20 }} />}
                     />
                 ) : (
                     <View>
