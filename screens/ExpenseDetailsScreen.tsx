@@ -1,20 +1,15 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
-import { Category, GetExpenseDocument, GetExpenseQuery } from "../components/generated";
+import { Category, GetExpenseDocument, GetExpenseQuery, GetExpenseQueryVariables } from "../components/generated";
 import { ColorValue, TouchableOpacity } from "react-native"
 import Colors from "../constants/Colors";
 
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackScreenProps } from "../types";
-import { Feather } from "@expo/vector-icons";
-import moment from "moment";
 import { useAuth } from "../hooks/useAuth";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
-import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
-import { PencilButton } from "../components/PencilButton";
+import { PencilButton } from "../components/buttons/PencilButton";
 
 export function formatDate(date: string | null | undefined): string {
     if (!date) {
@@ -25,15 +20,21 @@ export function formatDate(date: string | null | undefined): string {
     return `${months[parseInt(month) - 1]} ${dayOfMonth}, ${year}`;
 }
 
-export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
-    const passwordHash = useAuth();
-    const { expenseId, ...otherParams } = route.params;
-    const { loading, error, data, refetch } = useQuery<GetExpenseQuery>(GetExpenseDocument, {
-        variables: { passwordHash: passwordHash, expenseId: expenseId }
-    });
+function formatAmount(amount: number | null | undefined): string {
+    if (!amount) {
+        return '0.00';
+    }
+    return Number(amount).toFixed(2);
+}
 
-    useUnauthRedirect();
-    useRefresh(refetch, [passwordHash]);
+export default function ExpenseDetailsScreen({ navigation, route }: RootStackScreenProps<'ExpenseDetails'>) {
+    const { expenseId } = route.params;
+    const [getExpense, { data, refetch }] = useLazyQuery<GetExpenseQuery, GetExpenseQueryVariables>(GetExpenseDocument);
+    const passwordHash = useAuth({
+        onRetrieved: ((passwordHash) => getExpense({ variables: { passwordHash, expenseId } })),
+        redirect: 'ifUnauthorized',
+    });
+    useRefresh(() => refetch({ passwordHash, expenseId }), [expenseId]);
 
     useEffect(() => {
         if (data) {
@@ -55,22 +56,15 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
         };
     }, [data]);
 
-    function formatAmount(amount: number | null | undefined): string {
-        if (!amount) {
-            return '0.00';
-        }
-        return Number(amount).toFixed(2);
-    }
-
     const expenseTypename = data?.expense.__typename;
 
     return (
-        <Screen>
+        <View style={styles.screen}>
             {
                 expenseTypename === "ExpenseSuccess" ?
                     <View>
                         <View style={styles.colHeader}>
-                            <Text>Amount</Text>
+                            <Text style={styles.amountHeading}>Amount</Text>
                         </View>
                         <View style={styles.catAndAmount}>
                             <View style={styles.catColorAndName}>
@@ -87,24 +81,32 @@ export default function ExpenseDetailsScreen({ navigation, route }: RootStackScr
                             <Text style={styles.merchantLabel}>Merchant:</Text>
                             <Text style={styles.merchant}>{data?.expense.expense.merchant?.name ? data.expense.expense.merchant.name : 'None'}</Text>
                         </View>
+                        <View style={styles.separator} />
                         <View style={styles.descContainer}>
                             <Text style={styles.descLabel}>Details:</Text>
-                            <Text>{data?.expense.expense.description ? data.expense.expense.description : 'None'}</Text>
+                            <Text style={styles.desc}>{data?.expense.expense.description ? data.expense.expense.description : 'None'}</Text>
                         </View>
                         <View style={styles.separator}></View>
                     </View>
                     :
                     <Text>{expenseTypename === "FailurePayload" ? data?.expense.exceptionName : ""}</Text>
             }
-        </Screen>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
     colHeader: {
         paddingHorizontal: 40,
         alignItems: "flex-end",
         marginTop: 30,
+    },
+    amountHeading: {
+        fontSize: 18,
     },
     catAndAmount: {
         paddingHorizontal: 40,
@@ -123,9 +125,11 @@ const styles = StyleSheet.create({
     },
     catName: {
         fontWeight: "600",
+        fontSize: 18,
     },
     amount: {
         fontWeight: "600",
+        fontSize: 18,
     },
     dateContainer: {
         paddingHorizontal: 40,
@@ -135,6 +139,7 @@ const styles = StyleSheet.create({
     },
     date: {
         fontWeight: "600",
+        fontSize: 18,
     },
     separator: {
         alignSelf: "center",
@@ -142,24 +147,29 @@ const styles = StyleSheet.create({
         width: "80%",
         backgroundColor: '#444',
         opacity: 0.2,
-        marginTop: 8,
+        marginVertical: 20,
     },
     merchantContainer: {
         flexDirection: 'row',
         paddingHorizontal: 40,
-        marginTop: 10,
     },
     merchantLabel: {
         fontWeight: '600',
         marginRight: 10,
+        fontSize: 18,
     },
-    merchant: {},
+    merchant: {
+        fontSize: 18,
+    },
     descContainer: {
         paddingHorizontal: 40,
-        marginTop: 10,
     },
     descLabel: {
         fontWeight: '600',
-        marginBottom: 5
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    desc: {
+        fontSize: 18,
     },
 });

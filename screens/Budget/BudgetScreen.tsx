@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { useEffect, useMemo, useState } from "react";
 import { Budget, BudgetCategory, CopyBudgetDocument, CopyBudgetMutation, CopyBudgetMutationVariables, CreateBudgetCategoryDocument, CreateBudgetCategoryMutation, CreateBudgetCategoryMutationVariables, CreateBudgetDocument, CreateBudgetMutation, CreateBudgetMutationVariables, GetBudgetsDocument, GetBudgetsQuery, GetBudgetsQueryVariables, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, MonthType } from "../../components/generated";
 import { TouchableHighlight } from "react-native"
@@ -12,8 +12,7 @@ import { BudgetList } from "../../components/budget/BudgetList";
 import { useRefresh } from "../../hooks/useRefresh";
 import { useAuth } from "../../hooks/useAuth";
 import { MONTHS_ORDER } from "../../constants/Months"
-import { Screen } from "../../components/Screen";
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import moment from "moment";
 import { Feather } from '@expo/vector-icons';
 
@@ -41,31 +40,29 @@ function HeaderButton({ direction, onPress, marginLeft, marginRight }: HeaderBut
 }
 
 export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'Budget'>) {
-    const passwordHash = useAuth();
     const now = moment();
     const [month, setMonth] = useState(MONTHS_ORDER[now.month()]);
     const [year, setYear] = useState(now.year());
 
-    const { data: budgetData, refetch: budgetRefetch } = useQuery<GetBudgetsQuery, GetBudgetsQueryVariables>(GetBudgetsDocument, {
-        variables: { passwordHash },
+    const [getBudgets, { data: budgetData, refetch: budgetRefetch }] = useLazyQuery<GetBudgetsQuery, GetBudgetsQueryVariables>(GetBudgetsDocument);
+    const [getMonthlyBreakdown, { data: monthData, refetch: monthRefetch }] = useLazyQuery<GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables>(GetMonthBreakdownDocument);
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => {
+            getBudgets({ variables: { passwordHash } });
+            getMonthlyBreakdown({ variables: { passwordHash, month: month as MonthType, year } });
+        },
+        redirect: 'ifUnauthorized',
     });
-    const { data: monthData, refetch: monthRefetch } = useQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument, {
-        variables: {
-            passwordHash,
-            month,
-            year
-        }
-    });
+    useRefresh(() => {
+        budgetRefetch({ passwordHash });
+        monthRefetch({ passwordHash, month: month as MonthType, year });
+    }, [month, year]);
+
     const [createBudget] = useMutation<CreateBudgetMutation>(CreateBudgetDocument, {
         variables: { passwordHash, month, year },
     });
     const [createBudgetCategory] = useMutation<CreateBudgetCategoryMutation, CreateBudgetCategoryMutationVariables>(CreateBudgetCategoryDocument);
     const [copyBudget] = useMutation<CopyBudgetMutation, CopyBudgetMutationVariables>(CopyBudgetDocument);
-
-    useRefresh(() => {
-        budgetRefetch();
-        monthRefetch();
-    }, [passwordHash]);
 
     const selectedBudget = useMemo(() => {
         if (budgetData?.budgets.__typename == 'BudgetsSuccess') {
@@ -207,7 +204,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
     }
 
     return (
-        <Screen>
+        <View style={styles.screen}>
             <ChartDisplay
                 planned={plannedAmount || 0}
                 actualBudgeted={actualAmount?.budgeted || 0}
@@ -249,11 +246,15 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                     </View>
                 )
             }
-        </Screen>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
     itemSeparator: {
         height: 1,
         backgroundColor: 'rgba(0,0,0,0.2)',

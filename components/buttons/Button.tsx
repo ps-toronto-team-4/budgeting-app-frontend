@@ -1,7 +1,7 @@
 import { StyleSheet, Touchable, TouchableOpacity, GestureResponderEvent } from 'react-native';
-import { View, Text } from './Themed';
-import Colors from '../constants/Colors';
-import useColorScheme from '../hooks/useColorScheme';
+import { View, Text } from '../Themed';
+import Colors from '../../constants/Colors';
+import useColorScheme from '../../hooks/useColorScheme';
 
 type ButtonProps = {
     text: string;

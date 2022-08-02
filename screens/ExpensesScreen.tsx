@@ -1,19 +1,16 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { useMemo, useState } from "react";
 import { GetExpensesDocument, GetExpensesQuery, GetExpensesQueryVariables } from "../components/generated";
 import { FlatList } from "react-native";
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/buttons/AddButton";
 import { useAuth } from "../hooks/useAuth";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
-import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
 import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
 import { formatDate } from "./ExpenseDetailsScreen";
-import Button from "../components/Button";
 
 type ExpenseDisplayPropsOrDate = ExpenseDisplayProps | string;
 
@@ -26,6 +23,10 @@ type Expenses = {
     category?: {
         __typename?: "Category" | undefined;
         colourHex: string;
+        name: string;
+    } | null | undefined;
+    merchant?: {
+        __typename?: "Merchant" | undefined;
         name: string;
     } | null | undefined;
 }[];
@@ -48,7 +49,8 @@ function processExpenses(expenses: Expenses, onPress: (id: number) => void): Exp
             color: `#${expense.category?.colourHex || Colors.light.uncategorizedColor}`,
             amount: expense.amount,
             onPress: onPress,
-            date: expense.date,
+            date: expense.date.split(' ')[0], // ignore the time
+            merchant: expense.merchant?.name || '',
         };
     }).sort((ex1, ex2) => { // Sort by date
         if (ex1.date > ex2.date) {
@@ -90,27 +92,27 @@ function keyExtractor(item: ExpenseDisplayPropsOrDate) {
 }
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
-    const passwordHash = useAuth(); useUnauthRedirect();
-    const { data, refetch } = useQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
-        variables: { passwordHash }
+    const [getExpenses, { data, refetch }] = useLazyQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument);
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => getExpenses({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
     });
+    useRefresh(() => refetch({ passwordHash }));
     const processedExpenses = useMemo(() => {
         if (data?.expenses.__typename === 'ExpensesSuccess')
             return processExpenses(data.expenses.expenses, (id) => navigation.navigate('ExpenseDetails', { expenseId: id }));
         return [];
     }, [data]);
 
-    useRefresh(refetch, [passwordHash]);
-
     const handleAddExpense = () => navigation.navigate('CreateExpense');
 
     if (data === undefined) {
-        return <Screen><Text>Loading data...</Text></Screen>;
+        return <View style={staticStyles.screen}><Text>Loading data...</Text></View>;
     } else if (data.expenses.__typename !== 'ExpensesSuccess') {
-        return <Screen><Text>Error fetching data.</Text></Screen>;
+        return <View style={staticStyles.screen}><Text>Error fetching data.</Text></View>;
     } else {
         return (
-            <Screen>
+            <View style={staticStyles.screen}>
                 <FlatList
                     data={processedExpenses}
                     renderItem={renderItem}
@@ -119,12 +121,16 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                 <View style={staticStyles.addExpenseBtn}>
                     <AddButton size={100} onPress={handleAddExpense} />
                 </View>
-            </Screen>
+            </View>
         );
     }
 }
 
 const staticStyles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
     itemSeparator: {
         flex: 1,
         flexBasis: 2,
