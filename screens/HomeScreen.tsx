@@ -14,48 +14,49 @@ import { ExpenseDisplay } from "../components/ExpenseDisplay";
 import Colors from "../constants/Colors";
 import { Feather } from "@expo/vector-icons";
 
-    const ALERT_COLOR = {
-        over: {
-            backgroundColor: 'hsl(2, 50%, 80%)',
-            borderColor: 'hsl(2, 80%, 30%)'
-        },
-        under: {
-            backgroundColor: 'hsl(108, 50%, 80%)',
-            borderColor: 'hsl(108, 80%, 30%)'
-        }
+const ALERT_COLOR = {
+    over: {
+        backgroundColor: 'hsl(2, 50%, 80%)',
+        borderColor: 'hsl(2, 80%, 30%)'
+    },
+    under: {
+        backgroundColor: 'hsl(108, 50%, 80%)',
+        borderColor: 'hsl(108, 80%, 30%)'
     }
+}
 
 export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const [name, setName] = useState('there');
     const [overBudget, setOverBudget] = useState<string[]>([]);
-    const [monthData, setMonthData] = useState<{amountSpent: number, amountBudgeted: number}[]>([]);
-    const [expenses, setExpenses] = useState<{id: number, amount: number, category?: {name: string, colourHex: string} | null}[]>([]);
-    const [upcoming, setUpcoming] = useState<{id: number, amount: number, category?: {name: string, colourHex: string} | null}[]>([]);
+    const [monthData, setMonthData] = useState<{ amountSpent: number, amountBudgeted: number }[]>([]);
+    const [expenses, setExpenses] = useState<{ id: number, amount: number, category?: { name: string, colourHex: string } | null }[]>([]);
+    const [upcoming, setUpcoming] = useState<{ id: number, amount: number, category?: { name: string, colourHex: string } | null }[]>([]);
     const date = new Date();
     const day = date.getDate();
     const month = date.getMonth();
-    const monthName = MONTHS_ORDER[month].at(0) + MONTHS_ORDER[month].substring(1).toLowerCase();
+    const monthName = MONTHS_ORDER[month][0] + MONTHS_ORDER[month].substring(1).toLowerCase();
     const year = date.getFullYear();
 
-    const [getUser, {}] = useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {
+    const [getUser, { }] = useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {
         onCompleted: (data) => {
             setName(data?.user.__typename === 'User' ? data.user.firstName : 'there');
         }
     })
 
-    const[getMonth, {loading: monthLoading, data: yearData, refetch: monthRefetch}] = useLazyQuery<GetMonthTotalsQuery, GetMonthTotalsQueryVariables>(GetMonthTotalsDocument, {
+    const [getMonth, { loading: monthLoading, data: yearData, refetch: monthRefetch }] = useLazyQuery<GetMonthTotalsQuery, GetMonthTotalsQueryVariables>(GetMonthTotalsDocument, {
         onCompleted(data) {
             if (data.monthsTotals.__typename === 'MonthsTotals') {
                 setMonthData(data.monthsTotals.byMonth.filter((item) => item.year === year));
-        }}
+            }
+        }
     })
 
-    const {data, loading, refetch} = useQuery<GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables>(GetExpensesInMonthDocument, {
+    const { data, loading, refetch } = useQuery<GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables>(GetExpensesInMonthDocument, {
         onCompleted: (data) => {
             if (data.expensesInMonth.__typename === 'ExpensesSuccess') {
                 if (data.expensesInMonth.expenses.length) {
                     let tempExpenses = data.expensesInMonth.expenses.slice(); // copy the data since it is read-only
-                    setExpenses(tempExpenses.sort((a, b) => b.date.localeCompare(a.date)).slice(0,3))
+                    setExpenses(tempExpenses.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3))
                 }
             }
         }
@@ -64,8 +65,8 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getUser({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
-      });
-      useRefresh(() => refetch({ passwordHash }));
+    });
+    useRefresh(() => refetch({ passwordHash }));
 
     useEffect(() => {
         let diff = monthData[month]?.amountBudgeted - monthData[month]?.amountSpent || 0;
@@ -74,37 +75,37 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         }
     }, [monthData]);
 
-    function renderItem(item: {id: number, amount: number, category?: {name: string, colourHex: string} | null}) {
+    function renderItem(item: { id: number, amount: number, category?: { name: string, colourHex: string } | null }) {
         const color = item.category?.colourHex || Colors.light.uncategorizedColor;
         const name = item.category?.name || 'Uncategorized';
 
-        return  <ExpenseDisplay
-                    id={item.id}
-                    name={name}
-                    color={'#' + color}
-                    amount={item.amount}
-                    onPress={(id) => navigation.navigate('ExpenseDetails', { expenseId: id })}
-                />
+        return <ExpenseDisplay
+            id={item.id}
+            name={name}
+            color={'#' + color}
+            amount={item.amount}
+            onPress={(id) => navigation.navigate('ExpenseDetails', { expenseId: id })}
+        />
     }
 
     const FirstExpense = () => {
         return (
-            <Text style={{textAlign: 'center', fontSize: 18, margin: '20%'}}>You have no expenses for {monthName} yet. Try adding some by pressing this button:</Text>
+            <Text style={{ textAlign: 'center', fontSize: 18, margin: '20%' }}>You have no expenses for {monthName} yet. Try adding some by pressing this button:</Text>
         )
     }
 
     return (
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
             <Text style={style.greeting}>Hello, {name}!</Text>
-            { overBudget.length ? (
+            {overBudget.length ? (
                 <View style={[style.alert, ALERT_COLOR.over]}>
-                    <Feather name='info' size={24} color={ALERT_COLOR.over.borderColor} style={{margin: 10}}/>
-                    <Text style={style.alertText}>Your expenses for the following categories in {monthName} are over-budget: 
-                    <strong> {overBudget.toString()}</strong></Text>
+                    <Feather name='info' size={24} color={ALERT_COLOR.over.borderColor} style={{ margin: 10 }} />
+                    <Text style={style.alertText}>Your expenses for the following categories in {monthName} are over-budget:
+                        <strong> {overBudget.toString()}</strong></Text>
                 </View>
             ) : (
                 <View style={[style.alert, ALERT_COLOR.under]}>
-                    <Feather name='info' size={24} color={ALERT_COLOR.under.borderColor} style={{margin: 10}}/>
+                    <Feather name='info' size={24} color={ALERT_COLOR.under.borderColor} style={{ margin: 10 }} />
                     <Text style={style.alertText}>You have no over-bugdet expenses in {monthName} so far</Text>
                 </View>
             )}
@@ -112,16 +113,16 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                 <Text style={style.subtitle}>Your activity:</Text>
                 {monthLoading ? <ActivityIndicator size='large' /> : (
                     yearData?.monthsTotals.__typename === 'MonthsTotals' ? (
-                    <>
-                        <View style={style.halfSummary}>
-                            <Text style={style.summaryData}>${monthData.at(month)?.amountSpent.toFixed(2)}</Text>
-                            <Text>Your total spendings this month so far</Text>
-                        </View>
-                        <View style={style.halfSummary}>
-                            <Text style={style.summaryData}>${yearData.monthsTotals.averageSpent.toFixed(2)}</Text>
-                            <Text>Your average monthly spendings this year</Text>
-                        </View>
-                    </>
+                        <>
+                            <View style={style.halfSummary}>
+                                <Text style={style.summaryData}>${monthData[month]?.amountSpent.toFixed(2)}</Text>
+                                <Text>Your total spendings this month so far</Text>
+                            </View>
+                            <View style={style.halfSummary}>
+                                <Text style={style.summaryData}>${yearData.monthsTotals.averageSpent.toFixed(2)}</Text>
+                                <Text>Your average monthly spendings this year</Text>
+                            </View>
+                        </>
                     ) : (
                         <View>
                             <Text style={Styles.alert}>Something went wrong.</Text>
@@ -129,15 +130,15 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
-            
+
             <View>
                 <Text style={style.subtitle}>Latest {MONTHS_ORDER[month]} expenses:</Text>
-                { loading ? <ActivityIndicator size='large' /> : (
+                {loading ? <ActivityIndicator size='large' /> : (
                     data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
                         <FlatList
                             data={expenses}
-                            renderItem={({item}) => renderItem(item)}
-                            ListEmptyComponent={<FirstExpense/>}
+                            renderItem={({ item }) => renderItem(item)}
+                            ListEmptyComponent={<FirstExpense />}
                         />
                     ) : (
                         <Text style={Styles.alert}>Something went wrong.</Text>
@@ -145,7 +146,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                 )}
             </View>
             <View style={style.addBtn}>
-                <AddButton size={70} onPress={() => navigation.navigate('CreateExpense')}/>
+                <AddButton size={70} onPress={() => navigation.navigate('CreateExpense')} />
             </View>
         </View>
     );
@@ -171,7 +172,7 @@ const style = StyleSheet.create({
     },
     alertText: {
         fontSize: 16,
-        marginHorizontal: 10 
+        marginHorizontal: 10
     },
     subtitle: {
         padding: 10,
