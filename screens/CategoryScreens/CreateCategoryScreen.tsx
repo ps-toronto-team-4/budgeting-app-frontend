@@ -1,7 +1,7 @@
 import { Alert, ActivityIndicator, TouchableHighlight } from 'react-native';
 import { Text, View, RequiredField } from '../../components/Themed';
 import Button from '../../components/buttons/Button';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
 import TextInput from '../../components/forms/TextInput';
@@ -14,6 +14,7 @@ import { colorsList } from '../../constants/CategoryColors';
 import { Form } from '../../components/forms/Form';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRefresh } from '../../hooks/useRefresh';
+import { TrashButton } from '../../components/buttons/TrashButton';
 
 export default function CreateCategoryScreen({ navigation, route }: RootStackScreenProps<'CreateCategory'>) {
   const [name, setName] = useState(route.params?.name || '')

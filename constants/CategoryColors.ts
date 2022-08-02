@@ -19,4 +19,6 @@ export const colorsList = [
     '#E6E287',
     '#77768C',
     '#DDDDDD'
-]
+] as const;
+
+export type CategoryColor = typeof colorsList[number];

@@ -2,7 +2,7 @@ import { StyleSheet, Alert, ActivityIndicator, Modal, TouchableHighlight } from 
 
 import { Text, View, RequiredField } from '../../components/Themed';
 import Button from '../../components/buttons/Button';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
 import TextInput from '../../components/forms/TextInput';
@@ -14,6 +14,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
 import modalStyle from '../../constants/Modal';
 import { Form } from "../../components/forms/Form";
+import { TrashButton } from '../../components/buttons/TrashButton';
+import { CategoryEditForm } from '../../components/forms/CategoryEditForm';
 
 export default function EditCategoryScreen({ navigation, route }: RootStackScreenProps<'EditCategory'>) {
 
@@ -59,6 +61,12 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
     })
   });
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <TrashButton onPress={() => setConfirmDelete(true)} />
+    });
+  }, []);
+
   const categoryTaken = () => {
     if (categoriesData?.categories.__typename === 'CategoriesSuccess') {
       return categoriesData.categories.categories.find((cat) => {
@@ -83,6 +91,15 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
     setCheck(true);
     if (newColor && newName && !categoryTaken() && !colorTaken()) updateCategory();
   }
+
+  return (
+    <CategoryEditForm onSubmit={() => console.log('form submitted')} initVals={{
+      id: route.params.id,
+      name: route.params.name,
+      color: route.params.color,
+      details: route.params.details || '',
+    }} />
+  );
 
   return (
     <Form backdrop={confirmDelete}>
@@ -133,7 +150,6 @@ export default function EditCategoryScreen({ navigation, route }: RootStackScree
           />
         </TouchableHighlight>
         <Button text="Save Category" disabled={confirmDelete} onPress={onSubmit} accessibilityLabel={'Save Category Button'} />
-        <Button text="Delete Category" disabled={confirmDelete} backgroundColor='red' onPress={() => setConfirmDelete(true)} accessibilityLabel={'Delete Category Button'} />
         <Modal
 
           transparent={true}
