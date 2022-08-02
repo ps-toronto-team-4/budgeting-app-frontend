@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { StyleSheet, TouchableHighlight, View, Text, TextInput, ScrollView, Keyboard, KeyboardAvoidingView, Platform } from "react-native";
+import { StyleSheet, TouchableHighlight, View, Text, TextInput, ScrollView, Keyboard, KeyboardAvoidingView, Platform, ColorValue, ViewStyle, StyleProp } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import Forms from "../../constants/Forms";
 import { useRefresh } from "../../hooks/useRefresh";
+import { ColorCircle } from "../ColorCircle";
 
-export type DropdownFieldDatum = { id: string, value: string }
+export type DropdownFieldDatum = { id: string, value: string, color?: ColorValue }
 
 interface DropdownItemProps {
     item: DropdownFieldDatum;
@@ -12,10 +13,21 @@ interface DropdownItemProps {
 }
 
 function DropdownItem({ item, onPress }: DropdownItemProps) {
+    const { id, value, color } = item;
+    const textStyle: StyleProp<ViewStyle> = useMemo(() => {
+        return [styles.itemValue, { paddingLeft: color ? 20 : 80 }]
+    }, [color]);
+
     return (
-        <TouchableHighlight style={styles.container} onPress={() => onPress(item.id, item.value)} underlayColor="rgba(0,0,0,0.1)" key={item.id}>
+        <TouchableHighlight style={styles.container} onPress={() => onPress(id, value)} underlayColor="rgba(0,0,0,0.1)" key={id}>
             <View style={styles.content}>
-                <Text style={styles.itemValue}>{item.value}</Text>
+                {
+                    color &&
+                    <View style={{ marginLeft: 40 }}>
+                        <ColorCircle color={color} size={20} />
+                    </View>
+                }
+                <Text style={textStyle}>{value}</Text>
             </View>
         </TouchableHighlight>
     );
@@ -167,7 +179,6 @@ const styles = StyleSheet.create({
         fontSize: Forms.fontSize,
         fontWeight: '600',
         paddingVertical: 3,
-        paddingLeft: 80,
     },
     scrollView: {
         position: 'absolute',

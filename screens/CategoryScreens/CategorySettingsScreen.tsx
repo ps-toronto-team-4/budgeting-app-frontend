@@ -12,6 +12,7 @@ import Styles from "../../constants/Styles";
 import { useRefresh } from "../../hooks/useRefresh";
 import { Form } from "../../components/forms/Form";
 import AddButton from "../../components/buttons/AddButton";
+import { ColorCircle } from "../../components/ColorCircle";
 
 export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
     const [getCategories, { data, loading, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {
@@ -31,8 +32,8 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
                 underlayColor="rgba(0,0,0,0.1)">
                 <View style={styles.itemContainer}>
                     <View style={styles.colorAndNameContainer}>
-                        <View style={{ width: 24, height: 24, marginRight: 10, backgroundColor: "#" + item.colourHex, borderRadius: 12, borderWidth: 0.5 }} />
-                        <Text style={{ fontSize: 22, marginHorizontal: 5, fontWeight: 'bold' }}>{item.name}</Text>
+                        <ColorCircle color={'#' + item.colourHex} size={24} />
+                        <Text style={{ fontSize: 22, marginHorizontal: 5, marginLeft: 15, fontWeight: 'bold' }}>{item.name}</Text>
                     </View>
                     <MaterialIcons name="navigate-next" size={28} color="black" />
                 </View>

@@ -104,7 +104,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                     <DropdownField
                         label="Category"
                         placeholder="optional"
-                        data={data.categories.categories.map(x => { return { id: x.id.toString(), value: x.name } })}
+                        data={data.categories.categories.map(x => { return { id: x.id.toString(), value: x.name, color: '#' + x.colourHex } })}
                         defaultValue={
                             initVals ?
                                 data.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name

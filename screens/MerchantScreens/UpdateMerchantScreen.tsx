@@ -132,7 +132,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                     data={
                         categoryData?.categories.__typename === "CategoriesSuccess" ?
                             categoryData.categories.categories.map(cat => {
-                                return { id: cat.id.toString(), value: cat.name }
+                                return { id: cat.id.toString(), value: cat.name, color: '#' + cat.colourHex }
                             }) : []
                     }
                     onChange={handleCategorySelect} />
