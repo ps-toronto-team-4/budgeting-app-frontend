@@ -53,7 +53,6 @@ query getUser($passwordHash: String!) {
     }
 }
 
-
 query getCategories($passwordHash: String!) {
     categories(passwordHash: $passwordHash) {
         __typename
@@ -442,9 +441,51 @@ query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
     }
 }
 
+query getMonthTotals($passwordHash: String!){
+    monthsTotals(passwordHash: $passwordHash){
+        ... on MonthsTotals{
+            averageSpent
+            byMonth{
+                amountBudgeted
+                amountSpent
+                month
+                year
+            }
+        } 
+        ... on FailurePayload {
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+query getExpensesInMonth($month: MonthType!, $year: Int!, $passwordHash: String!) {
+    expensesInMonth(month: $month, year: $year, passwordHash: $passwordHash) {
+        __typename
+        ...on ExpensesSuccess {
+            expenses {
+                id
+                date
+                amount
+                category {
+                    name
+                    colourHex
+                }
+                merchant {
+                    name
+                }
+                description
+            }
+        }
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
 
 mutation copyBudget($passwordHash: String!, $month:MonthType!, $year:Int!, $id:Int!){
-    copyBudget(passwordHash: $passwordHash,month: $month,year: $year, id:$id){
+    copyBudget(passwordHash: $passwordHash, month: $month, year: $year, id: $id){
         __typename
         ... on BudgetSuccess{
             budget{
@@ -473,22 +514,6 @@ mutation deleteMerchant($passwordHash: String!, $id: Int!){
 
 }
 
-query getMonthTotals($passwordHash: String!){
-    monthsTotals(passwordHash: $passwordHash){
-        ... on MonthsTotals{
-            byMonth{
-                amountBudgeted
-                amountSpent
-                month
-                year
-            }
-        } 
-        ... on FailurePayload {
-            errorMessage
-            exceptionName
-        }
-    }
-}
 # Used by ExpenseEditForm. Do not change.
 query merchantsAndCategories($passwordHash: String!) {
     __typename
@@ -523,6 +548,31 @@ query merchantsAndCategories($passwordHash: String!) {
 
         ...on FailurePayload {
             __typename
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query homePageData($passwordHash: String!, $month: MonthType!, $year: Int!) {
+    budgetByDate(passwordHash: $passwordHash, month: $month, year: $year) {
+        __typename
+        ...on BudgetSuccess {
+            budget {
+                budgetCategories {
+                    amount
+                    category {
+                        name
+                        expenses {
+                            amount
+                            date
+                        }
+                    }
+                }
+            }
+        }
+
+        ...on FailurePayload {
             exceptionName
             errorMessage
         }
