@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { RootStackScreenProps } from "../../types";
 import Colors from "../../constants/Colors";
 import { Budget, BudgetCategory, DeleteBudgetCategoryDocument, DeleteBudgetCategoryMutation, DeleteBudgetCategoryMutationVariables, UpdateBudgetCategoryDocument, UpdateBudgetCategoryMutation, UpdateBudgetCategoryMutationVariables } from "../../components/generated";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet, Modal } from "react-native";
 import Button from "../../components/buttons/Button";
 import { Row } from "../../components/forms/Row";
 import { AmountInput } from "../../components/forms/AmountInput";
@@ -13,12 +13,14 @@ import { Form } from "../../components/forms/Form";
 import { InputRow } from "../../components/forms/InputRow";
 import { TrashButton } from "../../components/buttons/TrashButton";
 import { DisplayField } from "../../components/forms/DisplayField";
+import modalStyle from "../../constants/Modal";
 
 export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'EditBudget'>) {
     const passwordHash = useAuth({ redirect: 'ifUnauthorized' });
     const [amount, setAmount] = useState(route.params.budgetCategory.amount);
     const budgetCategory = route.params.budgetCategory;
     const [amountError, setAmountError] = useState('');
+    const [confirmDelete, setConfirmDelete] = useState(false);
 
     const [updateBudget] = useMutation<UpdateBudgetCategoryMutation, UpdateBudgetCategoryMutationVariables>(UpdateBudgetCategoryDocument, {
         variables: { passwordHash, id: budgetCategory?.id, amount },
@@ -43,7 +45,7 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
 
     useEffect(() => {
         navigation.setOptions({
-            headerRight: (_) => <TrashButton onPress={deleteBudget} />
+            headerRight: (_) => <TrashButton onPress={() => setConfirmDelete(true)} />
         });
     }, []);
 
@@ -72,6 +74,20 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
                     accessibilityLabel="Button to Save Budget"
                     onPress={handleSubmit} />
             </View>
+            <Modal
+                transparent={true}
+                visible={confirmDelete}
+                onRequestClose={() => setConfirmDelete(false)}
+            >
+                <View style={modalStyle.container}>
+                    <Text style={modalStyle.title}>Delete Budget?</Text>
+                    <Text style={modalStyle.text}>Are you sure you want to delete this budget?</Text>
+                    <View style={modalStyle.buttonView}>
+                        <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button' />
+                        <Button text="Delete" onPress={() => deleteBudget()} size='half' backgroundColor='red' accessibilityLabel='Delete Category button' />
+                    </View>
+                </View>
+            </Modal>
         </Form>
     );
 }
