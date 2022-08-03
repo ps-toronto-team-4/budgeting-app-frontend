@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet } from "react-native";
 import { RootStackScreenProps } from "../../types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useRefresh } from "../../hooks/useRefresh";
 import Button from "../../components/buttons/Button";
@@ -17,19 +17,14 @@ interface MonthlyDatum {
     id?: number,
 }
 
-interface MonthlyExpenseGraphProps {
-    data: MonthlyDatum[]
-    monthSelectedCallback?: (datum: MonthlyDatum) => null,
-    mainColour?: string,
-    highlightColour?: string,
-}
 
 
 
 export default function ExpandExpense({ navigation, route }: RootStackScreenProps<'ExpandExpenses'>) {
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => {
-            getMonthTotals()
+            getMonthTotals();
+            getTopMerchant();
         },
         redirect: 'ifUnauthorized',
     });
@@ -37,24 +32,27 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     const [year, setYear] = useState(route.params.year);
     const [topMerchant, setTopMerchant] = useState<string | undefined>("");
     const [getMonthTotals, { loading: monthTotalsLoading, data: monthTotalsData, refetch: monthTotalsRefetch }] = useLazyQuery<GetMonthTotalsQuery>(GetMonthTotalsDocument,
-        { variables: { passwordHash } })
+        { variables: { passwordHash } });
 
-    const { loading: monthBreakdownLoading, data: monthBreakdownData } = useQuery<GetMonthBreakdownQuery>(GetMonthTotalsDocument,
+    const [getTopMerchant, { loading: monthBreakdownLoading, data: monthBreakdownData }] = useLazyQuery<GetMonthBreakdownQuery>(GetMonthTotalsDocument,
         {
             variables: { passwordHash, month, year },
-        })
+        });
 
 
     useRefresh(() => {
-        monthTotalsRefetch()
+        monthTotalsRefetch();
     })
 
-    const FindTopMerchant = () => {
-
-        if (monthBreakdownData?.monthBreakdown.__typename == "MonthBreakdown") {
+    useEffect(() => {
+        console.log(monthBreakdownData?.monthBreakdown.__typename)
+        if (!monthBreakdownLoading && monthBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
             setTopMerchant(monthBreakdownData.monthBreakdown.topMerchant?.merchant?.name);
+        } else {
+            setTopMerchant("Undefined")
         }
-    }
+    }, [route.params]);
+
 
     return <View style={staticStyles.screen}>
 
@@ -75,6 +73,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
         <View style={{ justifyContent: "center" }}>
             <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
+                {topMerchant} is your top spending Merchant
             </Text>
         </View>
     </View >
