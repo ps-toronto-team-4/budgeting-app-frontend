@@ -63,22 +63,22 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                     }
                 }
             },
-            {
-                eventKey: "all",
-                target: "labels",
-                mutation: (props: any) => {
-                    if (id === props.datum.id) {
-                        return { text: props.datum.amountSpent.toFixed(2) }
-                    } else {
-                        return { text: "" }
-                    }
-                },
-                callback: () => {
-                    if (mutations.length !== 0) {
-                        setMutations([])
-                    }
-                }
-            }
+            // {
+            //     eventKey: "all",
+            //     target: "labels",
+            //     mutation: (props: any) => {
+            //         if (id === props.datum.id) {
+            //             return { text: props.datum.amountSpent.toFixed(2) }
+            //         } else {
+            //             return { text: "" }
+            //         }
+            //     },
+            //     callback: () => {
+            //         if (mutations.length !== 0) {
+            //             setMutations([])
+            //         }
+            //     }
+            // }
         ])
     }
 
@@ -119,7 +119,7 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                 data={data}
                 x={(d: any) => { return d?.month.slice(0, 3) }}
                 y="amountSpent"
-                labels={({ datum }) => datum.amountSpent}
+                labels={({ datum }) => datum.amountSpent.toFixed(2)}
                 barRatio={0.5}
                 style={{ data: { fill: mainColour ? mainColour : "#2e8f48" } }}
                 events={[
