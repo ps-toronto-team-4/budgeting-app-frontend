@@ -15,6 +15,11 @@ type ByCategoryProps = {
     year: number;
 }
 
+type PercentProps = {
+    categoryData: MonthBreakdownCategory[];
+    categoryName: string;
+}
+
 
 interface ExternalMutation {
     target: string,
@@ -34,6 +39,8 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     });
     const [month, setMonth] = useState(route.params.month);
     const [year, setYear] = useState(route.params.year);
+    const [existing, setExisting] = useState(true);
+    const [percent, setPercent] = useState("");
     const [categoryExpense, setCategoryExpense] = useState<string>();
     const [selectedCategory, setSelectedCategory] = useState<{ id: number, name: string } | undefined>();
     const [getMonthlyBreakdown, { loading: monthlyBreakdownLoading, data: monthlyBreakdownData, refetch: monthlyBreakdownRefetch }] = useLazyQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument,
@@ -48,10 +55,33 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     });
 
     const RetrieveAmountSpent = (categoryData: MonthBreakdownCategory[], categoryName: string) => {
-        console.log(categoryName);
         if (categoryData.map((data) => { data.category?.name === categoryName })) {
-            setCategoryExpense(categoryData.find(e => e.category?.name === categoryName)?.amountSpent.toFixed(2))
+
+            setCategoryExpense(categoryData.find(e => e.category?.name === categoryName)?.amountSpent.toFixed(2));
         }
+
+    }
+
+    const PercentOfTotal = ({ categoryData, categoryName }: PercentProps) => {
+        if (monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
+            let totalSpent = monthlyBreakdownData.monthBreakdown.totalSpent;
+            let categoryIndex = categoryData.findIndex(e => e.category?.name === categoryName);
+            let currentCategorySpent = categoryData[categoryIndex].amountSpent;
+            let delta = (currentCategorySpent) / (totalSpent);
+
+            if (delta > 0) {
+                setExisting(true);
+                setPercent(Math.abs((100 * (delta))).toFixed(1) + "%");
+            } else {
+                setExisting(false);
+                setPercent("");
+            }
+        }
+
+        return (
+            <Text style={{ fontWeight: 'bold' }}>{percent}</Text>
+        );
+
 
     }
 
@@ -277,16 +307,33 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 <>
                     <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 20 }}>
                         <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                            {/* <Text>{monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory} spent on {category?.name}</Text> */}
                             <Text style={{ fontWeight: 'bold' }}>${categoryExpense}</Text>
                             <Text> spent on</Text>
                         </View>
 
-                    </View><View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 5 }}>
+                    </View>
+
+                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 5 }}>
                         <View style={{ flexDirection: 'row', justifyContent: "center" }}>
                             <Text style={{ fontWeight: 'bold' }}>{selectedCategory?.name}</Text>
                         </View>
                     </View>
+
+                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 20 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: "center" }}>
+                            {
+                                existing == true && <>
+                                    <PercentOfTotal categoryData=
+                                        {monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
+                                        categoryName={selectedCategory.name} />
+
+                                </>
+                            }
+                        </View>
+
+                    </View>
+
+
                 </>
 
 
