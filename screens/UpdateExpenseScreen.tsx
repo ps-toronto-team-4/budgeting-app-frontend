@@ -45,9 +45,15 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 merchantId: vals.merchantId || null,
                 categoryId: vals.categoryId || null,
                 desc: vals.desc || null
+            },
+            onCompleted: (response) => {
+                if (response.updateExpense.__typename === 'ExpenseSuccess') {
+                    navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0 });
+                } else if (response.updateExpense.__typename === 'FailurePayload') {
+                    alert('Error occurred while trying to update expense: ' + response.updateExpense.exceptionName);
+                }
             }
         });
-        navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0 });
     }
 
     return (
@@ -65,8 +71,8 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                 onRequestClose={() => setConfirmDelete(false)}
             >
                 <View style={modalStyle.container}>
-                    <Text style={modalStyle.title}>Delete Merchant?</Text>
-                    <Text style={modalStyle.text}>Are you sure you want to delete this merchant?</Text>
+                    <Text style={modalStyle.title}>Delete Expense?</Text>
+                    <Text style={modalStyle.text}>Are you sure you want to delete this expense?</Text>
                     <View style={modalStyle.buttonView}>
                         <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button' />
                         <Button text="Delete" onPress={() => { deleteExpense() }} size='half' backgroundColor='red' accessibilityLabel='Delete Category button' />

@@ -80,8 +80,8 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
                 onRequestClose={() => setConfirmDelete(false)}
             >
                 <View style={modalStyle.container}>
-                    <Text style={modalStyle.title}>Delete Merchant?</Text>
-                    <Text style={modalStyle.text}>Are you sure you want to delete this merchant?</Text>
+                    <Text style={modalStyle.title}>Delete Budget?</Text>
+                    <Text style={modalStyle.text}>Are you sure you want to delete this budget?</Text>
                     <View style={modalStyle.buttonView}>
                         <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button' />
                         <Button text="Delete" onPress={() => deleteBudget()} size='half' backgroundColor='red' accessibilityLabel='Delete Category button' />
