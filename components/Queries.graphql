@@ -424,7 +424,7 @@ mutation deleteBudgetCategory($passwordHash: String!, $id:Int!){
 
 query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
     monthBreakdown(passwordHash:$passwordHash,month:$month,year:$year){
-        ... on MonthBreakdown {
+        ...on MonthBreakdown {
             byCategory{
                 amountSpent
                 category{
@@ -433,41 +433,27 @@ query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
                     id
                 }
             }
+            byMerchant{
+                merchant{
+                    id
+                    name
+                    description
+                }
+                amountSpent
+            }
             topMerchant{
-        merchant{
-          id
-          name
-          defaultCategory{
-            id
-            name
-          }
-          expenses{
-            id
-            amount
-          }
-        }
-        amountSpent
-      }
-      
-      topCategory{
-        category{
-          id
-          name
-          colourHex
-          expenses{
-            id
-            amount
-          }
-          merchants{
-            id
-            name
-          }
-        }
-      }
+                merchant{
+                    id
+                    name
+                }
+                amountSpent
+            }
+            month
+            year
             totalSpent
-            
         }
-        ... on FailurePayload{
+
+        ...on FailurePayload{
             errorMessage
             exceptionName
         }

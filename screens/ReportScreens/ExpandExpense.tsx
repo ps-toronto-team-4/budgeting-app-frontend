@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useRefresh } from "../../hooks/useRefresh";
 import Button from "../../components/buttons/Button";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { GetMonthBreakdownQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "../../components/generated";
+import { GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "../../components/generated";
 import MonthlyExpenseGraph from '../../components/graphs/MonthlyExpenses';
 import { TopBar } from "../../components/budget/TopBar";
 
@@ -34,7 +34,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     const [getMonthTotals, { loading: monthTotalsLoading, data: monthTotalsData, refetch: monthTotalsRefetch }] = useLazyQuery<GetMonthTotalsQuery>(GetMonthTotalsDocument,
         { variables: { passwordHash } });
 
-    const [getTopMerchant, { loading: monthBreakdownLoading, data: monthBreakdownData }] = useLazyQuery<GetMonthBreakdownQuery>(GetMonthTotalsDocument,
+    const [getTopMerchant, { loading: monthBreakdownLoading, data: monthBreakdownData }] = useLazyQuery<GetMonthBreakdownQuery>(GetMonthBreakdownDocument,
         {
             variables: { passwordHash, month, year },
         });
@@ -45,14 +45,25 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     })
 
     useEffect(() => {
-        console.log(monthBreakdownData?.monthBreakdown.__typename)
+        console.log(monthBreakdownData?.monthBreakdown.__typename);
         if (!monthBreakdownLoading && monthBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
             setTopMerchant(monthBreakdownData.monthBreakdown.topMerchant?.merchant?.name);
         } else {
-            setTopMerchant("Undefined")
+            setTopMerchant("Undefined");
         }
-    }, [route.params]);
+    })
+    // const RetreiveTopMerchant = () => {
+    //     console.log(monthBreakdownData?.monthBreakdown.__typename);
+    //     if (!monthBreakdownLoading && monthBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
+    //         setTopMerchant(monthBreakdownData.monthBreakdown.topMerchant?.merchant?.name);
+    //     } else {
+    //         setTopMerchant("Undefined");
+    //     }
 
+    //     return (
+    //         <Text>{topMerchant}</Text>
+    //     );
+    // }
 
     return <View style={staticStyles.screen}>
 
@@ -72,6 +83,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
         </View>
 
         <View style={{ justifyContent: "center" }}>
+            {/* <RetreiveTopMerchant></RetreiveTopMerchant> */}
             <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
                 {topMerchant} is your top spending Merchant
             </Text>
