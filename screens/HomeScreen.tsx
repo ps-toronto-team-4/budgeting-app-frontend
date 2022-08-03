@@ -60,9 +60,9 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     let tempExpenses = data.expensesInMonth.expenses.slice(); // copy the data since it is read-only
                     tempExpenses.sort((a, b) => b.date.localeCompare(a.date))
 
-                    tempExpenses.filter((item) => {
-                        //item.date > date
-                    })
+                    setUpcoming(tempExpenses.filter((item) => {
+                        return item.date.substring(0,10) > date.toJSON().substring(0,10)
+                    }))
                 }
             }
         }
@@ -127,7 +127,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
 
     const FirstExpense = () => {
         return (
-            <Text style={{ textAlign: 'center', fontSize: 18, margin: '20%' }}>You have no expenses for {monthName} yet. Try adding some by pressing this button:</Text>
+            <Text style={style.noExpense}>You have no expenses for {monthName} yet. Try adding some by pressing this button:</Text>
         )
     }
 
@@ -166,46 +166,47 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
-            <Text style={{ fontWeight: 'bold', fontSize: 24, paddingLeft: 20 }}>{MONTHS_ORDER[month]}</Text>
-            <ScrollView style={{}}>
-                <View style={{ borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(0, 0, 0, 0.1)', padding: 20 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5 }}>
-                        <Text style={style.subtitle}>Upcoming Expenses:</Text>
+            <Text style={{fontWeight: 'bold', fontSize: 24, paddingLeft: 20}}>{MONTHS_ORDER[month]}</Text>
+            <ScrollView>
+            <View style={style.expenses}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <Text style={style.subtitle}>Upcoming Expenses:</Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'flex-end', padding: 10}}>
+                        <Text style={{fontSize: 16, backgroundColor: '#2424a8', color: 'white', paddingHorizontal: 9, paddingVertical: 3, textAlign: 'center', textAlignVertical: 'center', borderRadius: 90, marginRight: 15}}>
+                            {upcoming.length}
+                        </Text>
                         <AntDesign
                             name={expanded ? 'up' : 'down'}
                             size={20}
                             color="black"
                             onPress={() => setExpanded(!expanded)} />
                     </View>
-                    {expanded &&
-                        expenses.length ? (
-                        expenses.map((item) => renderItem(item))
-                    ) : (
-                        <Text style={{ padding: 5, }}>You have no upcoming expenses for this month.</Text>
-                    )
+                </View>
+                <View>
+                    {expanded ? (
+                        upcoming.length > 0 ? (
+                            upcoming.map((item) => renderItem(item))
+                            ) : (
+                                <Text style={style.noExpense}>You have no upcoming expenses for this month.</Text>
+                        )) : (<></>)
                     }
                 </View>
-                {/* <Text>{date.toUTCString}</Text>
-            <Text>{date.toTimeString}</Text>
-            <Text>{date.toString}</Text>
-            <Text>{date.toDateString}</Text>
-            <Text>{date.toJSON}</Text>
-            <Text>{date.toISOString}</Text> */}
-                <View>
-                    <Text style={style.subtitle}>Latest expenses:</Text>
-                    {loading ? <ActivityIndicator size='large' /> : (
-                        data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
-                            <FlatList
-                                data={expenses}
-                                renderItem={({ item }) => renderItem(item)}
-                                ListEmptyComponent={<FirstExpense />}
-                            />
-                        ) : (
-                            <Text style={Styles.alert}>Something went wrong.</Text>
-                        )
-                    )}
-                </View>
-            </ScrollView>
+            </View>
+            <View style={style.expenses}>
+                <Text style={style.subtitle}>Latest Expenses:</Text>
+                { loading ? <ActivityIndicator size='large' /> : (
+                    data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
+                        <FlatList
+                            data={expenses}
+                            renderItem={({ item }) => renderItem(item)}
+                            ListEmptyComponent={<FirstExpense />}
+                        />
+                    ) : (
+                        <Text style={Styles.alert}>Something went wrong.</Text>
+                    )
+                )}
+            </View>
+            </ScrollView >
             <View style={style.addBtn}>
                 <AddButton size={70} onPress={() => navigation.navigate('CreateExpense')} />
             </View>
@@ -238,7 +239,6 @@ const style = StyleSheet.create({
     },
     subtitle: {
         padding: 10,
-        //textAlign: 'center',
         fontWeight: 'bold',
         fontSize: 18
     },
@@ -258,7 +258,14 @@ const style = StyleSheet.create({
         fontSize: 32,
     },
     expenses: {
-
+        borderBottomWidth: 1, 
+        borderColor: 'rgba(0, 0, 0, 0.1)', 
+        marginTop: 15,
+        padding: 15
+    },
+    noExpense: {
+        fontSize: 18, 
+        margin: 10
     },
     addBtn: {
         position: 'absolute',
