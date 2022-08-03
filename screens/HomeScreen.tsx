@@ -88,6 +88,8 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         homePageDataRefetch({ passwordHash });
     });
 
+    // Jeremie thinks this function is super bad, and I agrees, especially given the
+    // fact there is a query that does exactly this already. Basically, TODO: fix this
     const overBudgetedCategories: string[] = useMemo(() => {
         if (homePageData?.budgetByDate.__typename === 'BudgetSuccess') {
             if (!homePageData.budgetByDate.budget.budgetCategories) return [];
