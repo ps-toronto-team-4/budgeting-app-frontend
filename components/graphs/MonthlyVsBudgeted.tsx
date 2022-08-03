@@ -186,15 +186,17 @@ const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yea
 
     return (<View>
 
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', width: "100%" }}>
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <ArrowButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
                 }} />
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
-                    inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
+                <View>
+                    <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
+                        inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
+                </View>
             </View>
 
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
