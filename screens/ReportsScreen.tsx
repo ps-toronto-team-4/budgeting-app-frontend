@@ -48,7 +48,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
             <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
             <ScrollView>
                 <View>
-                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenditure by Months</Text>
+                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenses by Months</Text>
                 </View>
                 <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <MonthlyExpenseGraph
@@ -58,7 +58,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                     <Button text='View More' onPress={() => navigation.navigate('ExpandExpenses', { year, month })}></Button>
                 </View>
                 <View>
-                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenditure VS Budgeted by Month</Text>
+                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Budget and Expenses by Month</Text>
                 </View>
                 <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <MonthlyVsBudgeted
@@ -68,7 +68,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                     <Button text='View More' onPress={() => navigation.navigate('ExpandBudget', { year, month })}></Button>
                 </View>
                 <View>
-                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenditure VS Budgeted by Category for month of {month.slice(0, 1) + month.slice(1).toLowerCase()}</Text>
+                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Budget and Expenses by Category</Text>
                 </View>
                 <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <MonthlyVsBudgetedCategory
@@ -81,7 +81,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                     <Button text='View More' onPress={() => navigation.navigate('ExpandBarCat', { year, month })}></Button>
                 </View>
                 <View>
-                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Category breakdown for the month of {month.slice(0, 1) + month.slice(1).toLowerCase()}</Text>
+                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Total Expenses by Category</Text>
                 </View>
                 <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []} month={month} year={year}></ByCategory>
