@@ -30,10 +30,12 @@ const ALERT_COLOR = {
 export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const [name, setName] = useState('there');
     const [monthData, setMonthData] = useState<{ amountSpent: number, amountBudgeted: number }[]>([]);
-    const [expenses, setExpenses] = useState<{ id: number, amount: number, category?: { name: string, colourHex: string } | null }[]>([]);
-    const [upcoming, setUpcoming] = useState<{ id: number, amount: number, category?: { name: string, colourHex: string } | null }[]>([]);
+    const [expenses, setExpenses] = useState<{ id: number, amount: number, date: string, category?: { name: string, colourHex: string } | null }[]>([]);
     const [expanded, setExpanded] = useState(false);
     const date = new Date();
+    const upcoming = useMemo(() => {
+        return expenses.filter(item => item.date.substring(0, 10) > date.toJSON().substring(0, 10));
+    }, [expenses]);
     const day = date.getDate();
     const month = date.getMonth();
     const monthName = MONTHS_ORDER[month][0] + MONTHS_ORDER[month].substring(1).toLowerCase();
@@ -58,12 +60,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
             if (data.expensesInMonth.__typename === 'ExpensesSuccess') {
                 if (data.expensesInMonth.expenses.length) {
                     let tempExpenses = data.expensesInMonth.expenses.slice(); // copy the data since it is read-only
-                    tempExpenses.sort((a, b) => b.date.localeCompare(a.date))
-
-                    setUpcoming(tempExpenses.filter((item) => {
-                        return item.date.substring(0, 10) > date.toJSON().substring(0, 10)
-                    }))
-
+                    setExpenses(tempExpenses.sort((a, b) => b.date.localeCompare(a.date)));
                 }
             }
         }
@@ -91,18 +88,10 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         homePageDataRefetch({ passwordHash });
     });
 
-    // useEffect(() => {
-    //     if (data?.expensesInMonth.__typename === 'ExpensesSuccess') {
-    //         let tempExpenses = data.expensesInMonth.expenses.slice(); // copy the data since it is read-only
-    //         tempExpenses.sort((a, b) => b.date.localeCompare(a.date))
-    //         setExpenses(expenses.slice(upcoming.length, upcoming.length + 3));
-    //     }
-    // }, [data, upcoming])
-
-    const hasOverBudgeted = useMemo(() => {
+    const overBudgetedCategories: string[] = useMemo(() => {
         if (homePageData?.budgetByDate.__typename === 'BudgetSuccess') {
-            if (!homePageData.budgetByDate.budget.budgetCategories) return false;
-            return homePageData.budgetByDate.budget.budgetCategories.map(budgetCategory => {
+            if (!homePageData.budgetByDate.budget.budgetCategories) return [];
+            const overBudgetedCategoryNames = homePageData.budgetByDate.budget.budgetCategories.map(budgetCategory => {
                 let sum = 0;
                 if (budgetCategory.category.expenses) {
                     sum = budgetCategory.category.expenses
@@ -113,10 +102,19 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                         })
                         .reduce((partialSum, amnt) => partialSum + amnt, 0);
                 }
-                return sum > budgetCategory.amount;
-            }).some(x => x);
+                if (sum > budgetCategory.amount) {
+                    return budgetCategory.category.name;
+                } else {
+                    return false;
+                }
+            })
+            let onlyNames: string[] = [];
+            for (let x of overBudgetedCategoryNames) {
+                if (x) onlyNames.push(x);
+            }
+            return onlyNames;
         } else {
-            return false;
+            return [];
         }
     }, [homePageData]);
 
@@ -143,10 +141,11 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <Text style={style.greeting}>Hello, {name}!</Text>
-            {hasOverBudgeted ? (
+            {overBudgetedCategories ? (
                 <View style={[style.alert, ALERT_COLOR.over]}>
                     <Feather name='info' size={24} color={ALERT_COLOR.over.borderColor} style={{ margin: 10 }} />
-                    <Text style={style.alertText}>You are over budget in some categories for the month of {monthName}</Text>
+                    <Text style={style.alertText}>You are over budget in these categories for the month of {monthName}:
+                        {overBudgetedCategories.map((x, i) => <Text key={i}>{' ' + x + (i < overBudgetedCategories.length - 1 ? ',' : '')}</Text>)}</Text>
                 </View>
             ) : (
                 <View style={[style.alert, ALERT_COLOR.under]}>
@@ -208,7 +207,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                             expenses.length === 0 ?
                                 <FirstExpense />
                                 :
-                                expenses.map(expense => {
+                                expenses.slice(upcoming.length, upcoming.length + 3).map(expense => {
                                     return renderItem(expense);
                                 })
                         ) : (
