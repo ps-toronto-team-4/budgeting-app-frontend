@@ -1,4 +1,4 @@
-import { ActivityIndicator, AppRegistry, StyleSheet } from 'react-native';
+import { ActivityIndicator, AppRegistry, Platform, StyleSheet } from 'react-native';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
@@ -25,8 +25,8 @@ export default function App() {
     return (
       <ApolloProvider client={client}>
         <SafeAreaProvider>
+          <StatusBar backgroundColor='black' style={Platform.OS === 'android' ? 'light' : 'dark'} />
           <Navigation colorScheme={colorScheme} />
-          <StatusBar backgroundColor='black' />
         </SafeAreaProvider>
       </ApolloProvider>
     );
