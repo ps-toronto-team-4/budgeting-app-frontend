@@ -41,7 +41,7 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
             {loading ? (<ActivityIndicator size='large' />) : (
                 data?.merchants.__typename === "MerchantsSuccess" ? (
                     <FlatList
-                        data={data.merchants.merchants}
+                        data={data.merchants.merchants.slice().sort((merch1, merch2) => merch1.name > merch2.name ? 1 : -1)}
                         renderItem={renderMerchant}
                         ListFooterComponent={<View style={{ height: 20 }} />}
                     />

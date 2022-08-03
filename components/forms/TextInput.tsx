@@ -4,7 +4,7 @@ export default function TextInput(props: TextInputProps) {
     const { style, ...otherProps } = props;
 
     return (
-        <DefaultTextInput style={[style, styles.input]} {...otherProps}></DefaultTextInput>
+        <DefaultTextInput placeholderTextColor="grey" style={[style, styles.input]} {...otherProps}></DefaultTextInput>
     );
 }
 

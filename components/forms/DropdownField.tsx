@@ -47,13 +47,17 @@ export interface DropdownFieldProps {
      */
     check?: boolean;
     onCreateNew?: (value: string) => void;
+    /**
+     * Only does anything if onCreateNew is defined.
+     */
+    labelForCreateNew?: string;
 }
 
 /**
  * This component has a lot of moving parts. Modification can result in unexpected behaviour and is
  * done at your own risk. If you need any changes to this component, ask Hark.
  */
-export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required, check, onCreateNew }: DropdownFieldProps) {
+export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required, check, onCreateNew, labelForCreateNew }: DropdownFieldProps) {
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const scrollViewStartRef = useRef<View>(null);
@@ -127,6 +131,7 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                         <Text style={styles.label}>{label}</Text>
                         <TextInput
                             style={styles.input}
+                            placeholderTextColor="grey"
                             placeholder={!focused ? placeholder : 'start typing to search'}
                             editable={focused}
                             ref={inputRef}
@@ -149,11 +154,17 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                 {
                     focused &&
                     <ScrollView style={[styles.scrollView, { maxHeight: maxScrollViewHeight }]} keyboardShouldPersistTaps="always">
-                        {filteredData.map(datum => <DropdownItem item={datum} onPress={handleItemPress} key={datum.id} />)}
+                        {
+                            filteredData.map(datum =>
+                                <DropdownItem item={datum} onPress={handleItemPress} key={datum.id} />
+                            ).sort((item1, item2) =>
+                                item1.props.item.value > item2.props.item.value ? 1 : -1
+                            )
+                        }
                         {
                             onCreateNew &&
                             <DropdownItem
-                                item={{ id: 'new', value: value ? `Add "${value}"` : `Create new ${label.toLowerCase()}`, color: 'plus' }}
+                                item={{ id: 'new', value: value ? `Add "${value}"` : `Create new ${labelForCreateNew || label.toLowerCase()}`, color: 'plus' }}
                                 onPress={handlePressCreateNew} />
                         }
                     </ScrollView>
