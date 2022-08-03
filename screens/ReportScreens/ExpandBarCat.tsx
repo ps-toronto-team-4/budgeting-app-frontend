@@ -74,7 +74,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
                             {overBudgetedCategories.map((ele, index) => {
                                 return (
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <AntDesign name='right' size={32} color="black" />
                                         <Text style={{ fontSize: 16 }}>{ele.category?.name || 'Uncategorized'}</Text>
                                     </View>
