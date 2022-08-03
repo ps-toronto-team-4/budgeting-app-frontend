@@ -530,3 +530,29 @@ query merchantsAndCategories($passwordHash: String!) {
         }
     }
 }
+
+
+query homePageData($passwordHash: String!, $month: MonthType!, $year: Int!) {
+    budgetByDate(passwordHash: $passwordHash, month: $month, year: $year) {
+        __typename
+        ...on BudgetSuccess {
+            budget {
+                budgetCategories {
+                    amount
+                    category {
+                        name
+                        expenses {
+                            amount
+                            date
+                        }
+                    }
+                }
+            }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
