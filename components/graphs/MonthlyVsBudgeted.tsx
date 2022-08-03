@@ -38,119 +38,125 @@ const RenderGraph = ({ data }: GraphParameters) => {
         }];
     }
 
-    return (<VictoryChart>
-        <VictoryAxis
-            style={{
-                grid: { stroke: "none" },
-            }}
-        />
-        <VictoryLegend x={25} y={10}
-            orientation="horizontal"
-            gutter={20}
-            style={{ border: { stroke: "black" } }}
-            colorScale={["#aa3377", "#e0b4cd", "#008866"]}
-            data={[
-                { name: "Planned Expense" }, { name: "Unplanned Expense" }, { name: "Budgeted" }
-            ]}
-        />
-        <VictoryGroup offset={20}
-        >
-            <VictoryStack colorScale={['#aa3377', '#e0b4cd']}>
-
-
-                <VictoryBar
-                    categories={{ x: filteredData.map(ele => ele.shortMonth) }}
-                    name="bar-1"
-                    barWidth={20}
-                    data={filteredData.map(ele => {
-                        return {
-                            x: ele.shortMonth,
-                            y: ele.amountSpentPlanned
-                        }
-                    })}
-                    events={[
-                        {
-                            target: "data",
-                            eventHandlers: {
-                                onClick: onPressClickHandler,
-                                onPressIn: onPressClickHandler,
-
-                            }
-                        }
-                    ]}
-
+    return (
+        <>
+            <VictoryChart>
+                <VictoryAxis
+                    style={{
+                        grid: { stroke: "none" },
+                    }}
                 />
-                <VictoryBar
-                    categories={{ x: filteredData.map(ele => ele.shortMonth) }}
-                    name="bar-2"
-                    barWidth={20}
-                    data={filteredData.map(ele => {
-                        return {
-                            x: ele.shortMonth,
-                            y: ele.amountSpentUnplanned
-                        }
-                    })}
-                    events={[
-                        {
-                            target: "data",
-                            eventHandlers: {
-                                onClick: onPressClickHandler,
-                                onPressIn: onPressClickHandler,
-
-                            }
-                        }
-                    ]}
-
-                />
-            </VictoryStack>
-            <VictoryStack colorScale={['#008866', '#008866']}>
+                <VictoryGroup offset={20}
+                >
+                    <VictoryStack colorScale={['#aa3377', '#e0b4cd']}>
 
 
-                <VictoryBar
-                    categories={{ x: filteredData.map(ele => ele.shortMonth) }}
-                    barWidth={20}
-                    data={filteredData.map(ele => {
-                        return {
-                            x: ele.shortMonth,
-                            y: ele.amountBudgeted
-                        }
-                    })}
-                    events={[
-                        {
-                            target: "data",
-                            eventHandlers: {
-                                onClick: onPressClickHandler,
-                                onPressIn: onPressClickHandler,
+                        <VictoryBar
+                            categories={{ x: filteredData.map(ele => ele.shortMonth) }}
+                            name="bar-1"
+                            barWidth={20}
+                            data={filteredData.map(ele => {
+                                return {
+                                    x: ele.shortMonth,
+                                    y: ele.amountSpentPlanned
+                                }
+                            })}
+                            events={[
+                                {
+                                    target: "data",
+                                    eventHandlers: {
+                                        onClick: onPressClickHandler,
+                                        onPressIn: onPressClickHandler,
 
-                            }
-                        }
-                    ]}
+                                    }
+                                }
+                            ]}
 
-                />
-                <VictoryBar
-                    categories={{ x: filteredData.map(ele => ele.shortMonth) }}
-                    barWidth={20}
-                    data={filteredData.map(ele => {
-                        return {
-                            x: ele.shortMonth,
-                            y: ele.zero
-                        }
-                    })}
-                    events={[
-                        {
-                            target: "data",
-                            eventHandlers: {
-                                onClick: onPressClickHandler,
-                                onPressIn: onPressClickHandler,
+                        />
+                        <VictoryBar
+                            categories={{ x: filteredData.map(ele => ele.shortMonth) }}
+                            name="bar-2"
+                            barWidth={20}
+                            data={filteredData.map(ele => {
+                                return {
+                                    x: ele.shortMonth,
+                                    y: ele.amountSpentUnplanned
+                                }
+                            })}
+                            events={[
+                                {
+                                    target: "data",
+                                    eventHandlers: {
+                                        onClick: onPressClickHandler,
+                                        onPressIn: onPressClickHandler,
 
-                            }
-                        }
-                    ]}
-                />
-            </VictoryStack>
-        </VictoryGroup>
+                                    }
+                                }
+                            ]}
 
-    </VictoryChart>)
+                        />
+                    </VictoryStack>
+                    <VictoryStack colorScale={['#008866', '#008866']}>
+
+
+                        <VictoryBar
+                            categories={{ x: filteredData.map(ele => ele.shortMonth) }}
+                            barWidth={20}
+                            data={filteredData.map(ele => {
+                                return {
+                                    x: ele.shortMonth,
+                                    y: ele.amountBudgeted
+                                }
+                            })}
+                            events={[
+                                {
+                                    target: "data",
+                                    eventHandlers: {
+                                        onClick: onPressClickHandler,
+                                        onPressIn: onPressClickHandler,
+
+                                    }
+                                }
+                            ]}
+
+                        />
+                        <VictoryBar
+                            categories={{ x: filteredData.map(ele => ele.shortMonth) }}
+                            barWidth={20}
+                            data={filteredData.map(ele => {
+                                return {
+                                    x: ele.shortMonth,
+                                    y: ele.zero
+                                }
+                            })}
+                            events={[
+                                {
+                                    target: "data",
+                                    eventHandlers: {
+                                        onClick: onPressClickHandler,
+                                        onPressIn: onPressClickHandler,
+
+                                    }
+                                }
+                            ]}
+                        />
+                    </VictoryStack>
+                </VictoryGroup>
+
+            </VictoryChart>
+            <VictoryLegend x={25} y={0}
+                centerTitle={true}
+                orientation="horizontal"
+                itemsPerRow={2}
+                gutter={20}
+                height={60}
+                style={{ border: { stroke: "black" } }}
+                colorScale={["#aa3377", "#e0b4cd", "#008866"]}
+                data={[
+                    { name: "Planned Expense" }, { name: "Unplanned Expense" }, { name: "Budgeted" }
+                ]}
+            />
+        </>)
 }
 
 interface MonthlyVsBudgetedParameters {
@@ -188,7 +194,7 @@ const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yea
     return (<View>
 
         <View style={{ flexDirection: 'row', width: "100%" }}>
-            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
+            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end", paddingBottom: 70 }}>
                 {showArrows && sliceEnd !== 0 && <ArrowButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
                 }} />}
@@ -200,7 +206,7 @@ const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yea
                 </View>
             </View>
 
-            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
+            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end", paddingBottom: 70 }}>
                 {showArrows && sliceEnd != inputData.length - displayAmountNumber && <ArrowButton direction="right" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.min(inputData.length - displayAmountNumber, sliceEnd + jumpAmountNumber))
                 }} />}

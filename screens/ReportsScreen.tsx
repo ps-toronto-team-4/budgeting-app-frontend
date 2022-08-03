@@ -77,6 +77,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                             budgetsData.budgets.budgets.find(ele => {
                                 return ele.month == month && ele.year == year
                             }) as Budget : undefined} />
+                    <View style={{ height: 20 }}></View>
                     <Button text='View More' onPress={() => navigation.navigate('ExpandBarCat', { year, month })}></Button>
                 </View>
                 <View>
