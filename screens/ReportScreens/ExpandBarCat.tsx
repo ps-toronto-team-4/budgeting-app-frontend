@@ -7,7 +7,7 @@ import { TopBar } from '../../components/budget/TopBar';
 import { useLazyQuery } from '@apollo/client';
 import { Budget, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, MonthType } from "../../components/generated";
 import MonthlyVsBudgetedCategory from '../../components/graphs/monthlyVsBudgetedCategory';
-
+import { AntDesign } from "@expo/vector-icons";
 
 export default function ExpandExpense({ navigation, route }: RootStackScreenProps<'ExpandExpenses'>) {
 
@@ -60,13 +60,6 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 budgetReferenceData={currentBudget} />
             <View>
                 <View style={{ flex: 1, flexGrow: 1, flexDirection: 'column', alignItems: 'center' }}>
-                    {/* <View style={{ flex: 1, marginLeft: 50, marginRight: 50, marginBottom: 25 }}>
-                        <Text style={{ fontSize: 30, textAlign: 'center' }}>
-                            For the month of {month} in {year}
-                        </Text>
-                    </View> */}
-
-
                     <View style={{ flex: 1, marginTop: 55, marginBottom: 5, marginLeft: 75, marginRight: 75 }}>
                         <Text style={{ fontSize: 26, textAlign: 'center' }}>
 
@@ -77,21 +70,16 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
                     {overBudgetedCategories.length !== 0 &&
                         <View style={{ flex: 1, marginTop: 5, marginBottom: 5, marginLeft: 75, marginRight: 75 }}>
-                            <Text style={{ fontSize: 26, textAlign: 'center' }}>
-                                {overBudgetedCategories.map((ele, index) => {
-                                    const name = ele.category?.name || 'Uncategorized'
-                                    let pre = ''
-                                    if (index == 0) {
-                                        pre = ''
-                                    } else if (index == overBudgetedCategories.length - 1) {
-                                        pre = ' and '
-                                    } else {
-                                        pre = ', '
-                                    }
-                                    return pre + name
-                                }
-                                ).join("") + " were over budget"}
-                            </Text>
+                            <Text style={{ fontSize: 26, textAlign: 'center' }}>You are over budget in..</Text>
+
+                            {overBudgetedCategories.map((ele, index) => {
+                                return (
+                                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <AntDesign name='right' size={32} color="black" />
+                                        <Text style={{ fontSize: 16 }}>{ele.category?.name || 'Uncategorized'}</Text>
+                                    </View>
+                                )
+                            })}
                         </View>}
 
                     {/* <View style={{ flexDirection: 'row' }}>
