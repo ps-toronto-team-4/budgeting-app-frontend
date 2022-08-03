@@ -1,7 +1,9 @@
-import { Text, View, StyleSheet } from "react-native";
+
+import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { RootStackScreenProps } from "../../types";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { TopBar } from '../../components/budget/TopBar';
 import { useLazyQuery } from '@apollo/client';
 import { Budget, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, MonthType } from "../../components/generated";
 import MonthlyVsBudgetedCategory from '../../components/graphs/monthlyVsBudgetedCategory';
@@ -26,11 +28,11 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
         variables: { passwordHash }
     })
 
-    let highestExpense: number | string = 'N/A'
-    let lowestExpense: number | string = 'N/A'
+    let highestExpense: string = 'N/A'
+    let lowestExpense: string = 'N/A'
     if (monthlyBreakdownData?.monthBreakdown.__typename == 'MonthBreakdown') {
-        highestExpense = Math.max(...monthlyBreakdownData.monthBreakdown.byCategory.map(ele => ele.amountSpent))
-        lowestExpense = Math.min(...monthlyBreakdownData.monthBreakdown.byCategory.map(ele => ele.amountSpent))
+        highestExpense = '$' + Math.max(...monthlyBreakdownData.monthBreakdown.byCategory.map(ele => ele.amountSpent)).toFixed(2)
+        lowestExpense = '$' + Math.min(...monthlyBreakdownData.monthBreakdown.byCategory.map(ele => ele.amountSpent)).toFixed(2)
     }
 
     const currentBudget: Budget | undefined = budgetsData?.budgets.__typename === 'BudgetsSuccess' ?
@@ -38,56 +40,97 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
             return ele.month == month && ele.year == year
         }) as Budget : undefined
 
+
+
+    const overBudgetedCategories = monthlyBreakdownData?.monthBreakdown.__typename == 'MonthBreakdown' ?
+        monthlyBreakdownData.monthBreakdown.byCategory.filter(ele => {
+            const curBudget = currentBudget ? currentBudget.budgetCategories?.find(x => x.category.name == ele.category?.name) : undefined
+            const delta = curBudget ? curBudget.amount - ele.amountSpent : -ele.amountSpent
+            return delta < 0
+        }) : []
+
+    const totalCategories = monthlyBreakdownData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthlyBreakdownData.monthBreakdown.byCategory.length : 0
+
     return <View style={staticStyles.screen}>
-        <MonthlyVsBudgetedCategory
-            data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
-            budgetReferenceData={currentBudget} />
-        <View>
-            <View style={{ flex: 1, flexGrow: 1, flexDirection: 'column', alignItems: 'center' }}>
-                <View style={{ flexBasis: 60 }}>
-                    <Text style={{ fontSize: 26 }}>
-                        For the month of {month} in {year}
-                    </Text>
-                </View>
+        <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
+        <ScrollView>
 
-                <View style={{ flexDirection: 'row' }}>
+            <MonthlyVsBudgetedCategory
+                data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
+                budgetReferenceData={currentBudget} />
+            <View>
+                <View style={{ flex: 1, flexGrow: 1, flexDirection: 'column', alignItems: 'center' }}>
+                    {/* <View style={{ flex: 1, marginLeft: 50, marginRight: 50, marginBottom: 25 }}>
+                        <Text style={{ fontSize: 30, textAlign: 'center' }}>
+                            For the month of {month} in {year}
+                        </Text>
+                    </View> */}
 
-                    <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
-                        <View style={{ borderBottomColor: 'black', borderBottomWidth: 1 }}>
-                            <Text style={{ textAlign: 'center', fontSize: 18 }}>
-                                Highest Expenditure
-                            </Text>
-                        </View>
-                        <View style={{ margin: 5 }}>
-                            <Text>
 
-                                $ {highestExpense}
-                            </Text>
-                        </View>
+                    <View style={{ flex: 1, marginTop: 55, marginBottom: 5, marginLeft: 75, marginRight: 75 }}>
+                        <Text style={{ fontSize: 26, textAlign: 'center' }}>
+
+                            {overBudgetedCategories.length === 0 || totalCategories === 0 ? "Congraduations! None of your budgets were exceeded" :
+                                ((100 * overBudgetedCategories.length / totalCategories).toFixed()) + "% of your categories were over budget"}
+                        </Text>
                     </View>
-                    <View style={{ flexBasis: 5, marginLeft: 5, marginRight: 5 }} />
 
-                    <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
-                        <View style={{ borderBottomColor: 'black', borderBottomWidth: 1 }}>
-                            <Text style={{ textAlign: 'center', fontSize: 18 }}>
-                                Lowest  Expenditure
+                    {overBudgetedCategories.length !== 0 &&
+                        <View style={{ flex: 1, marginTop: 5, marginBottom: 5, marginLeft: 75, marginRight: 75 }}>
+                            <Text style={{ fontSize: 26, textAlign: 'center' }}>
+                                {overBudgetedCategories.map((ele, index) => {
+                                    const name = ele.category?.name || 'Uncategorized'
+                                    let pre = ''
+                                    if (index == 0) {
+                                        pre = ''
+                                    } else if (index == overBudgetedCategories.length - 1) {
+                                        pre = ' and '
+                                    } else {
+                                        pre = ', '
+                                    }
+                                    return pre + name
+                                }
+                                ).join("") + " were over budget"}
                             </Text>
-                        </View>
-                        <View style={{ margin: 5 }}>
-                            <Text>
+                        </View>}
 
-                                $ {lowestExpense}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+                    {/* <View style={{ flexDirection: 'row' }}>
 
-                <View style={{ flex: 1, width: 300, marginTop: 30 }}>
+                        <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
+                            <View style={{ borderBottomColor: 'black', borderBottomWidth: 1 }}>
+                                <Text style={{ textAlign: 'center', fontSize: 18 }}>
+                                    Highest Expenditure
+                                </Text>
+                            </View>
+                            <View style={{ margin: 5 }}>
+                                <Text>
+                                    {highestExpense}
+                                </Text>
+                            </View>
+                        </View>
+                        <View style={{ flexBasis: 5, marginLeft: 5, marginRight: 5 }} />
+
+                        <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
+                            <View style={{ borderBottomColor: 'black', borderBottomWidth: 1 }}>
+                                <Text style={{ textAlign: 'center', fontSize: 18 }}>
+                                    Lowest  Expenditure
+                                </Text>
+                            </View>
+                            <View style={{ margin: 5 }}>
+                                <Text>
+
+                                    {lowestExpense}
+                                </Text>
+                            </View>
+                        </View>
+                    </View> */}
+
+                    {/* <View style={{ flex: 1, width: 300, marginTop: 30 }}>
                     <Text style={{ textAlign: 'center', fontSize: 18, borderBottomColor: 'black', borderBottomWidth: 1 }}> All overbudgeted categories</Text>
                     <View>
-                        {monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" &&
-                            monthlyBreakdownData.monthBreakdown.byCategory.map(ele => {
-                                const curBudget = currentBudget ? currentBudget.budgetCategories?.find(x => x.category.name == ele.category?.name) : undefined
+                    {monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" &&
+                    monthlyBreakdownData.monthBreakdown.byCategory.map(ele => {
+                        const curBudget = currentBudget ? currentBudget.budgetCategories?.find(x => x.category.name == ele.category?.name) : undefined
 
                                 const delta = curBudget ? curBudget.amount - ele.amountSpent : -ele.amountSpent
                                 if (delta < 0) {
@@ -107,10 +150,11 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
                         }
                     </View>
-                </View>
+                </View> */}
 
+                </View>
             </View>
-        </View>
+        </ScrollView>
 
     </View >
 }
