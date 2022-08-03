@@ -59,7 +59,7 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
                         <Text style={staticStyles.headerText}>
                             {category}
                         </Text>
-                        <PencilButton onPress={onPressDots} paddingRight={0} color="black" />
+                        <PencilButton onPress={onPressDots} color="black" />
                     </View>
                     <BudgetWarning label={(atBudget && 'At Budget') || (overBudget && 'Over Budget') || (nearBudget && 'Near Budget') || undefined} />
                     <View style={staticStyles.body}>

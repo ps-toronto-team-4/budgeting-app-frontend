@@ -94,7 +94,9 @@ function keyExtractor(item: ExpenseDisplayPropsOrDate) {
 }
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
-    const [getExpenses, { data, refetch }] = useLazyQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument);
+    const [getExpenses, { data, refetch }] = useLazyQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
+        fetchPolicy: 'no-cache',
+    });
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getExpenses({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
