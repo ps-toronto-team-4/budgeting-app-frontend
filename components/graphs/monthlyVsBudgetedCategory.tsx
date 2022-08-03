@@ -197,7 +197,7 @@ const MonthlyVsBudgetedCategory = ({ displayAmount, jumpAmount, data, budgetRefe
 
     return (<View>
 
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', width: "100%" }}>
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <ArrowButton direction="left" marginLeft={10} onPress={() => {
                     const newSpot = sliceEnd - jumpAmountNumber
@@ -205,14 +205,14 @@ const MonthlyVsBudgetedCategory = ({ displayAmount, jumpAmount, data, budgetRefe
                 }} />
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
-                    sliceEnd + displayAmountNumber > inputData.length ? inputData.slice(sliceEnd).concat(
-                        (inputData.slice(0, (sliceEnd + displayAmountNumber) - (inputData.length)))
-                    ) :
-                        inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)
-
-
-                } />
+                <View>
+                    <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
+                        sliceEnd + displayAmountNumber > inputData.length ? inputData.slice(sliceEnd).concat(
+                            (inputData.slice(0, (sliceEnd + displayAmountNumber) - (inputData.length)))
+                        ) :
+                            inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)
+                    } />
+                </View>
             </View>
 
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>

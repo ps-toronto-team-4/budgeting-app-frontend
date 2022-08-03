@@ -53,7 +53,6 @@ query getUser($passwordHash: String!) {
     }
 }
 
-
 query getCategories($passwordHash: String!) {
     categories(passwordHash: $passwordHash) {
         __typename
@@ -275,6 +274,7 @@ mutation createMerchant($passwordHash: String!, $name: String!, $description: St
     }
   }
 }
+
 query getMerchant ($passwordHash: String!, $id: Int!){
     merchant(passwordHash: $passwordHash, id: $id){
         __typename
@@ -298,7 +298,6 @@ query getMerchant ($passwordHash: String!, $id: Int!){
         }
     }
 }
-
 
 query getBudgets($passwordHash: String!){
  budgets(passwordHash:$passwordHash){
@@ -458,6 +457,31 @@ mutation copyBudget($passwordHash: String!, $month:MonthType!, $year:Int!, $id:I
     }
 }
 
+query getExpensesInMonth($month: MonthType!, $year: Int!, $passwordHash: String!) {
+    expensesInMonth(month: $month, year: $year, passwordHash: $passwordHash) {
+        __typename
+        ...on ExpensesSuccess {
+            expenses {
+                id
+                date
+                amount
+                category {
+                    name
+                    colourHex
+                }
+                merchant {
+                    name
+                }
+                description
+            }
+        }
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
 mutation deleteMerchant($passwordHash: String!, $id: Int!){
     deleteMerchant(passwordHash: $passwordHash, id: $id){
         __typename
@@ -479,9 +503,12 @@ query getMonthTotals($passwordHash: String!){
             byMonth{
                 amountBudgeted
                 amountSpent
+                amountSpentPlanned
+                amountSpentUnplanned
                 month
                 year
             }
+            averageSpent
         } 
         ... on FailurePayload {
             errorMessage
@@ -523,6 +550,31 @@ query merchantsAndCategories($passwordHash: String!) {
 
         ...on FailurePayload {
             __typename
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query homePageData($passwordHash: String!, $month: MonthType!, $year: Int!) {
+    budgetByDate(passwordHash: $passwordHash, month: $month, year: $year) {
+        __typename
+        ...on BudgetSuccess {
+            budget {
+                budgetCategories {
+                    amount
+                    category {
+                        name
+                        expenses {
+                            amount
+                            date
+                        }
+                    }
+                }
+            }
+        }
+
+        ...on FailurePayload {
             exceptionName
             errorMessage
         }

@@ -8,8 +8,6 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ColorSchemeName } from 'react-native';
-
-
 import ForgotPasswordScreen from '../screens/UserAuthScreens/ForgotPasswordScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import SignInScreen from '../screens/UserAuthScreens/SignInScreen';
@@ -40,6 +38,7 @@ import ExpandBarCatScreen from '../screens/ReportScreens/ExpandBarCat';
 
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
+import HomeScreen from '../screens/HomeScreen';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -103,17 +102,21 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 
 function Root() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator initialRouteName='Home'>
       <Tab.Group screenOptions={{
+
         headerShadowVisible: false,
         headerTitleAlign: 'center',
-        headerTitleStyle: { fontWeight: 'bold' },
+        headerTitleStyle: { fontWeight: 'bold', fontSize: 24 },
+        tabBarLabelStyle: { fontSize: 12 },
+        tabBarStyle: { paddingBottom: 25, paddingTop: 5, height: 70 },
         tabBarAllowFontScaling: true,
         tabBarActiveTintColor: Colors.light.tabIconSelected,
         tabBarInactiveTintColor: Colors.light.btnBackground
       }}>
         <Tab.Screen name="Expenses" component={ExpensesScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="pricetags" size={24} color={color} />, }} />
         <Tab.Screen name="Budget" component={BudgetScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="wallet" size={24} color={color} /> }} />
+        <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false, tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} /> }} />
         <Tab.Screen name="Reports" component={ReportsScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="pie-chart" size={24} color={color} /> }} />
         <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="settings-sharp" size={24} color={color} /> }} />
       </Tab.Group>
