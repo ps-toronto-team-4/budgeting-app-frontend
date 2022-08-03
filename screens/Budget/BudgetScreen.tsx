@@ -43,6 +43,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
     const now = moment();
     const [month, setMonth] = useState(MONTHS_ORDER[now.month()]);
     const [year, setYear] = useState(now.year());
+    const currentMonthIsNotPast = (year > now.year() || (year === now.year() && MONTHS_ORDER.indexOf(month) >= now.month()));
 
     const [getBudgets, { data: budgetData, refetch: budgetRefetch }] = useLazyQuery<GetBudgetsQuery, GetBudgetsQueryVariables>(GetBudgetsDocument);
     const [getMonthlyBreakdown, { data: monthData, refetch: monthRefetch }] = useLazyQuery<GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables>(GetMonthBreakdownDocument);
@@ -214,7 +215,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                     actualAmount && actualAmount.unbudgeted > 0 &&
                     <View style={styles.warningContainer}>
                         <Feather name="info" size={21} color="red" style={styles.warningIcon} />
-                        <Text style={styles.warningText}>${actualAmount?.unbudgeted.toFixed(2)} of expenses are unplanned.</Text>
+                        <Text style={styles.warningText}>${actualAmount?.unbudgeted.toFixed(2)} of expenses {currentMonthIsNotPast ? "are" : "were"} unplanned.</Text>
                     </View>
                 }
             </>
@@ -222,7 +223,10 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                 (selectedBudget && selectedBudget.budgetCategories && selectedBudget.budgetCategories.length > 0 &&
                     <>
                         <View style={{ alignSelf: 'center', marginBottom: 20, }}>
-                            <Button text="Add Budget" onPress={handleAddBudget} />
+                            {
+                                currentMonthIsNotPast &&
+                                <Button text="Add Budget" onPress={handleAddBudget} />
+                            }
                         </View>
                         <View style={styles.itemSeparator}></View>
                         <ScrollView>
@@ -238,9 +242,12 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
                     </>)
                 || (
                     <View style={{ alignItems: 'center', flex: 1, paddingTop: 70, }}>
-                        <Button text="Add Budget" onPress={handleAddBudget} />
                         {
-                            previousBudget &&
+                            currentMonthIsNotPast &&
+                            <Button text="Add Budget" onPress={handleAddBudget} />
+                        }
+                        {
+                            previousBudget && currentMonthIsNotPast &&
                             <Button text="Use Previous Budget" onPress={handleUsePreviousBudget} />
                         }
                     </View>
