@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native"
-import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
+import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLegend, VictoryStack } from "victory-native";
 import ArrowButton from "../buttons/ArrowButton";
 import { Budget, BudgetCategory } from "../generated";
 
@@ -26,7 +26,10 @@ const RenderGraph = ({ data }: GraphParameters) => {
         return {
             ...ele,
             id: index,
-            shortCat: ele.category.name.substring(0, 5) + '..'
+            shortCat: ele.category.name.substring(0, 5) + '..',
+            amountUnplanned: ele.amountBudgeted === 0 ? ele.amountSpent : 0,
+            amountPlanned: ele.amountBudgeted !== 0 ? ele.amountSpent : 0,
+            zero: 0
         }
     })
 
@@ -45,45 +48,110 @@ const RenderGraph = ({ data }: GraphParameters) => {
                 grid: { stroke: "none" },
             }}
         />
+        <VictoryLegend x={25} y={10}
+            orientation="horizontal"
+            gutter={20}
+            style={{ border: { stroke: "black" } }}
+            colorScale={["#aa3377", "#e0b4cd", "#008866"]}
+            data={[
+                { name: "Planned Expense" }, { name: "Unplanned Expense" }, { name: "Budgeted" }
+            ]}
+        />
         <VictoryGroup offset={20}
-            colorScale={['red', 'lime']}
-
         >
+            <VictoryStack colorScale={['#aa3377', '#e0b4cd']}>
 
-            <VictoryBar
-                name="bar-1"
-                barWidth={20}
-                data={filteredData}
-                y="amountSpent"
-                x="shortCat"
-                events={[
-                    {
-                        target: "data",
-                        eventHandlers: {
-                            onClick: onPressClickHandler,
-                            onPressIn: onPressClickHandler,
 
+                <VictoryBar
+                    categories={{ x: filteredData.map(ele => ele.shortCat) }}
+                    name="bar-1"
+                    barWidth={20}
+                    data={filteredData.map(ele => {
+                        return {
+                            x: ele.shortCat,
+                            y: ele.amountPlanned
                         }
-                    }
-                ]}
+                    })}
+                    events={[
+                        {
+                            target: "data",
+                            eventHandlers: {
+                                onClick: onPressClickHandler,
+                                onPressIn: onPressClickHandler,
 
-            />
-            <VictoryBar
-                barWidth={20}
-                data={filteredData}
-                y="amountBudgeted"
-                x="shortCat"
-                events={[
-                    {
-                        target: "data",
-                        eventHandlers: {
-                            onClick: onPressClickHandler,
-                            onPressIn: onPressClickHandler,
-
+                            }
                         }
-                    }
-                ]}
-            />
+                    ]}
+
+                />
+                <VictoryBar
+                    categories={{ x: filteredData.map(ele => ele.shortCat) }}
+                    name="bar-2"
+                    barWidth={20}
+                    data={filteredData.map(ele => {
+                        return {
+                            x: ele.shortCat,
+                            y: ele.amountUnplanned
+                        }
+                    })}
+                    events={[
+                        {
+                            target: "data",
+                            eventHandlers: {
+                                onClick: onPressClickHandler,
+                                onPressIn: onPressClickHandler,
+
+                            }
+                        }
+                    ]}
+
+                />
+            </VictoryStack>
+            <VictoryStack colorScale={['#008866', '#008866']}>
+
+
+                <VictoryBar
+                    categories={{ x: filteredData.map(ele => ele.shortCat) }}
+                    barWidth={20}
+                    data={filteredData.map(ele => {
+                        return {
+                            x: ele.shortCat,
+                            y: ele.amountBudgeted
+                        }
+                    })}
+                    events={[
+                        {
+                            target: "data",
+                            eventHandlers: {
+                                onClick: onPressClickHandler,
+                                onPressIn: onPressClickHandler,
+
+                            }
+                        }
+                    ]}
+
+                />
+                <VictoryBar
+                    categories={{ x: filteredData.map(ele => ele.shortCat) }}
+                    barWidth={20}
+                    data={filteredData.map(ele => {
+                        return {
+                            x: ele.shortCat,
+                            y: ele.zero
+                        }
+                    })}
+                    events={[
+                        {
+                            target: "data",
+                            eventHandlers: {
+                                onClick: onPressClickHandler,
+                                onPressIn: onPressClickHandler,
+
+                            }
+                        }
+                    ]}
+                />
+            </VictoryStack>
         </VictoryGroup>
     </VictoryChart>)
 }
