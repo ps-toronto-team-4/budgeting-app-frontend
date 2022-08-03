@@ -508,6 +508,7 @@ query getMonthTotals($passwordHash: String!){
                 month
                 year
             }
+            averageSpent
         } 
         ... on FailurePayload {
             errorMessage
