@@ -221,53 +221,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 />
 
             </View>
-            {
-                categoryData.length !== 0 && <VictoryLegend
-                    centerTitle={true}
-                    orientation="horizontal"
-                    colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
-                    data={
 
-                        categoryData.filter((data) => data.amountSpent != 0).map((data) => {
-                            if (data.category === null) {
-                                return {
-                                    name: "Uncategorized",
-                                    symbol: {
-                                        fill: "#757575",
-                                    }
-                                }
-                            } else {
-                                return {
-                                    name: data.category?.name,
-                                    symbol: {
-                                        fill: "#" + data.category?.colourHex
-                                    }
-                                }
-                            }
-                        })
-
-
-                    }
-                    itemsPerRow={3}
-                    gutter={20}
-                    height={100}
-                />
-            }
-            <DropdownRow
-                label="Category"
-                data={
-                    categoriesData?.categories.__typename == "CategoriesSuccess" ?
-                        categoriesData.categories.categories.map(x => { return { id: x.id, name: x.name } }) : []
-                }
-                onSelect={(month === selectedMonth) ? handleCategorySelect : (name: string) => { }}
-                expanded={categoryOpen}
-                onExpand={() => setCategoryOpen(true)}
-                onCollapse={() => setCategoryOpen(false)}
-                topBorder
-                bottomBorder={!categoryOpen}
-                createLabel="Category"
-                defaultValue={category?.name}
-            />
 
         </View>
 

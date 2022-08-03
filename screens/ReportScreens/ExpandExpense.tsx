@@ -47,7 +47,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     })
 
 
-    const RetreiveTopMerchant = () => {
+    const RetrieveTopMerchant = () => {
         if (!monthBreakdownLoading && monthBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
             setTopMerchant(monthBreakdownData.monthBreakdown.topMerchant?.merchant?.name);
         } else {
@@ -97,7 +97,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
         <View style={{ justifyContent: "center", alignContent: 'center' }}>
             <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                <RetreiveTopMerchant />
+                <RetrieveTopMerchant />
                 <Text style={{ paddingLeft: 5, flexWrap: 'wrap', width: 200 }}>is your top spending Merchant</Text>
             </View>
             {/* <View style={{ flexDirection: 'row', justifyContent: "center" }}>
