@@ -113,18 +113,22 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         setFocused(false);
     };
 
-    const handlePress = useCallback(() => {
+    const handlePress = () => {
         setFocused(true);
         scrollViewStartRef.current?.measureInWindow((x, y) => {
             setScrollViewScreenY(y);
         });
-    }, []);
+    };
 
     function handlePressCreateNew() {
         onCreateNew && onCreateNew(value);
         setCachedValue(value);
         setFocused(false);
     }
+
+    useEffect(() => {
+        console.log(focused);
+    }, [focused]);
 
     return (
         <>
@@ -141,10 +145,15 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                             onBlur={() => setFocused(false)}
                             value={value}
                             onChangeText={setValue} />
-                        <AntDesign
-                            name={focused ? 'up' : 'down'}
-                            size={20}
-                            color="black" />
+                        <TouchableHighlight
+                            style={styles.arrowIconContainer}
+                            underlayColor="rgba(0,0,0,0.1)"
+                            onPress={() => { }}>
+                            <AntDesign
+                                name={focused ? 'up' : 'down'}
+                                size={20}
+                                color="black" />
+                        </TouchableHighlight>
                     </View>
                     {
                         errorMessage.length > 0 && !focused &&
@@ -206,6 +215,13 @@ const styles = StyleSheet.create({
         fontSize: Forms.fontSize,
         fontWeight: '600',
         paddingVertical: 3,
+    },
+    arrowIconContainer: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     scrollView: {
         position: 'absolute',
