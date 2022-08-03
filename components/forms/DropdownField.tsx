@@ -154,7 +154,13 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                 {
                     focused &&
                     <ScrollView style={[styles.scrollView, { maxHeight: maxScrollViewHeight }]} keyboardShouldPersistTaps="always">
-                        {filteredData.map(datum => <DropdownItem item={datum} onPress={handleItemPress} key={datum.id} />)}
+                        {
+                            filteredData.map(datum =>
+                                <DropdownItem item={datum} onPress={handleItemPress} key={datum.id} />
+                            ).sort((item1, item2) =>
+                                item1.props.item.value > item2.props.item.value ? 1 : -1
+                            )
+                        }
                         {
                             onCreateNew &&
                             <DropdownItem
