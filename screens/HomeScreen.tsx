@@ -2,7 +2,7 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import { useState, useEffect, useMemo } from "react";
 import { GetExpensesInMonthDocument, GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, GetMonthTotalsQueryVariables, GetUserDocument, GetUserQuery, GetUserQueryVariables, HomePageDataDocument, HomePageDataQuery, HomePageDataQueryVariables, MonthType } from "../components/generated";
 import React from 'react';
-import { View, Text, ActivityIndicator, FlatList, ScrollView } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import Styles from "../constants/Styles";
@@ -14,7 +14,6 @@ import { ExpenseDisplay } from "../components/ExpenseDisplay";
 import Colors from "../constants/Colors";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import moment from "moment";
 
 const ALERT_COLOR = {
     over: {
@@ -29,17 +28,16 @@ const ALERT_COLOR = {
 
 export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const [name, setName] = useState('there');
-    const [monthData, setMonthData] = useState<{ amountSpent: number, amountBudgeted: number }[]>([]);
-    const [expenses, setExpenses] = useState<{ id: number, amount: number, date: string, category?: { name: string, colourHex: string } | null }[]>([]);
     const [expanded, setExpanded] = useState(false);
+    const [expenses, setExpenses] = useState<{ id: number, amount: number, date: string, category?: { name: string, colourHex: string } | null }[]>([]);
     const date = new Date();
-    const upcoming = useMemo(() => {
-        return expenses.filter(item => item.date.substring(0, 10) > date.toJSON().substring(0, 10));
-    }, [expenses]);
-    const day = date.getDate();
     const month = date.getMonth();
     const monthName = MONTHS_ORDER[month][0] + MONTHS_ORDER[month].substring(1).toLowerCase();
     const year = date.getFullYear();
+
+    const upcoming = useMemo(() => {
+        return expenses.filter(item => item.date.substring(0, 10) > date.toJSON().substring(0, 10));
+    }, [expenses]);
 
     const [getUser, { }] = useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {
         onCompleted: (data) => {
@@ -47,13 +45,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         }
     })
 
-    const [getMonth, { loading: monthLoading, data: yearData, refetch: monthRefetch }] = useLazyQuery<GetMonthTotalsQuery, GetMonthTotalsQueryVariables>(GetMonthTotalsDocument, {
-        onCompleted(data) {
-            if (data.monthsTotals.__typename === 'MonthsTotals') {
-                setMonthData(data.monthsTotals.byMonth.filter((item) => item.year === year));
-            }
-        }
-    })
+    const [getMonth, { loading: monthLoading, data: yearData, refetch: monthRefetch }] = useLazyQuery<GetMonthTotalsQuery, GetMonthTotalsQueryVariables>(GetMonthTotalsDocument)
 
     const [getExpenses, { data, loading, refetch }] = useLazyQuery<GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables>(GetExpensesInMonthDocument, {
         onCompleted: (data) => {
@@ -82,43 +74,27 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
             year,
         },
     });
+
     useRefresh(() => {
         refetch({ passwordHash });
         monthRefetch({ passwordHash });
         homePageDataRefetch({ passwordHash });
     });
 
-    // Jeremie thinks this function is super bad, and I agrees, especially given the
-    // fact there is a query that does exactly this already. Basically, TODO: fix this
-    const overBudgetedCategories: string[] = useMemo(() => {
-        if (homePageData?.budgetByDate.__typename === 'BudgetSuccess') {
-            if (!homePageData.budgetByDate.budget.budgetCategories) return [];
-            const overBudgetedCategoryNames = homePageData.budgetByDate.budget.budgetCategories.map(budgetCategory => {
-                let sum = 0;
-                if (budgetCategory.category.expenses) {
-                    sum = budgetCategory.category.expenses
-                        .map(expense => {
-                            const expenseDate = moment(expense.date);
-                            if (expenseDate.year() !== year || expenseDate.month() !== month) return 0;
-                            return expense.amount;
-                        })
-                        .reduce((partialSum, amnt) => partialSum + amnt, 0);
-                }
-                if (sum > budgetCategory.amount) {
-                    return budgetCategory.category.name;
-                } else {
-                    return false;
-                }
-            })
-            let onlyNames: string[] = [];
-            for (let x of overBudgetedCategoryNames) {
-                if (x) onlyNames.push(x);
-            }
-            return onlyNames;
-        } else {
-            return [];
+    const homeQueryData = useMemo(() => {
+        let overBudgetCategories: string[] = [];
+        let actual = 0;
+        if (homePageData?.budgetDetailsByDate.__typename === 'BudgetDetails'
+            && homePageData.budgetDetailsByDate.byCategory) {
+            actual = homePageData.budgetDetailsByDate.totalActual;
+            overBudgetCategories = homePageData.budgetDetailsByDate.byCategory.filter(budgetCategory => {
+                return (budgetCategory.amountActual > budgetCategory.amountBudgeted);
+            }).map((item) => item.category.name);
+            return {actual, overBudgetCategories}
         }
+        return {actual, overBudgetCategories}
     }, [homePageData]);
+
 
     function renderItem(item: { id: number, amount: number, category?: { name: string, colourHex: string } | null }) {
         const color = item.category?.colourHex || Colors.light.uncategorizedColor;
@@ -143,11 +119,11 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <Text style={style.greeting}>Hello, {name}!</Text>
-            {overBudgetedCategories ? (
+            {homeQueryData.overBudgetCategories ? (
                 <View style={[style.alert, ALERT_COLOR.over]}>
                     <Feather name='info' size={24} color={ALERT_COLOR.over.borderColor} style={{ margin: 10 }} />
                     <Text style={style.alertText}>You are over budget in these categories for the month of {monthName}:
-                        {overBudgetedCategories.map((x, i) => <Text key={i}>{' ' + x + (i < overBudgetedCategories.length - 1 ? ',' : '')}</Text>)}</Text>
+                        {homeQueryData.overBudgetCategories.map((x, i) => <Text key={i}>{' ' + x + (i < homeQueryData.overBudgetCategories.length - 1 ? ',' : '')}</Text>)}</Text>
                 </View>
             ) : (
                 <View style={[style.alert, ALERT_COLOR.under]}>
@@ -155,15 +131,16 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     <Text style={style.alertText}>You have no over-budget categories in {monthName} so far</Text>
                 </View>
             )}
+            <Text style={style.subtitle}>Your activity:</Text>
             <View style={style.summary}>
-                <Text style={style.subtitle}>Your activity:</Text>
                 {monthLoading ? <ActivityIndicator size='large' /> : (
                     yearData?.monthsTotals.__typename === 'MonthsTotals' ? (
                         <>
                             <View style={style.halfSummary}>
-                                <Text style={style.summaryData}>${monthData[month]?.amountSpent.toFixed(2)}</Text>
+                                <Text style={style.summaryData}>${homeQueryData.actual.toFixed(2)}</Text>
                                 <Text>Your total spendings this month so far</Text>
                             </View>
+                            <View style={{width: 1, height: '90%', backgroundColor: 'gray'}}/>
                             <View style={style.halfSummary}>
                                 <Text style={style.summaryData}>${yearData.monthsTotals.averageSpent.toFixed(2)}</Text>
                                 <Text>Your average monthly spendings this year</Text>
@@ -176,15 +153,16 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
-            <Text style={{ fontWeight: 'bold', fontSize: 24, paddingLeft: 20 }}>{MONTHS_ORDER[month]}</Text>
             <ScrollView>
                 <View style={style.expenses}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Text style={style.subtitle}>Upcoming Expenses:</Text>
-                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: 10 }}>
-                            <Text style={{ fontSize: 16, backgroundColor: '#2424a8', color: 'white', paddingHorizontal: 9, paddingVertical: 3, textAlign: 'center', textAlignVertical: 'center', borderRadius: 90, marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', padding: 15 }}>
+                            <View style={{ backgroundColor: 'rgb(22, 89, 193)', paddingHorizontal: 9, paddingVertical: 3, borderRadius: 90, marginRight: 15 }}>
+                            <Text style={{ fontSize: 16, color: 'white', textAlign: 'center', textAlignVertical: 'center'}}>
                                 {upcoming.length}
                             </Text>
+                            </View>
                             <AntDesign
                                 name={expanded ? 'up' : 'down'}
                                 size={20}
@@ -249,20 +227,22 @@ const style = StyleSheet.create({
         maxWidth: '80%'
     },
     subtitle: {
-        padding: 10,
+        padding: 15,
         fontWeight: 'bold',
-        fontSize: 18
+        fontSize: 18,
     },
     summary: {
-        justifyContent: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
         alignItems: 'center',
         padding: 10,
         textAlign: 'center'
     },
     halfSummary: {
-        width: '50%',
-        marginBottom: 10
-
+        width: '42%',
+        alignItems: 'center',
+        marginBottom: 10,
+        
     },
     summaryData: {
         fontWeight: 'bold',
@@ -272,7 +252,6 @@ const style = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: 'rgba(0, 0, 0, 0.1)',
         marginTop: 15,
-        padding: 15
     },
     noExpense: {
         fontSize: 18,
