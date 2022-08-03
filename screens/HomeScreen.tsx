@@ -61,8 +61,9 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     tempExpenses.sort((a, b) => b.date.localeCompare(a.date))
 
                     setUpcoming(tempExpenses.filter((item) => {
-                        return item.date.substring(0,10) > date.toJSON().substring(0,10)
+                        return item.date.substring(0, 10) > date.toJSON().substring(0, 10)
                     }))
+
                 }
             }
         }
@@ -89,6 +90,14 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         monthRefetch({ passwordHash });
         homePageDataRefetch({ passwordHash });
     });
+
+    // useEffect(() => {
+    //     if (data?.expensesInMonth.__typename === 'ExpensesSuccess') {
+    //         let tempExpenses = data.expensesInMonth.expenses.slice(); // copy the data since it is read-only
+    //         tempExpenses.sort((a, b) => b.date.localeCompare(a.date))
+    //         setExpenses(expenses.slice(upcoming.length, upcoming.length + 3));
+    //     }
+    // }, [data, upcoming])
 
     const hasOverBudgeted = useMemo(() => {
         if (homePageData?.budgetByDate.__typename === 'BudgetSuccess') {
@@ -166,46 +175,47 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
-            <Text style={{fontWeight: 'bold', fontSize: 24, paddingLeft: 20}}>{MONTHS_ORDER[month]}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 24, paddingLeft: 20 }}>{MONTHS_ORDER[month]}</Text>
             <ScrollView>
-            <View style={style.expenses}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <Text style={style.subtitle}>Upcoming Expenses:</Text>
-                    <View style={{flexDirection: 'row', justifyContent: 'flex-end', padding: 10}}>
-                        <Text style={{fontSize: 16, backgroundColor: '#2424a8', color: 'white', paddingHorizontal: 9, paddingVertical: 3, textAlign: 'center', textAlignVertical: 'center', borderRadius: 90, marginRight: 15}}>
-                            {upcoming.length}
-                        </Text>
-                        <AntDesign
-                            name={expanded ? 'up' : 'down'}
-                            size={20}
-                            color="black"
-                            onPress={() => setExpanded(!expanded)} />
+                <View style={style.expenses}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={style.subtitle}>Upcoming Expenses:</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: 10 }}>
+                            <Text style={{ fontSize: 16, backgroundColor: '#2424a8', color: 'white', paddingHorizontal: 9, paddingVertical: 3, textAlign: 'center', textAlignVertical: 'center', borderRadius: 90, marginRight: 15 }}>
+                                {upcoming.length}
+                            </Text>
+                            <AntDesign
+                                name={expanded ? 'up' : 'down'}
+                                size={20}
+                                color="black"
+                                onPress={() => setExpanded(!expanded)} />
+                        </View>
                     </View>
-                </View>
-                <View>
-                    {expanded ? (
-                        upcoming.length > 0 ? (
-                            upcoming.map((item) => renderItem(item))
+                    <View>
+                        {expanded ? (
+                            upcoming.length > 0 ? (
+                                upcoming.map((item) => renderItem(item))
                             ) : (
                                 <Text style={style.noExpense}>You have no upcoming expenses for this month.</Text>
-                        )) : (<></>)
-                    }
+                            )) : (<></>)
+                        }
+                    </View>
                 </View>
-            </View>
-            <View style={style.expenses}>
-                <Text style={style.subtitle}>Latest Expenses:</Text>
-                { loading ? <ActivityIndicator size='large' /> : (
-                    data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
-                        <FlatList
-                            data={expenses}
-                            renderItem={({ item }) => renderItem(item)}
-                            ListEmptyComponent={<FirstExpense />}
-                        />
-                    ) : (
-                        <Text style={Styles.alert}>Something went wrong.</Text>
-                    )
-                )}
-            </View>
+                <View style={style.expenses}>
+                    <Text style={style.subtitle}>Latest Expenses:</Text>
+                    {loading ? <ActivityIndicator size='large' /> : (
+                        data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
+                            expenses.length === 0 ?
+                                <FirstExpense />
+                                :
+                                expenses.map(expense => {
+                                    return renderItem(expense);
+                                })
+                        ) : (
+                            <Text style={Styles.alert}>Something went wrong.</Text>
+                        )
+                    )}
+                </View>
             </ScrollView >
             <View style={style.addBtn}>
                 <AddButton size={70} onPress={() => navigation.navigate('CreateExpense')} />
@@ -258,13 +268,13 @@ const style = StyleSheet.create({
         fontSize: 32,
     },
     expenses: {
-        borderBottomWidth: 1, 
-        borderColor: 'rgba(0, 0, 0, 0.1)', 
+        borderBottomWidth: 1,
+        borderColor: 'rgba(0, 0, 0, 0.1)',
         marginTop: 15,
         padding: 15
     },
     noExpense: {
-        fontSize: 18, 
+        fontSize: 18,
         margin: 10
     },
     addBtn: {
