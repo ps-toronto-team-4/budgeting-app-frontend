@@ -82,6 +82,10 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         Keyboard.addListener('keyboardDidHide', (e) => {
             setKeyboardScreenY(e.endCoordinates.screenY);
         });
+        return () => {
+            Keyboard.removeAllListeners('keyboardDidShow');
+            Keyboard.removeAllListeners('keyboardDidHide');
+        };
     }, []);
 
     useEffect(() => {
