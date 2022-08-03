@@ -122,16 +122,16 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                 labels={({ datum }) => datum.amountSpent.toFixed(2)}
                 barRatio={0.5}
                 style={{ data: { fill: mainColour ? mainColour : "#2e8f48" } }}
-                events={[
-                    {
-                        target: "data",
-                        eventHandlers: {
-                            onClick: onPressClickHandler,
-                            onPressIn: onPressClickHandler,
+            // events={[
+            //     {
+            //         target: "data",
+            //         eventHandlers: {
+            //             onClick: onPressClickHandler,
+            //             onPressIn: onPressClickHandler,
 
-                        }
-                    }
-                ]}
+            //         }
+            //     }
+            // ]}
             />
         </VictoryChart>
         {/* </Svg> */}
@@ -194,13 +194,13 @@ const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearS
             }
         }, [monthSelector, yearSelector])
 
-
+    const showArrows = inputData.length > displayAmountNumber
     return (<>
         <View style={{ flexDirection: 'row' }}>
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
-                <HeaderButton direction="left" marginLeft={10} onPress={() => {
+                {showArrows && sliceEnd !== 0 && <HeaderButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
-                }} />
+                }} />}
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <MonthlyExpenseGraph
@@ -208,9 +208,9 @@ const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearS
                         inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
             </View>
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
-                <HeaderButton direction="right" marginLeft={10} onPress={() => {
+                {showArrows && sliceEnd != inputData.length - displayAmountNumber && <HeaderButton direction="right" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.min(inputData.length - displayAmountNumber, sliceEnd + jumpAmountNumber))
-                }} />
+                }} />}
             </View>
         </View>
 

@@ -194,15 +194,15 @@ const MonthlyVsBudgetedCategory = ({ displayAmount, jumpAmount, data, budgetRefe
         }
         , [data])
 
-
+    const showArrows = inputData.length > displayAmountNumber
     return (<View>
 
         <View style={{ flexDirection: 'row', width: "100%" }}>
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
-                <ArrowButton direction="left" marginLeft={10} onPress={() => {
+                {showArrows && <ArrowButton direction="left" marginLeft={10} onPress={() => {
                     const newSpot = sliceEnd - jumpAmountNumber
                     setSliceEnd(newSpot < 0 ? newSpot + inputData.length : newSpot)
-                }} />
+                }} />}
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <View>
@@ -216,10 +216,10 @@ const MonthlyVsBudgetedCategory = ({ displayAmount, jumpAmount, data, budgetRefe
             </View>
 
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
-                <ArrowButton direction="right" marginLeft={10} onPress={() => {
+                {showArrows && <ArrowButton direction="right" marginLeft={10} onPress={() => {
                     const newSpot = sliceEnd + jumpAmountNumber
                     setSliceEnd(newSpot % inputData.length)
-                }} />
+                }} />}
             </View>
         </View>
     </View >)

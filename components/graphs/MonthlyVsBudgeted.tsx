@@ -28,13 +28,11 @@ const RenderGraph = ({ data }: GraphParameters) => {
         }
     })
 
-    console.log(filteredData)
 
     const onPressClickHandler = () => {
         return [{
             target: "data",
             mutation: (props: any) => {
-                console.log(props.datum)
                 return null
             }
         }];
@@ -165,7 +163,7 @@ interface MonthlyVsBudgetedParameters {
 
 const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yearSelector }: MonthlyVsBudgetedParameters) => {
     const displayAmountNumber = displayAmount ? displayAmount : 5
-    const jumpAmountNumber = jumpAmount ? jumpAmount : 1
+    const jumpAmountNumber = jumpAmount ? jumpAmount : 3
     const inputData = data
 
     const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
@@ -185,13 +183,15 @@ const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yea
             }
         }, [monthSelector, yearSelector])
 
+    const showArrows = inputData.length > displayAmountNumber
+
     return (<View>
 
         <View style={{ flexDirection: 'row', width: "100%" }}>
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
-                <ArrowButton direction="left" marginLeft={10} onPress={() => {
+                {showArrows && sliceEnd !== 0 && <ArrowButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
-                }} />
+                }} />}
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <View>
@@ -201,9 +201,9 @@ const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yea
             </View>
 
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
-                <ArrowButton direction="right" marginLeft={10} onPress={() => {
+                {showArrows && sliceEnd != inputData.length - displayAmountNumber && <ArrowButton direction="right" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.min(inputData.length - displayAmountNumber, sliceEnd + jumpAmountNumber))
-                }} />
+                }} />}
             </View>
         </View>
     </View >)
