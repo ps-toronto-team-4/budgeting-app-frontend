@@ -47,13 +47,17 @@ export interface DropdownFieldProps {
      */
     check?: boolean;
     onCreateNew?: (value: string) => void;
+    /**
+     * Only does anything if onCreateNew is defined.
+     */
+    labelForCreateNew?: string;
 }
 
 /**
  * This component has a lot of moving parts. Modification can result in unexpected behaviour and is
  * done at your own risk. If you need any changes to this component, ask Hark.
  */
-export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required, check, onCreateNew }: DropdownFieldProps) {
+export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required, check, onCreateNew, labelForCreateNew }: DropdownFieldProps) {
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const scrollViewStartRef = useRef<View>(null);
@@ -154,7 +158,7 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                         {
                             onCreateNew &&
                             <DropdownItem
-                                item={{ id: 'new', value: value ? `Add "${value}"` : `Create new ${label.toLowerCase()}`, color: 'plus' }}
+                                item={{ id: 'new', value: value ? `Add "${value}"` : `Create new ${labelForCreateNew || label.toLowerCase()}`, color: 'plus' }}
                                 onPress={handlePressCreateNew} />
                         }
                     </ScrollView>

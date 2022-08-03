@@ -111,6 +111,10 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
         if (newName && !merchantTaken()) updateMerchant();
     }
 
+    function handleCreateCategory(value: string) {
+        navigation.navigate('CreateCategory', { name: value });
+    }
+
     return (
         <Form>
             <View style={styles.container}>
@@ -135,7 +139,9 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                                 return { id: cat.id.toString(), value: cat.name, color: '#' + cat.colourHex }
                             }) : []
                     }
-                    onChange={handleCategorySelect} />
+                    onChange={handleCategorySelect}
+                    onCreateNew={handleCreateCategory}
+                    labelForCreateNew="category" />
                 <View style={styles.buttonContainer}>
                     <Button text={"Update Merchant"} disabled={confirmDelete} accessibilityLabel={"Button to Update Merchant"} onPress={handleMerchant} />
                 </View>
