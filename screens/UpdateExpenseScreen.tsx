@@ -19,6 +19,13 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         variables: {
             passwordHash: passwordHash,
             id: route.params?.id,
+        },
+        onCompleted: (response) => {
+            if (response.deleteExpense.__typename === 'DeleteSuccess') {
+                navigation.navigate('Root', { screen: "Expenses" });
+            } else if (response.deleteExpense.__typename === 'FailurePayload') {
+                alert("Error deleting expense: " + response.deleteExpense.exceptionName);
+            }
         }
     });
 
@@ -43,11 +50,6 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
         navigation.navigate('ExpenseDetails', { expenseId: route.params?.id || 0 });
     }
 
-    function handleDelete() {
-        deleteExpense();
-        navigation.navigate('Root');
-    }
-
     return (
         <>
             <ExpenseEditForm onSubmit={handleSubmit} initVals={{
@@ -67,7 +69,7 @@ export default function UpdateExpenseScreen({ navigation, route }: RootStackScre
                     <Text style={modalStyle.text}>Are you sure you want to delete this merchant?</Text>
                     <View style={modalStyle.buttonView}>
                         <Button text="Cancel" onPress={() => setConfirmDelete(false)} size='half' accessibilityLabel='Cancel button' />
-                        <Button text="Delete" onPress={() => { handleDelete() }} size='half' backgroundColor='red' accessibilityLabel='Delete Category button' />
+                        <Button text="Delete" onPress={() => { deleteExpense() }} size='half' backgroundColor='red' accessibilityLabel='Delete Category button' />
                     </View>
                 </View>
             </Modal>

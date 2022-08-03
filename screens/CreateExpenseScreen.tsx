@@ -19,9 +19,15 @@ export default function CreateExpenseScreen({ navigation, route }: RootStackScre
                 merchantId: vals.merchantId || null,
                 categoryId: vals.categoryId || null,
                 desc: vals.desc || null,
-            }
+            },
+            onCompleted: (response) => {
+                if (response.createExpense.__typename === 'ExpenseSuccess') {
+                    navigation.navigate('Root', { screen: 'Expenses' });
+                } else if (response.createExpense.__typename === 'FailurePayload') {
+                    alert('Error creating expense: ' + response.createExpense.exceptionName);
+                }
+            },
         });
-        navigation.navigate("Root");
     }
 
     return (
