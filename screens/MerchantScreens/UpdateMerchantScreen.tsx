@@ -16,6 +16,7 @@ import { InputRow } from "../../components/forms/InputRow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { InputField } from "../../components/forms/InputField";
 import { DropdownField } from "../../components/forms/DropdownField";
+import { TrashButton } from "../../components/buttons/TrashButton";
 
 export default function UpdateMerchantScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
     const [getMerchants, { data: manyMerchantsData }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
@@ -63,9 +64,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
 
     const DeleteButton = () => {
         return (
-            <TouchableOpacity onPress={() => { setConfirmDelete(true) }} style={styles.deleteButton}>
-                <AntDesign name="delete" size={24} color={(confirmDelete ? 'grey' : 'red')} />
-            </TouchableOpacity>
+            <TrashButton onPress={() => setConfirmDelete(true)} />
         );
     }
 
