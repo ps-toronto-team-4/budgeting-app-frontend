@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import FakeFlatList from '../FakeFlatList';
+import FakeFlatList from './FakeFlatList';
 import { BudgetCategory as BudgetCategoryType, GetMonthBreakdownQuery } from '../generated';
-import { BudgetCategory } from '../BudgetCategory';
+import { BudgetCategory } from './BudgetCategory';
 
 export interface BudgetListProps {
     data: Array<BudgetCategoryType> | undefined | null;

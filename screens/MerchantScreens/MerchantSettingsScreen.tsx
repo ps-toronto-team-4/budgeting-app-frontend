@@ -1,59 +1,84 @@
-import { useQuery } from "@apollo/client";
-import { GetMerchantsDocument, GetMerchantsQuery, Merchant, } from "../../components/generated";
-import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
+import { useLazyQuery } from "@apollo/client";
+import { GetMerchantsDocument, GetMerchantsQuery, GetMerchantsQueryVariables, Merchant, } from "../../components/generated";
+import { ActivityIndicator, Alert, StyleSheet, TouchableHighlight, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text } from 'react-native';
 import { RootStackScreenProps } from "../../types";
-import Button from "../../components/Button";
+import Button from "../../components/buttons/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Styles from "../../constants/Styles";
-import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
 import { useRefresh } from "../../hooks/useRefresh";
+import AddButton from "../../components/buttons/AddButton";
 
 export default function MerchantSettingsScreen({ navigation }: RootStackScreenProps<'MerchantSettings'>) {
-    
-    const passwordHash = useAuth();
-
-    useUnauthRedirect();
-
-    const {data, loading, refetch} = useQuery<GetMerchantsQuery>(GetMerchantsDocument, {
-        variables: { passwordHash },
+    const [getMerchants, { data, loading, refetch }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument, {
         onError: (error => {
-          Alert.alert(error.message);
+            Alert.alert(error.message);
         })
     });
-    
-    useRefresh(refetch, [passwordHash]);
+    const passwordHash = useAuth({ onRetrieved: (passwordHash) => getMerchants({ variables: { passwordHash } }), redirect: 'ifUnauthorized' });
+    useRefresh(() => refetch({ passwordHash }));
 
-      const renderMerchant = ({item}: {item: Merchant}) => {
+    const renderMerchant = ({ item }: { item: Merchant }) => {
         return (
-        <TouchableOpacity style={Styles.list} onPress={() => navigation.navigate("UpdateMerchant", {id: item.id, name: item.name, description: item.description, category: item.defaultCategory || undefined})}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={{ fontSize: 18, marginHorizontal: 5 }}>{item.name}</Text>
-            </View>
-            <MaterialIcons name="navigate-next" size={24} color="black" />
-        </TouchableOpacity>
-      )}
+            <TouchableHighlight
+                style={styles.row}
+                onPress={() => navigation.navigate("UpdateMerchant", { id: item.id, name: item.name, description: item.description, category: item.defaultCategory || undefined })}
+                underlayColor="rgba(0,0,0,0.1)">
+                <View style={styles.itemContainer}>
+                    <Text style={{ fontSize: 22, marginHorizontal: 5, fontWeight: 'bold', width: 250 }}>{item.name}</Text>
+                    <MaterialIcons name="navigate-next" size={28} color="black" />
+                </View>
+            </TouchableHighlight>
+        )
+    }
 
     return (
-        <View>
-            <Button text="Create New Merchant" accessibilityLabel="Link to Create New" onPress={() => navigation.navigate('CreateMerchant')}/>
-            { loading ? (<ActivityIndicator size='large'/>) : (
-                    data?.merchants.__typename === "MerchantsSuccess" ? (
-                        <FlatList
-                            data={data.merchants.merchants}
-                            renderItem={renderMerchant}
-                        />
-                    ) : (
+        <View style={styles.screen}>
+            {loading ? (<ActivityIndicator size='large' />) : (
+                data?.merchants.__typename === "MerchantsSuccess" ? (
+                    <FlatList
+                        data={data.merchants.merchants}
+                        renderItem={renderMerchant}
+                        ListFooterComponent={<View style={{ height: 20 }} />}
+                    />
+                ) : (
                     <View>
                         <Text>{data?.merchants.exceptionName}</Text>
                         <Text>{data?.merchants.errorMessage}</Text>
                     </View>
                 ))}
+            <View style={styles.addBtnContainer}>
+                <AddButton size={100} onPress={() => navigation.navigate('CreateMerchant')} />
+            </View>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
+    row: {
+        alignItems: 'center',
+        paddingVertical: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0,0,0,0.1)'
+    },
+    addBtnContainer: {
+        position: 'absolute',
+        right: 20,
+        bottom: 20,
+    },
+    itemContainer: {
+        width: 300,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+});
 

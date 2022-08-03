@@ -1,4 +1,4 @@
-query getPasswordHash($username: String!, $password: String!) {
+query login($username: String!, $password: String!) {
     signIn(username: $username , password: $password) {
         __typename
         ...on SignInSuccess {
@@ -143,6 +143,9 @@ query getExpenses ($passwordHash: String!) {
                 description
                 category {
                     colourHex
+                    name
+                }
+                merchant {
                     name
                 }
             }
@@ -468,4 +471,60 @@ mutation deleteMerchant($passwordHash: String!, $id: Int!){
         }
     }
 
+}
+
+query getMonthTotals($passwordHash: String!){
+    monthsTotals(passwordHash: $passwordHash){
+        ... on MonthsTotals{
+            byMonth{
+                amountBudgeted
+                amountSpent
+                month
+                year
+            }
+        } 
+        ... on FailurePayload {
+            errorMessage
+            exceptionName
+        }
+    }
+}
+# Used by ExpenseEditForm. Do not change.
+query merchantsAndCategories($passwordHash: String!) {
+    __typename
+
+    merchants(passwordHash: $passwordHash) {
+        __typename
+        ...on MerchantsSuccess {
+            __typename
+            merchants {
+                id
+                name
+            }
+        }
+
+        ...on FailurePayload {
+            __typename
+            exceptionName
+            errorMessage
+        }
+    }
+
+    categories(passwordHash: $passwordHash) {
+        __typename
+        ...on CategoriesSuccess {
+            __typename
+            categories {
+                id
+                name
+                colourHex
+            }
+        }
+
+        ...on FailurePayload {
+            __typename
+            exceptionName
+            errorMessage
+        }
+    }
 }

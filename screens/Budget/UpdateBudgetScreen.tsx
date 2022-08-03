@@ -5,18 +5,20 @@ import { RootStackScreenProps } from "../../types";
 import Colors from "../../constants/Colors";
 import { Budget, BudgetCategory, DeleteBudgetCategoryDocument, DeleteBudgetCategoryMutation, DeleteBudgetCategoryMutationVariables, UpdateBudgetCategoryDocument, UpdateBudgetCategoryMutation, UpdateBudgetCategoryMutationVariables } from "../../components/generated";
 import { View, Text, TextInput, StyleSheet } from "react-native";
-import Button from "../../components/Button";
-import { Row } from "../../components/Row";
-import { AmountInput } from "../../components/AmountInput";
+import Button from "../../components/buttons/Button";
+import { Row } from "../../components/forms/Row";
+import { AmountInput } from "../../components/forms/AmountInput";
 import { useAuth } from "../../hooks/useAuth";
-import { Screen } from "../../components/Screen";
-import { InputRow } from "../../components/InputRow";
-import { TrashButton } from "../../components/TrashButton";
+import { Form } from "../../components/forms/Form";
+import { InputRow } from "../../components/forms/InputRow";
+import { TrashButton } from "../../components/buttons/TrashButton";
+import { DisplayField } from "../../components/forms/DisplayField";
 
 export default function UpdateBudgetScreen({ navigation, route }: RootStackScreenProps<'EditBudget'>) {
-    const passwordHash = useAuth();
+    const passwordHash = useAuth({ redirect: 'ifUnauthorized' });
     const [amount, setAmount] = useState(route.params.budgetCategory.amount);
-    const [budgetCategory, setBudgetCategory] = useState<BudgetCategory>(route.params.budgetCategory);
+    const budgetCategory = route.params.budgetCategory;
+    const [amountError, setAmountError] = useState('');
 
     const [updateBudget] = useMutation<UpdateBudgetCategoryMutation, UpdateBudgetCategoryMutationVariables>(UpdateBudgetCategoryDocument, {
         variables: { passwordHash, id: budgetCategory?.id, amount },
@@ -46,21 +48,31 @@ export default function UpdateBudgetScreen({ navigation, route }: RootStackScree
     }, []);
 
     function handleSubmit() {
+        if (amount === 0) {
+            setAmountError('Please enter a non-zero amount.');
+            return;
+        }
         updateBudget();
     }
 
-    return (
-        <Screen>
-            <AmountInput defaultAmount={amount} onChangeAmount={setAmount} />
-            <InputRow label="Category:" disabled placeholder={budgetCategory.category.name} topBorder bottomBorder />
+    function handleChangeAmount(newAmount: number) {
+        if (newAmount !== 0) {
+            setAmountError('');
+        }
+        setAmount(newAmount);
+    }
 
+    return (
+        <Form>
+            <AmountInput defaultAmount={amount} onChangeAmount={handleChangeAmount} errorMessage={amountError} />
+            <DisplayField label="Category" value={budgetCategory.category.name} />
             <View style={styles.buttonContainer}>
                 <Button
                     text="Save Budget"
                     accessibilityLabel="Button to Save Budget"
                     onPress={handleSubmit} />
             </View>
-        </Screen>
+        </Form>
     );
 }
 

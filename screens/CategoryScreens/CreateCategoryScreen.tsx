@@ -1,28 +1,36 @@
-import { Alert, ActivityIndicator } from 'react-native';
+import { Alert, ActivityIndicator, TouchableHighlight } from 'react-native';
 import { Text, View, RequiredField } from '../../components/Themed';
-import Button from '../../components/Button';
+import Button from '../../components/buttons/Button';
 import React, { useState } from 'react';
 import Styles from '../../constants/Styles';
 import { RootStackScreenProps } from '../../types';
-import TextInput from '../../components/TextInput';
+import TextInput from '../../components/forms/TextInput';
 import ColorPalette from 'react-native-color-palette';
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useQuery } from '@apollo/client';
-import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery } from '../../components/generated';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { CreateCategoryDocument, CreateCategoryMutation, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from '../../components/generated';
 import { useAuth } from '../../hooks/useAuth';
 import { colorsList } from '../../constants/CategoryColors';
-import { useUnauthRedirect } from '../../hooks/useUnauthRedirect';
-import { Screen } from '../../components/Screen';
+import { Form } from '../../components/forms/Form';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRefresh } from '../../hooks/useRefresh';
 
-export default function CreateCategoryScreen({ navigation }: RootStackScreenProps<'CreateCategory'>) {
-  const [name, setName] = useState('')
+export default function CreateCategoryScreen({ navigation, route }: RootStackScreenProps<'CreateCategory'>) {
+  const [name, setName] = useState(route.params?.name || '')
   const [color, setColor] = useState('')
   const [details, setDetails] = useState('')
   const [check, setCheck] = useState(false) // true if need to check required fields
-  const passwordHash = useAuth();
 
-  useUnauthRedirect();
+  const [getCategories, { data: categoriesData, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {
+    onError: (error => {
+      Alert.alert(error.message);
+    }),
+  });
+  const passwordHash = useAuth({
+    onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
+    redirect: 'ifUnauthorized',
+  });
+  useRefresh(() => refetch({ passwordHash }));
 
   // Create category graphql query
   const [createCategory, { loading, data }] = useMutation<CreateCategoryMutation>(CreateCategoryDocument, {
@@ -32,20 +40,12 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
     }),
     onCompleted: (data => {
       if (data.createCategory.__typename === 'CategorySuccess') {
-        AsyncStorage.setItem('New Category', JSON.stringify({name, id: data.createCategory.category.id}))
-        .then(() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root"))
-        .catch((err) => console.log("Couldn't store new category"))
-        
+        AsyncStorage.setItem('New Category', JSON.stringify({ name, id: data.createCategory.category.id }))
+          .then(() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate("Root"))
+          .catch((err) => console.log("Couldn't store new category"))
       }
     })
   })
-
-  const { data: categoriesData } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-    variables: { passwordHash: passwordHash },
-    onError: (error => {
-      Alert.alert(error.message);
-    })
-  });
 
   const categoryTaken = () => {
     if (categoriesData?.categories.__typename === 'CategoriesSuccess') {
@@ -73,7 +73,7 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
   }
 
   return (
-    <Screen>
+    <Form>
       <View style={Styles.container}>
         {
           loading ?
@@ -82,11 +82,13 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
             data?.createCategory.__typename === 'CategorySuccess' ?
               <Text>Category created successfully! Redirecting...</Text> : <Text>{data?.createCategory.errorMessage}</Text>
         }
-        <TextInput
-          onChangeText={setName}
-          value={name}
-          placeholder="Name"
-        />
+        <TouchableHighlight>
+          <TextInput
+            onChangeText={setName}
+            value={name}
+            placeholder="Name"
+          />
+        </TouchableHighlight>
         {check && categoryTaken() ? <Text style={Styles.alert}>This category already exists</Text> : <></>}
         <RequiredField check={check} input={name} />
         <View style={Styles.palette}>
@@ -101,13 +103,15 @@ export default function CreateCategoryScreen({ navigation }: RootStackScreenProp
         </View>
         {check && colorTaken() ? <Text style={Styles.alert}>There is already a category with this color</Text> : <></>}
         <RequiredField check={check} input={color} />
-        <TextInput
-          onChangeText={(details) => setDetails(details)}
-          value={details}
-          placeholder="Details"
-        />
+        <TouchableHighlight>
+          <TextInput
+            onChangeText={(details) => setDetails(details)}
+            value={details}
+            placeholder="Details"
+          />
+        </TouchableHighlight>
         <Button text="Save Category" onPress={onSubmit} accessibilityLabel={'Save Category Button'}></Button>
       </View>
-    </Screen>
+    </Form>
   );
 }

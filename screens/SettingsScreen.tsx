@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, TouchableHighlight, SafeAreaView, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import Button from "../components/Button";
+import Button from "../components/buttons/Button";
 import { useAuth } from "../hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
-import { Screen } from "../components/Screen";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import Styles from '../constants/Styles';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { GetUserDocument, GetUserQuery, GetUserQueryVariables } from '../components/generated';
 import { useRefresh } from '../hooks/useRefresh';
 import { SettingsBar } from '../components/profile/SettingsBar';
@@ -19,12 +17,12 @@ function formatPhoneNumber(phoneNumber: string): string {
 }
 
 export default function SettingsScreen({ navigation }: RootTabScreenProps<'Settings'>) {
-    const passwordHash = useAuth();
-    const { data, refetch } = useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {
-        variables: { passwordHash }
+    const [getUser, { data, refetch }] = useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument);
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => getUser({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
     });
-    useRefresh(refetch, [passwordHash]);
-    useUnauthRedirect();
+    useRefresh(() => refetch({ passwordHash }));
 
     const logout = () => {
         AsyncStorage.multiRemove(['passwordHash', 'New Category']).then(() => {
@@ -43,9 +41,9 @@ export default function SettingsScreen({ navigation }: RootTabScreenProps<'Setti
     }, []);
 
     if (!data) {
-        return <Screen></Screen>
+        return <View style={styles.screen}></View>;
     } else if (data?.user.__typename !== 'User') {
-        return <Text>Error fetching user data.</Text>;
+        return <View style={styles.screen}><Text>Error fetching user data.</Text></View>;
     } else {
         const user = data.user;
 

@@ -7,10 +7,11 @@ export interface ExpenseDisplayProps {
     color: ColorValue;
     name: string;
     amount: number;
+    merchant?: string;
     onPress: (id: number) => void;
 }
 
-export function ExpenseDisplay({ id, color, name, amount, onPress }: ExpenseDisplayProps) {
+export function ExpenseDisplay({ id, color, name, amount, merchant, onPress }: ExpenseDisplayProps) {
     const dynamicStyles = useMemo(() => {
         return StyleSheet.create({
             coloredBar: {
@@ -29,6 +30,12 @@ export function ExpenseDisplay({ id, color, name, amount, onPress }: ExpenseDisp
                         <Text style={staticStyles.itemName}>{name}</Text>
                         <Text style={staticStyles.amount}>${amount.toFixed(2)}</Text>
                     </View>
+                    {
+                        merchant !== undefined && merchant.length > 0 &&
+                        <View style={staticStyles.merchantContainer}>
+                            <Text style={staticStyles.merchant}>{merchant}</Text>
+                        </View>
+                    }
                 </View>
             </>
         </TouchableHighlight>
@@ -58,5 +65,13 @@ const staticStyles = StyleSheet.create({
     },
     amount: {
         fontSize: 22,
+    },
+    merchantContainer: {
+        width: 300,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+    },
+    merchant: {
+        fontSize: 16,
     },
 });

@@ -41,7 +41,7 @@ export default function ForgotPasswordScreen({ navigation }: RootStackScreenProp
 
 const styles = StyleSheet.create({
   graybackground: {
-    backgroundColor: 'gray',
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
   contactemail: {
     fontSize: 20,
