@@ -32,6 +32,7 @@ export function InputField({ label, placeholder, defaultValue, onChange, errorMe
                     <Text style={styles.label}>{label}</Text>
                     <TextInput
                         style={styles.input}
+                        placeholderTextColor="grey"
                         placeholder={placeholder}
                         defaultValue={defaultValue || ''}
                         editable={focused}

@@ -127,6 +127,7 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                         <Text style={styles.label}>{label}</Text>
                         <TextInput
                             style={styles.input}
+                            placeholderTextColor="grey"
                             placeholder={!focused ? placeholder : 'start typing to search'}
                             editable={focused}
                             ref={inputRef}
