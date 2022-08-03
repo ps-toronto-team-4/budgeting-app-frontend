@@ -7,6 +7,8 @@ import ArrowButton from "../buttons/ArrowButton";
 interface GraphDatum {
     amountBudgeted: number,
     amountSpent: number,
+    amountSpentPlanned: number,
+    amountSpentUnplanned: number,
     month: string,
     year: number
 }
@@ -23,7 +25,6 @@ const RenderGraph = ({ data }: GraphParameters) => {
             id: index,
             shortMonth: ele.month.substring(0, 3),
             zero: 0,
-            unplannedExpense: 50,
         }
     })
 
@@ -66,7 +67,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                     data={filteredData.map(ele => {
                         return {
                             x: ele.shortMonth,
-                            y: ele.amountSpent
+                            y: ele.amountSpentPlanned
                         }
                     })}
                     events={[
@@ -88,7 +89,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                     data={filteredData.map(ele => {
                         return {
                             x: ele.shortMonth,
-                            y: ele.amountBudgeted
+                            y: ele.amountSpentUnplanned
                         }
                     })}
                     events={[

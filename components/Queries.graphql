@@ -479,6 +479,8 @@ query getMonthTotals($passwordHash: String!){
             byMonth{
                 amountBudgeted
                 amountSpent
+                amountSpentPlanned
+                amountSpentUnplanned
                 month
                 year
             }
