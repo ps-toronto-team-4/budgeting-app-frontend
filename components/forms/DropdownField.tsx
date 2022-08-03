@@ -79,6 +79,9 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         Keyboard.addListener('keyboardDidShow', (e) => {
             setKeyboardScreenY(e.endCoordinates.screenY);
         });
+        Keyboard.addListener('keyboardDidHide', (e) => {
+            setKeyboardScreenY(e.endCoordinates.screenY);
+        });
     }, []);
 
     useEffect(() => {
