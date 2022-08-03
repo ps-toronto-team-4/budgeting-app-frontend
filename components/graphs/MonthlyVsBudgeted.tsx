@@ -7,6 +7,8 @@ import ArrowButton from "../buttons/ArrowButton";
 interface GraphDatum {
     amountBudgeted: number,
     amountSpent: number,
+    amountSpentPlanned: number,
+    amountSpentUnplanned: number,
     month: string,
     year: number
 }
@@ -23,7 +25,6 @@ const RenderGraph = ({ data }: GraphParameters) => {
             id: index,
             shortMonth: ele.month.substring(0, 3),
             zero: 0,
-            unplannedExpense: 50,
         }
     })
 
@@ -66,7 +67,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                     data={filteredData.map(ele => {
                         return {
                             x: ele.shortMonth,
-                            y: ele.amountSpent
+                            y: ele.amountSpentPlanned
                         }
                     })}
                     events={[
@@ -88,7 +89,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                     data={filteredData.map(ele => {
                         return {
                             x: ele.shortMonth,
-                            y: ele.amountBudgeted
+                            y: ele.amountSpentUnplanned
                         }
                     })}
                     events={[
@@ -186,15 +187,17 @@ const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yea
 
     return (<View>
 
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', width: "100%" }}>
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
                 <ArrowButton direction="left" marginLeft={10} onPress={() => {
                     setSliceEnd(Math.max(0, sliceEnd - jumpAmountNumber))
                 }} />
             </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
-                    inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
+                <View>
+                    <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
+                        inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)} />
+                </View>
             </View>
 
             <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end" }}>
