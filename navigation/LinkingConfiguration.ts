@@ -18,6 +18,7 @@ const linking: LinkingOptions<RootStackParamList> = {
             SignUp: 'register',
             Root: {
                 screens: {
+                    Home: 'home',
                     Expenses: 'expenses-list',
                     Reports: 'reports',
                     Budget: 'budget',
@@ -32,7 +33,6 @@ const linking: LinkingOptions<RootStackParamList> = {
             CreateExpense: 'create-expense',
             UpdateExpense: 'update-expense',
             ForgotPasswordModal: 'forgot-password',
-            NotFound: '*',
             CreateMerchant: 'create-merchant',
             CreateBudget: 'create-budget',
             EditBudget: 'update-budget',
@@ -41,6 +41,7 @@ const linking: LinkingOptions<RootStackParamList> = {
             ExpandBudget: 'reports-expand-budget',
             ExpandWheel: 'reports-expand-wheel',
             ExpandBarCat: 'reports-expand-bar-cat',
+            NotFound: '*',
         },
     },
 };
