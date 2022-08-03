@@ -1,6 +1,6 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { useState, useEffect, useMemo } from "react";
-import { GetExpensesInMonthDocument, GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, GetMonthTotalsQueryVariables, GetUserDocument, GetUserQuery, GetUserQueryVariables, MonthType } from "../components/generated";
+import { GetExpensesInMonthDocument, GetExpensesInMonthQuery, GetExpensesInMonthQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, GetMonthTotalsQueryVariables, GetUserDocument, GetUserQuery, GetUserQueryVariables, HomePageDataDocument, HomePageDataQuery, HomePageDataQueryVariables, MonthType } from "../components/generated";
 import React from 'react';
 import { View, Text, ActivityIndicator, FlatList, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
@@ -14,6 +14,7 @@ import { ExpenseDisplay } from "../components/ExpenseDisplay";
 import Colors from "../constants/Colors";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import moment from "moment";
 
 const ALERT_COLOR = {
     over: {
@@ -28,7 +29,6 @@ const ALERT_COLOR = {
 
 export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const [name, setName] = useState('there');
-    const [overBudget, setOverBudget] = useState<string[]>([]);
     const [monthData, setMonthData] = useState<{ amountSpent: number, amountBudgeted: number }[]>([]);
     const [expenses, setExpenses] = useState<{ id: number, amount: number, category?: { name: string, colourHex: string } | null }[]>([]);
     const [upcoming, setUpcoming] = useState<{ id: number, amount: number, category?: { name: string, colourHex: string } | null }[]>([]);
@@ -70,19 +70,46 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
 
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => {
-            getUser({ variables: { passwordHash } }),
-            getMonth({ variables: { passwordHash} }),
-            getExpenses({variables: {passwordHash, month: MonthType.August, year} })},
+            getUser({ variables: { passwordHash } });
+            getMonth({ variables: { passwordHash } });
+            getExpenses({ variables: { passwordHash, month: MonthType.August, year } });
+            getHomePageData();
+        },
         redirect: 'ifUnauthorized',
     });
-    useRefresh(() => {refetch({ passwordHash }); monthRefetch({passwordHash})});
+    const [getHomePageData, { data: homePageData, refetch: homePageDataRefetch }] = useLazyQuery<HomePageDataQuery, HomePageDataQueryVariables>(HomePageDataDocument, {
+        variables: {
+            passwordHash,
+            month: MONTHS_ORDER[month] as MonthType,
+            year,
+        },
+    });
+    useRefresh(() => {
+        refetch({ passwordHash });
+        monthRefetch({ passwordHash });
+        homePageDataRefetch({ passwordHash });
+    });
 
-    useEffect(() => {
-        let diff = monthData[month]?.amountBudgeted - monthData[month]?.amountSpent || 0;
-        if (diff < 0) {
-            setOverBudget(['Total']);
+    const hasOverBudgeted = useMemo(() => {
+        if (homePageData?.budgetByDate.__typename === 'BudgetSuccess') {
+            if (!homePageData.budgetByDate.budget.budgetCategories) return false;
+            return homePageData.budgetByDate.budget.budgetCategories.map(budgetCategory => {
+                let sum = 0;
+                if (budgetCategory.category.expenses) {
+                    sum = budgetCategory.category.expenses
+                        .map(expense => {
+                            const expenseDate = moment(expense.date);
+                            if (expenseDate.year() !== year || expenseDate.month() !== month) return 0;
+                            return expense.amount;
+                        })
+                        .reduce((partialSum, amnt) => partialSum + amnt, 0);
+                }
+                return sum > budgetCategory.amount;
+            }).some(x => x);
+        } else {
+            return false;
         }
-    }, [monthData]);
+    }, [homePageData]);
 
     function renderItem(item: { id: number, amount: number, category?: { name: string, colourHex: string } | null }) {
         const color = item.category?.colourHex || Colors.light.uncategorizedColor;
@@ -105,18 +132,17 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     }
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <Text style={style.greeting}>Hello, {name}!</Text>
-            {overBudget.length ? (
+            {hasOverBudgeted ? (
                 <View style={[style.alert, ALERT_COLOR.over]}>
                     <Feather name='info' size={24} color={ALERT_COLOR.over.borderColor} style={{ margin: 10 }} />
-                    <Text style={style.alertText}>Your expenses for the following categories in {monthName} are over-budget:
-                        <strong> {overBudget.toString()}</strong></Text>
+                    <Text style={style.alertText}>You are over budget in some categories for the month of {monthName}</Text>
                 </View>
             ) : (
                 <View style={[style.alert, ALERT_COLOR.under]}>
                     <Feather name='info' size={24} color={ALERT_COLOR.under.borderColor} style={{ margin: 10 }} />
-                    <Text style={style.alertText}>You have no over-bugdet expenses in {monthName} so far</Text>
+                    <Text style={style.alertText}>You have no over-budget categories in {monthName} so far</Text>
                 </View>
             )}
             <View style={style.summary}>
@@ -140,45 +166,45 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     )
                 )}
             </View>
-            <Text style={{fontWeight: 'bold', fontSize: 24, paddingLeft: 20}}>{MONTHS_ORDER[month]}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 24, paddingLeft: 20 }}>{MONTHS_ORDER[month]}</Text>
             <ScrollView style={{}}>
-            <View style={{borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(0, 0, 0, 0.1)', padding: 20}}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 5}}>
-                    <Text style={style.subtitle}>Upcoming Expenses:</Text>
-                    <AntDesign
-                        name={expanded ? 'up' : 'down'}
-                        size={20}
-                        color="black"
-                        onPress={() => setExpanded(!expanded)} />
+                <View style={{ borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(0, 0, 0, 0.1)', padding: 20 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5 }}>
+                        <Text style={style.subtitle}>Upcoming Expenses:</Text>
+                        <AntDesign
+                            name={expanded ? 'up' : 'down'}
+                            size={20}
+                            color="black"
+                            onPress={() => setExpanded(!expanded)} />
+                    </View>
+                    {expanded &&
+                        expenses.length ? (
+                        expenses.map((item) => renderItem(item))
+                    ) : (
+                        <Text style={{ padding: 5, }}>You have no upcoming expenses for this month.</Text>
+                    )
+                    }
                 </View>
-                {expanded &&
-                    expenses.length ? (
-                            expenses.map((item) => renderItem(item))
-                        ) : (
-                            <Text style={{padding: 5, }}>You have no upcoming expenses for this month.</Text>
-                        )
-                }
-            </View>
-            {/* <Text>{date.toUTCString}</Text>
+                {/* <Text>{date.toUTCString}</Text>
             <Text>{date.toTimeString}</Text>
             <Text>{date.toString}</Text>
             <Text>{date.toDateString}</Text>
             <Text>{date.toJSON}</Text>
             <Text>{date.toISOString}</Text> */}
-            <View>
-                <Text style={style.subtitle}>Latest expenses:</Text>
-                { loading ? <ActivityIndicator size='large' /> : (
-                    data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
-                        <FlatList
-                            data={expenses}
-                            renderItem={({ item }) => renderItem(item)}
-                            ListEmptyComponent={<FirstExpense />}
-                        />
-                    ) : (
-                        <Text style={Styles.alert}>Something went wrong.</Text>
-                    )
-                )}
-            </View>
+                <View>
+                    <Text style={style.subtitle}>Latest expenses:</Text>
+                    {loading ? <ActivityIndicator size='large' /> : (
+                        data?.expensesInMonth?.__typename === 'ExpensesSuccess' ? (
+                            <FlatList
+                                data={expenses}
+                                renderItem={({ item }) => renderItem(item)}
+                                ListEmptyComponent={<FirstExpense />}
+                            />
+                        ) : (
+                            <Text style={Styles.alert}>Something went wrong.</Text>
+                        )
+                    )}
+                </View>
             </ScrollView>
             <View style={style.addBtn}>
                 <AddButton size={70} onPress={() => navigation.navigate('CreateExpense')} />
