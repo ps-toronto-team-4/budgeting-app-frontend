@@ -57,7 +57,7 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
                     </View>
                 ))}
             <View style={styles.addBtnContainer}>
-                <AddButton size={100} onPress={() => navigation.navigate('CreateCategory')} />
+                <AddButton size={80} onPress={() => navigation.navigate('CreateCategory')} />
             </View>
         </View>
     );
@@ -70,8 +70,8 @@ const styles = StyleSheet.create({
     },
     addBtnContainer: {
         position: 'absolute',
-        right: 20,
-        bottom: 20,
+        right: 15,
+        bottom: 15,
     },
     row: {
         alignItems: 'center',

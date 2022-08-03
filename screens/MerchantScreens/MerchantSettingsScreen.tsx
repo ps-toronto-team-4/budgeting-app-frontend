@@ -52,7 +52,7 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
                     </View>
                 ))}
             <View style={styles.addBtnContainer}>
-                <AddButton size={100} onPress={() => navigation.navigate('CreateMerchant')} />
+                <AddButton size={80} onPress={() => navigation.navigate('CreateMerchant')} />
             </View>
         </View>
     );
@@ -71,8 +71,8 @@ const styles = StyleSheet.create({
     },
     addBtnContainer: {
         position: 'absolute',
-        right: 20,
-        bottom: 20,
+        right: 15,
+        bottom: 15,
     },
     itemContainer: {
         width: 300,
