@@ -147,9 +147,10 @@ const RenderGraph = ({ data }: GraphParameters) => {
                 </VictoryStack>
             </VictoryGroup>
         </VictoryChart>
-        <VictoryLegend x={25} y={0}
+        <VictoryLegend x={75} y={0}
             centerTitle={true}
             orientation="horizontal"
+
             itemsPerRow={2}
             gutter={20}
             height={60}
