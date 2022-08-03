@@ -126,10 +126,6 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         setFocused(false);
     }
 
-    useEffect(() => {
-        console.log(focused);
-    }, [focused]);
-
     return (
         <>
             <TouchableHighlight style={containerStyle} onPress={handlePress} underlayColor="rgba(0,0,0,0.1)">
@@ -148,7 +144,7 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                         <TouchableHighlight
                             style={styles.arrowIconContainer}
                             underlayColor="rgba(0,0,0,0.1)"
-                            onPress={() => { }}>
+                            onPress={() => { setFocused(oldFocused => !oldFocused) }}>
                             <AntDesign
                                 name={focused ? 'up' : 'down'}
                                 size={20}
