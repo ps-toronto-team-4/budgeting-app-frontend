@@ -143,7 +143,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                 <DropdownField
                     label="Default Category"
                     placeholder="optional"
-                    defaultValue={newCategory?.name}
+                    cachedValue={newCategory?.name}
                     data={
                         categoryData?.categories.__typename === "CategoriesSuccess" ?
                             categoryData.categories.categories.map(cat => {
