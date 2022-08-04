@@ -4,15 +4,16 @@ import { AntDesign } from "@expo/vector-icons";
 import Forms from "../../constants/Forms";
 import { useRefresh } from "../../hooks/useRefresh";
 import { ColorCircle } from "../ColorCircle";
+import { ReactElement } from "react";
 
 export type DropdownFieldDatum = { id: string, value: string, color?: ColorValue }
 
-interface DropdownItemProps {
+export interface DropdownItemProps {
     item: DropdownFieldDatum;
     onPress: (id: string, value: string) => void;
 }
 
-function DropdownItem({ item, onPress }: DropdownItemProps) {
+export function DropdownItem({ item, onPress }: DropdownItemProps) {
     const { id, value, color } = item;
     const textStyle: StyleProp<ViewStyle> = useMemo(() => {
         return [styles.itemValue, { paddingLeft: color ? 20 : 80 }]
@@ -95,10 +96,8 @@ export function DropdownField(props: DropdownFieldProps) {
     }, []);
 
     useEffect(() => {
-        if (props.cachedValue !== undefined) {
-            setCachedValue(props.cachedValue);
-            if (!focused) setValue(props.cachedValue);
-        }
+        setCachedValue(props.cachedValue || '');
+        if (!focused) setValue(props.cachedValue || '');
     }, [props.cachedValue]);
 
     useEffect(() => {
