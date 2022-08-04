@@ -84,14 +84,12 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                 <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Total Expenses by Category</Text>
                 </View>
-                <View >
-                    <ByCategory
-                        categoryData={
-                            monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []
-                        }
-                        month={month}
-                        year={year} />
-                </View>
+                <ByCategory
+                    categoryData={
+                        monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []
+                    }
+                    month={month}
+                    year={year} />
                 <View style={styles.btnContainer}>
                     <Button text='View More' onPress={() => navigation.navigate('ExpandWheel', { year, month })}></Button>
                 </View>
@@ -110,5 +108,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 20,
         marginBottom: 70,
+        zIndex: -1,
+        elevation: -1,
     }
 });
