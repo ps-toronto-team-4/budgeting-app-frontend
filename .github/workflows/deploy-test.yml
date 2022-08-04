@@ -1,7 +1,5 @@
 name: Generate QR
 on:
-  push:
-      branches: [develop]
   workflow_dispatch:
 
 jobs:
