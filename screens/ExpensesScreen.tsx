@@ -134,7 +134,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <View style={staticStyles.screen}>
-                <View style={{ flexBasis: 80 }}>
+                <View style={staticStyles.filterButton}>
 
                     <ExpenseFilter onApplyFilter={setFilters}></ExpenseFilter>
                 </View>
@@ -187,4 +187,10 @@ const staticStyles = StyleSheet.create({
     date: {
         fontSize: 18,
     },
+    filterButton: {
+        position: 'absolute',
+        right: 15,
+        top: 0,
+        zIndex: 10
+    }
 });

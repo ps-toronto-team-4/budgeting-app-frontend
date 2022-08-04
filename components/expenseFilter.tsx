@@ -1,13 +1,12 @@
 import { useLazyQuery } from "@apollo/client";
-import { isFor } from "@babel/types";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useMemo } from "react";
-import { useEffect } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View, ImageBackground, TouchableOpacity, ScrollView } from "react-native";
 import { GET_SHORT_MONTH } from "../constants/Months";
 import { useAuth } from "../hooks/useAuth";
 import { useRefresh } from "../hooks/useRefresh";
 import Button from "./buttons/Button"
+import { FilterButton } from "./buttons/FilterButton";
 import { GetCategoriesDocument, GetCategoriesQuery, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "./generated";
 
 type Expenses = {
@@ -200,9 +199,10 @@ const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
 
 
 
-    return (
+    return (<>
+        <FilterButton color='black' onPress={() => setModalVisible(true)}></FilterButton>
         <View style={styles.centeredView}>
-            <Button text="Filters" onPress={() => setModalVisible(true)}></Button>
+
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -274,6 +274,7 @@ const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
                 </View>
             </Modal>
         </View>
+    </>
     );
 };
 
