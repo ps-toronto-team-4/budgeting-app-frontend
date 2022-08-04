@@ -145,7 +145,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     </View>
                     <View style={style.summaryDataContainer}>
                         <Text style={style.summaryData}>${homeQueryData.monthTotal.toFixed(2)}</Text>
-                        <Text>Your total spendings this month so far</Text>
+                        <Text style={style.summaryText}>Your total spendings this month so far</Text>
                     </View>
                 </View>
                 <View style={style.halfSummary}>
@@ -154,7 +154,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     </View>
                     <View style={style.summaryDataContainer}>
                         <Text style={style.summaryData}>${averageData.toFixed(2)}</Text>
-                        <Text>Your average monthly spendings this year</Text>
+                        <Text style={style.summaryText}>Your average monthly spendings this year</Text>
                     </View>
                 </View>
             </View>
@@ -255,6 +255,11 @@ const style = StyleSheet.create({
         textAlignVertical: 'center',
         textAlign: 'center'
     },
+    summaryText: {
+        fontSize: 14,
+        textAlignVertical: 'center',
+        textAlign: 'center'
+    },
     summaryDataContainer: {
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
@@ -263,7 +268,7 @@ const style = StyleSheet.create({
         width: '100%'
     },
     dateContainer: {
-        backgroundColor: '#A780D9',
+        backgroundColor: 'rgba(173, 124, 237, 0.7)',
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         borderWidth: 1,
@@ -273,7 +278,9 @@ const style = StyleSheet.create({
     },
     dateText: {
         fontWeight: 'bold',
-        fontSize: 18
+        fontSize: 20,
+        textAlignVertical: 'center',
+        textAlign: 'center'
     },
     expenses: {
         borderBottomWidth: 1,
