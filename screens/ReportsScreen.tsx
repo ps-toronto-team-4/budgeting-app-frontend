@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     btnContainer: {
         alignItems: 'center',
         marginTop: 20,
-        marginBottom: 70,
+        marginBottom: 500,
         zIndex: -1,
         elevation: -1,
     }
