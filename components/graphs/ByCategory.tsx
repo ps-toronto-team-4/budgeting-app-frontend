@@ -7,7 +7,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { RootStackScreenProps } from "../../types";
 import { GetCategoriesDocument, GetCategoriesQuery, MonthBreakdownCategory } from "../generated";
 import { DropdownRow } from "../forms/DropdownRow";
-import { DropdownField } from "../forms/DropdownField";
+import { DropdownField, DropdownItem } from "../forms/DropdownField";
 
 type byCategoryProps = {
     categoryData: MonthBreakdownCategory[];
@@ -36,11 +36,11 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
     }, [categoryData]);
 
     function handleCategorySelect(categoryId: string | undefined) {
+        if (categoryId === '-1') setCategory({ id: -1, name: 'Uncategorized' })
         if (categoriesData?.categories.__typename == "CategoriesSuccess") {
             const foundCategory = categoriesData.categories.categories.find(x => x.id.toString() == categoryId);
 
             if (foundCategory !== undefined) {
-                setSelectedMonth(month);
                 setCategory(foundCategory);
             }
         }
@@ -64,6 +64,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                                 return {
                                     amountSpent: data.amountSpent,
                                     category: {
+                                        id: -1,
                                         name: "Uncategorized",
                                         colourHex: "757575",
                                     }
@@ -150,9 +151,9 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 label="Category"
                 placeholder="choose a category"
                 data={
-                    filteredCategoryData.map(x => {
-                        return { id: x.category?.id.toString() || '-1', value: x.category?.name || '' }
-                    })
+                    [...filteredCategoryData.map(x => {
+                        return { id: x.category?.id.toString() || '-2', value: x.category?.name || '' }
+                    }), { id: '-1', value: 'Uncategorized' }]
                 }
                 onChange={handleCategorySelect}
                 cachedValue={category?.name} />
