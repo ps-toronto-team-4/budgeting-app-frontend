@@ -134,7 +134,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <View style={staticStyles.screen}>
-                <View>
+                <View style={{ flexBasis: 80 }}>
 
                     <ExpenseFilter onApplyFilter={setFilters}></ExpenseFilter>
                 </View>

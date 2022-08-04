@@ -202,6 +202,7 @@ const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
 
     return (
         <View style={styles.centeredView}>
+            <Button text="Filters" onPress={() => setModalVisible(true)}></Button>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -272,7 +273,6 @@ const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
                     </View>
                 </View>
             </Modal>
-            <Button text="filters" onPress={() => setModalVisible(true)}></Button>
         </View>
     );
 };
