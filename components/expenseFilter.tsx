@@ -9,20 +9,47 @@ import { useRefresh } from "../hooks/useRefresh";
 import Button from "./buttons/Button"
 import { GetCategoriesDocument, GetCategoriesQuery, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "./generated";
 
-const ApplyFilter = (inputdata) => {
+type Expenses = {
+    __typename?: "Expense" | undefined;
+    amount: number;
+    id: number;
+    date: string;
+    description?: string | null | undefined;
+    category?: {
+        __typename?: "Category" | undefined;
+        colourHex: string;
+        name: string;
+    } | null | undefined;
+    merchant?: {
+        __typename?: "Merchant" | undefined;
+        name: string;
+    } | null | undefined;
+}[];
 
-    const filters = useState({
-        date: [],
-        category: [],
-        merchant: [],
+const ApplyFilter = (expenses: Expenses, filters: filterSet) => {
+
+    //merchnat filter
+    const merchnatFiltered = expenses.filter((ele) => {
+        if (filters.merchant.length == 0) {
+            return true
+        }
+        const foundIndex = filters.merchant.findIndex(merch => merch == ele.merchant?.name)
+        return foundIndex != -1
+    })
+
+    //category filter
+    const categoryFiltered = merchnatFiltered.filter((ele) => {
+        if (filters.category.length == 0) {
+            return true
+        }
+        const foundIndex = filters.category.findIndex(cat => cat == ele.category?.name)
+        return foundIndex != -1
     })
 
 
-    return (<>
-        <Button text="Apply Filters"></Button>
-        <Modal></Modal>
-    </>
-    )
+    //date filter
+
+    return categoryFiltered
 
 }
 
@@ -285,3 +312,4 @@ const styles = StyleSheet.create({
 });
 
 export default ExpenseFilter
+export { ApplyFilter }
