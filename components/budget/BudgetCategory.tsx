@@ -119,7 +119,7 @@ const staticStyles = StyleSheet.create({
     },
     warningContainer: {
         borderRadius: 20,
-        backgroundColor: Colors.light.btnBackground,
+        backgroundColor: 'rgb(191, 0, 0)',
         padding: 10,
         width: 110,
         alignItems: 'center',
