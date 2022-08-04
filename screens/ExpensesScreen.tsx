@@ -134,10 +134,12 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <View style={staticStyles.screen}>
-                <View>
-
-                    <ExpenseFilter onApplyFilter={setFilters}></ExpenseFilter>
-                </View>
+                {
+                    false && // the filter doesn't work
+                    <View>
+                        <ExpenseFilter onApplyFilter={setFilters}></ExpenseFilter>
+                    </View>
+                }
                 <>
                     {
                         processedExpenses.length === 0 &&
