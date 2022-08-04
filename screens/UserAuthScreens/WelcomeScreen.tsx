@@ -20,8 +20,10 @@ export default function WelcomeScreen({ navigation }: RootStackScreenProps<'Welc
 
     return (
         <View style={style.screen}>
-            <Text style={style.title}>Welcome to [AppName]!</Text>
-            <Image style={style.image} source={require('../../assets/images/image_placeholder.png')}></Image>
+            <Text style={style.title}>Welcome to</Text>
+            <Text style={style.pigeon}>Pigeon</Text>
+            <Text style={style.tagline}>Don't let your money fly away!</Text>
+            <Image style={style.image} source={require('../../assets/images/pigeon.png')}></Image>
             <Button text="Sign in" onPress={onPressSignIn} accessibilityLabel={'Sign In Page'}></Button>
             <Text style={style.registerCaption}>Don't have an account?</Text>
             <Button text="Create an account" onPress={onPressSignUp} accessibilityLabel={'Sign Up Page'}></Button>
@@ -39,9 +41,21 @@ const style = StyleSheet.create({
     title: {
         fontSize: 32,
         marginHorizontal: 25,
-        marginVertical: 10,
+        marginTop: 10,
+        textAlign: 'center',
+    },
+    pigeon: {
+        fontSize: 32,
+        marginHorizontal: 25,
         textAlign: 'center',
         fontWeight: 'bold',
+    },
+    tagline: {
+        fontSize: 18,
+        marginTop: 12,
+        marginHorizontal: 25,
+        textAlign: 'center',
+        fontWeight: '300',
     },
     image: {
         height: 150,

@@ -107,7 +107,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         <Form>
             <View style={styles.container}>
                 <InputField
-                    label="Merchant"
+                    label="Name"
                     placeholder="required"
                     onChange={setMerchantName}
                     errorMessage={merchantError} />

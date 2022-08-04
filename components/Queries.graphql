@@ -545,6 +545,10 @@ query merchantsAndCategories($passwordHash: String!) {
             merchants {
                 id
                 name
+                defaultCategory {
+                    id
+                    name
+                }
             }
         }
 
@@ -575,21 +579,27 @@ query merchantsAndCategories($passwordHash: String!) {
 }
 
 query homePageData($passwordHash: String!, $month: MonthType!, $year: Int!) {
-    budgetByDate(passwordHash: $passwordHash, month: $month, year: $year) {
+    budgetDetailsByDate(passwordHash: $passwordHash, month: $month, year: $year) {
         __typename
-        ...on BudgetSuccess {
-            budget {
-                budgetCategories {
+        ...on BudgetDetails {
+          totalActual
+          byCategory {
+            category {
+            	name
+            	expenses {
                     amount
+                    date
+                    id
                     category {
                         name
-                        expenses {
-                            amount
-                            date
-                        }
+                        colourHex
+                        id
                     }
                 }
-            }
+          	} 
+            amountActual
+            amountBudgeted
+          }
         }
 
         ...on FailurePayload {

@@ -7,7 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName } from 'react-native';
+import { Animated, ColorSchemeName, Keyboard } from 'react-native';
 import ForgotPasswordScreen from '../screens/UserAuthScreens/ForgotPasswordScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import SignInScreen from '../screens/UserAuthScreens/SignInScreen';
@@ -39,6 +39,8 @@ import ExpandBarCatScreen from '../screens/ReportScreens/ExpandBarCat';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -101,6 +103,21 @@ function RootNavigator() {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 function Root() {
+  const [tabBarVisible, setTabBarVisible] = useState(true);
+
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', () => {
+      setTabBarVisible(false);
+    });
+    Keyboard.addListener('keyboardDidHide', () => {
+      setTabBarVisible(true);
+    });
+    return () => {
+      Keyboard.removeAllListeners('keyboardDidShow');
+      Keyboard.removeAllListeners('keyboardDidHide');
+    };
+  }, []);
+
   return (
     <Tab.Navigator initialRouteName='Home'>
       <Tab.Group screenOptions={{
@@ -109,10 +126,10 @@ function Root() {
         headerTitleAlign: 'center',
         headerTitleStyle: { fontWeight: 'bold', fontSize: 24 },
         tabBarLabelStyle: { fontSize: 12 },
-        tabBarStyle: { paddingBottom: 25, paddingTop: 5, height: 70 },
+        tabBarStyle: { paddingBottom: 25, paddingTop: 5, height: 70, display: tabBarVisible ? 'flex' : 'none' },
         tabBarAllowFontScaling: true,
         tabBarActiveTintColor: Colors.light.tabIconSelected,
-        tabBarInactiveTintColor: Colors.light.btnBackground
+        tabBarInactiveTintColor: Colors.light.btnBackground,
       }}>
         <Tab.Screen name="Expenses" component={ExpensesScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="pricetags" size={24} color={color} />, }} />
         <Tab.Screen name="Budget" component={BudgetScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="wallet" size={24} color={color} /> }} />

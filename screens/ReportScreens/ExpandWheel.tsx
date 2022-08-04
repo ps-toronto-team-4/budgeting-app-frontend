@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet, Alert } from "react-native";
 import { RootStackScreenProps } from "../../types";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { Category, GetBudgetsDocument, GetBudgetsQuery, GetCategoriesDocument, GetCategoriesQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, MonthBreakdownCategory, MonthType } from "../../components/generated";
 import { useLazyQuery, useQuery } from "@apollo/client";
@@ -8,6 +8,7 @@ import Button from "../../components/buttons/Button";
 import { DropdownRow } from "../../components/forms/DropdownRow";
 import { VictoryLegend, VictoryPie } from "victory-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
+import { DropdownField } from "../../components/forms/DropdownField";
 
 type ByCategoryProps = {
     categoryData: MonthBreakdownCategory[];
@@ -54,45 +55,13 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
         }),
     });
 
-    const RetrieveAmountSpent = (categoryData: MonthBreakdownCategory[], categoryName: string) => {
-        if (categoryData.map((data) => { data.category?.name === categoryName })) {
-
-            setCategoryExpense(categoryData.find(e => e.category?.name === categoryName)?.amountSpent.toFixed(2));
-        }
-
-    }
-
-    const PercentOfTotal = ({ categoryData, categoryName }: PercentProps) => {
-        if (monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
-            let totalSpent = monthlyBreakdownData.monthBreakdown.totalSpent;
-            let categoryIndex = categoryData.findIndex(e => e.category?.name === categoryName);
-            let currentCategorySpent = categoryData[categoryIndex].amountSpent;
-            let delta = (currentCategorySpent) / (totalSpent);
-
-            if (delta > 0) {
-                setExisting(true);
-                setPercent(Math.abs((100 * (delta))).toFixed(1) + "%");
-            } else {
-                setExisting(false);
-                setPercent("");
-            }
-        }
-
-        return (
-            <Text style={{ fontWeight: 'bold' }}>{percent}</Text>
-        );
-
-
-    }
 
 
     const ByCategory = ({ categoryData, year, month }: ByCategoryProps) => {
         const passwordHash = useAuth();
-        const [category, setCategory] = useState<{ id: number, name: string } | undefined>();
-        const [categoryOpen, setCategoryOpen] = useState(false);
-        const [mutations, setMutations] = useState<Array<ExternalMutation>>([])
+        const [category, setCategory] = useState<{ id: number, name: string }>();
+        const [categoryName, setCategoryName] = useState<string | undefined>("");
         const [selectedMonth, setSelectedMonth] = useState("");
-
 
         const { data: categoriesData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
             variables: { passwordHash: passwordHash },
@@ -101,70 +70,64 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
             }),
         });
 
+        useEffect(() => {
+            setCategory(undefined);
+            setSelectedCategory(category);
+        }, [month]);
 
+        const filteredCategoryData = useMemo(() => {
+            return categoryData.slice().filter(x => !!x.category && x.amountSpent > 0);
+        }, [categoryData]);
 
+        const retrieveAmountSpent = () => {
+            if (categoryData.map((data) => { data.category?.name === categoryName })) {
 
-        const handleCategory = (id: number) => {
-            setMutations([
-                {
-                    target: "data",
-                    eventKey: "all",
-                    mutation: (props: any) => {
-                        if (id === props.datum.category.id) {
-                            return props = { radius: 120, innerRadius: 90, labelRadius: 120 };
-                        } else {
-                            return props = { radius: 100, innerRadius: 70 }
-                        }
+                setCategoryExpense(categoryData.find(e => e.category?.name === categoryName)?.amountSpent.toFixed(2));
+            }
 
-                    },
-                    callback: () => {
-                        if (mutations.length === 0) {
-                            setMutations([])
-                        }
-                    }
-                },
-                {
-                    eventKey: "all",
-                    target: "labels",
-                    mutation: (props: any) => {
-                        if (id === props.datum.category.id) {
-                            return props = { text: "$" + props.datum.amountSpent.toFixed(2) };
-                        } else {
-                            return props = { text: props.datum.category.name.substring(0, 3) + "..." };
-                        }
+        }
 
+        const percentOfTotal = () => {
+            if (monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
+                let totalSpent = monthlyBreakdownData.monthBreakdown.totalSpent;
+                let categoryIndex = categoryData.findIndex(e => e.category?.name === categoryName);
+                let currentCategorySpent = categoryData[categoryIndex].amountSpent;
+                let delta = (currentCategorySpent) / (totalSpent);
 
-                    },
-                    callback: () => {
-                        if (mutations.length === 0) {
-                            setMutations([])
-                        }
-                    }
+                if (delta > 0) {
+                    setPercent(Math.abs((100 * (delta))).toFixed(1) + "%");
+                } else {
+                    setPercent("");
                 }
-            ])
+            }
+
+
+
+
         }
 
 
-        function handleCategorySelect(categoryName: string | undefined) {
+        function handleCategorySelect(categoryId: string | undefined) {
+            console.log("I got into handleCategorySelect!");
+            if (categoryId === '-1') setCategory({ id: -1, name: 'Uncategorized' })
             if (categoriesData?.categories.__typename == "CategoriesSuccess") {
-                const foundCategory = categoriesData.categories.categories.find(x => x.name == categoryName);
+                const foundCategory = categoriesData.categories.categories.find(x => x.id.toString() == categoryId);
 
                 if (foundCategory !== undefined) {
-                    handleCategory(foundCategory.id);
-                    setSelectedMonth(month);
                     setCategory(foundCategory);
                     setSelectedCategory(foundCategory);
-                    RetrieveAmountSpent(categoryData, foundCategory.name);
+                    setCategoryName(foundCategory.name);
+                    retrieveAmountSpent();
+                    percentOfTotal();
                 }
+
+                console.log(selectedCategory);
             }
         }
 
-
-
         return (
-
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
-                <View>
+            <>
+                <View style={staticStyles.graphContainer}>
                     <View style={{ position: "absolute", height: '100%', width: '100%', justifyContent: "center", alignItems: "center" }}>
                         <Text>{year}</Text>
                         <Text>{month}</Text>
@@ -172,13 +135,15 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                     <VictoryPie
                         padAngle={2}
                         labelRadius={135}
-                        innerRadius={70}
+                        radius={({ datum }) => datum.category.name === category?.name ? 120 : 100}
+                        innerRadius={({ datum }) => datum.category.name === category?.name ? 90 : 70}
                         data={
                             categoryData.map((data) => {
                                 if (data.category === null) {
                                     return {
                                         amountSpent: data.amountSpent,
                                         category: {
+                                            id: -1,
                                             name: "Uncategorized",
                                             colourHex: "757575",
                                         }
@@ -197,42 +162,31 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                             data:
                                 { fill: (d) => "#" + d.datum.category.colourHex }
                         }}
-                        externalEventMutations={mutations as EventCallbackInterface<string | string[], StringOrNumberOrList>[]}
                         events={
                             [{
                                 target: "data",
                                 eventHandlers: {
-                                    onPressIn: () => {
+                                    onPress: () => {
                                         return (
-                                            [{
-                                                target: "labels",
-                                                mutation: (props) => {
-                                                    return props.text.charAt(0) === "$" ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
+                                            [
+                                                {
+                                                    target: "data",
+                                                    mutation: (props) => {
+                                                        setCategory({ id: props.datum.category.id, name: props.datum.category.name });
+                                                    }
                                                 }
-                                            },
-                                            {
-                                                target: "data",
-                                                mutation: (props) => {
-                                                    return props.radius === 100 ? { radius: 120, innerRadius: 90 } : { radius: 100, innerRadius: 70 };
-                                                }
-                                            }
                                             ]
                                         );
                                     },
                                     onClick: () => {
                                         return (
-                                            [{
-                                                target: "labels",
-                                                mutation: (props) => {
-                                                    return props.text === "$" + props.datum.amountSpent ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
+                                            [
+                                                {
+                                                    target: "data",
+                                                    mutation: (props) => {
+                                                        setCategory({ id: props.datum.category.id, name: props.datum.category.name });
+                                                    }
                                                 }
-                                            },
-                                            {
-                                                target: "data",
-                                                mutation: (props) => {
-                                                    return props.radius === 100 ? { radius: 120, innerRadius: 90, labelRadius: 120 } : { radius: 100 };
-                                                }
-                                            }
                                             ]
                                         );
                                     }
@@ -241,14 +195,13 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                             ]}
                     />
 
-                </View>
+                </View >
                 {
                     categoryData.length !== 0 && <VictoryLegend
                         centerTitle={true}
                         orientation="horizontal"
                         colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
                         data={
-
                             categoryData.filter((data) => data.amountSpent != 0).map((data) => {
                                 if (data.category === null) {
                                     return {
@@ -266,33 +219,24 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                                     }
                                 }
                             })
-
-
                         }
                         itemsPerRow={3}
                         gutter={20}
                         height={100}
                     />
                 }
-                <DropdownRow
+
+                <DropdownField
                     label="Category"
+                    placeholder="choose a category"
                     data={
-                        categoriesData?.categories.__typename == "CategoriesSuccess" ?
-                            categoriesData.categories.categories.map(x => { return { id: x.id, name: x.name } }) : []
+                        [...filteredCategoryData.map(x => {
+                            return { id: x.category?.id.toString() || '-2', value: x.category?.name || '' }
+                        }), { id: '-1', value: 'Uncategorized' }]
                     }
-                    onSelect={handleCategorySelect}
-                    expanded={categoryOpen}
-                    onExpand={() => setCategoryOpen(true)}
-                    onCollapse={() => setCategoryOpen(false)}
-                    topBorder
-                    bottomBorder={!categoryOpen}
-                    createLabel="Category"
-                    defaultValue={category?.name}
-                />
-
-            </View>
-
-
+                    onChange={handleCategorySelect}
+                    cachedValue={category?.name} />
+            </>
         );
     }
 
@@ -305,38 +249,25 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
             {
                 selectedCategory !== undefined &&
                 <>
-                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 20 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                            <Text style={{ fontWeight: 'bold' }}>${categoryExpense}</Text>
-                            <Text> spent on</Text>
-                        </View>
-
-                    </View>
-
-                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 5 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                            <Text style={{ fontWeight: 'bold' }}>{selectedCategory?.name}</Text>
+                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                        <View style={{ justifyContent: "center" }}>
+                            <Text style={{ justifyContent: 'center', textAlign: 'center' }}>
+                                <Text style={{ fontWeight: 'bold', fontSize: 26 }}>${categoryExpense}</Text>
+                                <Text style={{ fontSize: 26 }}> spent on </Text>
+                                <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{selectedCategory?.name}</Text>
+                            </Text>
                         </View>
                     </View>
 
-                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 20 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                            {
-                                existing == true && <>
-                                    <PercentOfTotal categoryData=
-                                        {monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
-                                        categoryName={selectedCategory.name} />
-                                    <Text> of your {month.charAt(0) + month.substring(1, month.length).toLowerCase()} expenses</Text>
-
-                                </>
-                            }
+                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                        <View style={{ justifyContent: "center" }}>
+                            <Text style={{ justifyContent: 'center', textAlign: 'center' }}>
+                                <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{percent}</Text>
+                                <Text style={{ fontSize: 26 }}> of your {month.charAt(0) + month.substring(1, month.length).toLowerCase()} expenses</Text>
+                            </Text>
                         </View>
-
                     </View>
-
-
                 </>
-
 
             }
         </View >
@@ -349,4 +280,7 @@ const staticStyles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
     },
+    graphContainer: {
+        alignItems: 'center',
+    }
 })
