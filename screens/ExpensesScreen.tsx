@@ -13,6 +13,7 @@ import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDispla
 import { formatDate } from "./ExpenseDetailsScreen";
 import Button from "../components/buttons/Button";
 import styles from "../constants/Styles";
+import ExpenseFilter from "../components/expenseFilter"
 
 type ExpenseDisplayPropsOrDate = ExpenseDisplayProps | string;
 
@@ -108,6 +109,12 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         return [];
     }, [data]);
 
+    const [filters, setFilters] = useState({
+        date: [],
+        category: [],
+        merchant: [],
+    })
+
     const handleAddExpense = () => navigation.navigate('CreateExpense');
 
     if (data === undefined) {
@@ -117,6 +124,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <View style={staticStyles.screen}>
+                <ExpenseFilter filters={filters} setFilters={setFilters}></ExpenseFilter>
                 <>
                     {
                         processedExpenses.length === 0 &&
