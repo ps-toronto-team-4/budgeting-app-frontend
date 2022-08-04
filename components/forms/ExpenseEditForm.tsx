@@ -58,6 +58,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
     const year = moment(date).year();
     const [amountError, setAmountError] = useState('');
     const nav = useNavigation();
+    const [defaultCategory, setDefaultCategory] = useState<string>();
 
     function handleSubmit() {
         if (amount === 0) {
@@ -78,6 +79,15 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
             setAmountError('');
         }
         setAmount(newAmount);
+    }
+
+    function handleMerchantChange(id: string) {
+        if (data?.merchants.__typename === 'MerchantsSuccess') {
+            const merchant = data.merchants.merchants.find(merch => merch.id === parseInt(id));
+            setDefaultCategory(merchant?.defaultCategory?.name);
+            setCategoryId(merchant?.defaultCategory?.id);
+        }
+        setMerchantId(parseInt(id));
     }
 
     function handleCreateMerchant(value: string) {
@@ -120,7 +130,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                                 : undefined
                         }
                         onFocus={() => setCalendarShown(false)}
-                        onChange={id => setMerchantId(parseInt(id))}
+                        onChange={handleMerchantChange}
                         onCreateNew={handleCreateMerchant} />
                 }
             </>
@@ -136,6 +146,7 @@ export function ExpenseEditForm({ initVals, onSubmit }: ExpenseEditFormProps) {
                                 data.categories.categories.find((cat) => cat.id === initVals.categoryId)?.name
                                 : undefined
                         }
+                        cachedValue={defaultCategory}
                         onFocus={() => setCalendarShown(false)}
                         onChange={id => setCategoryId(parseInt(id))}
                         onCreateNew={handleCreateCategory} />
