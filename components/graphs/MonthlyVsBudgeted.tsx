@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native"
-import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryStack, VictoryLegend } from "victory-native";
+import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryStack, VictoryLegend, VictoryLabel } from "victory-native";
 import ArrowButton from "../buttons/ArrowButton";
 
 
@@ -29,6 +29,8 @@ const RenderGraph = ({ data }: GraphParameters) => {
     })
 
 
+    const [undefY, setUndefY] = useState<number | undefined>(100)
+
     const onPressClickHandler = () => {
         return [{
             target: "data",
@@ -37,6 +39,12 @@ const RenderGraph = ({ data }: GraphParameters) => {
             }
         }];
     }
+
+    //to combat Y being undefined at the start which caused an label error
+    useEffect(() => {
+        setUndefY(0)
+        setTimeout(() => setUndefY(undefined), 100);
+    }, [data])
 
     return (
         <>
@@ -48,7 +56,11 @@ const RenderGraph = ({ data }: GraphParameters) => {
                 />
                 <VictoryGroup offset={20}
                 >
-                    <VictoryStack colorScale={['#aa3377', '#e0b4cd']}>
+                    <VictoryStack colorScale={['#aa3377', '#e0b4cd']}
+                        labels={filteredData.map(ele => '$' + ele.amountSpent.toFixed(2))}
+                        labelComponent={<VictoryLabel y={undefY} dx={-20} />}
+                    >
+
 
 
                         <VictoryBar
@@ -80,7 +92,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                             data={filteredData.map(ele => {
                                 return {
                                     x: ele.shortMonth,
-                                    y: ele.amountSpentUnplanned
+                                    y: ele.amountSpentUnplanned,
                                 }
                             })}
                             events={[
@@ -96,7 +108,10 @@ const RenderGraph = ({ data }: GraphParameters) => {
 
                         />
                     </VictoryStack>
-                    <VictoryStack colorScale={['#008866', '#008866']}>
+                    <VictoryStack colorScale={['#008866', '#008866']}
+                        labels={filteredData.map(ele => '$' + ele.amountBudgeted.toFixed(2))}
+                        labelComponent={<VictoryLabel y={undefY} dx={20} />}
+                    >
 
 
                         <VictoryBar
@@ -139,6 +154,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                                     }
                                 }
                             ]}
+                        // labels={({ datum }) => datum.y.toFixed(2)}
                         />
                     </VictoryStack>
                 </VictoryGroup>
