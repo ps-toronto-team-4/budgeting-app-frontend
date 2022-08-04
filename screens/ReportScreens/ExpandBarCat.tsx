@@ -53,7 +53,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
     const PercentOverBudget = () => {
         return (
-            <Text style={{ fontWeight: 'bold', textAlign: 'center' }}>{((100 * overBudgetedCategories.length / totalCategories).toFixed(1))}%</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((100 * overBudgetedCategories.length / totalCategories).toFixed(1))}%</Text>
         );
     }
 
@@ -65,11 +65,29 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 budgetReferenceData={currentBudget} />
             <View>
                 <View style={{ flex: 1, marginTop: 55, marginBottom: 5, marginLeft: 90, marginRight: 90 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: "center" }}>
+                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
                         {
                             overBudgetedCategories.length === 0 || totalCategories === 0 ?
-                                <Text style={{ textAlign: 'center' }}>Congratulations! None of your budgets were exceeded</Text> :
-                                <><PercentOverBudget></PercentOverBudget><Text> of your categories were over budget</Text></>
+                                <>
+                                    <View style={{ justifyContent: "center" }}>
+                                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                                            <Text style={{ textAlign: 'center' }}>Congratulations! None of your budgets were exceeded</Text>
+                                        </Text>
+                                    </View>
+
+                                </> :
+                                <>
+                                    <View style={{ justifyContent: "center" }}>
+                                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                                            <PercentOverBudget />
+                                            <Text style={{ fontSize: 26 }}> of your categories were </Text>
+                                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>over </Text>
+                                            <Text style={{ fontSize: 26 }}>budget</Text>
+                                        </Text>
+                                    </View>
+
+                                </>
+                            // <><PercentOverBudget></PercentOverBudget><Text> of your categories were over budget</Text></>
 
                         }
                     </View>
@@ -77,14 +95,14 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 <View style={{ flex: 1, flexGrow: 1, flexDirection: 'column', alignItems: 'center' }}>
 
                     {overBudgetedCategories.length !== 0 &&
-                        <View style={{ flex: 1, marginTop: 5, marginBottom: 5, marginLeft: 75, marginRight: 75 }}>
+                        <View style={{ flex: 1, marginTop: 5, marginBottom: 5, marginLeft: 90, marginRight: 90 }}>
                             <Text style={{ fontSize: 26, textAlign: 'center' }}>You are over budget in..</Text>
 
                             {overBudgetedCategories.map((ele, index) => {
                                 return (
                                     <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <AntDesign name='right' size={32} color="black" />
-                                        <Text style={{ fontSize: 16 }}>{ele.category?.name || 'Uncategorized'}</Text>
+                                        <Text style={{ fontSize: 26 }}>{ele.category?.name || 'Uncategorized'}</Text>
                                     </View>
                                 )
                             })}
