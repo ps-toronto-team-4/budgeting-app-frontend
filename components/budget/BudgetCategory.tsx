@@ -115,12 +115,11 @@ const staticStyles = StyleSheet.create({
     },
     warningRow: {
         paddingTop: 8,
-        alignItems: 'center',
     },
     warningContainer: {
         borderRadius: 20,
         backgroundColor: 'rgb(191, 0, 0)',
-        padding: 10,
+        padding: 7,
         width: 110,
         alignItems: 'center',
     },
