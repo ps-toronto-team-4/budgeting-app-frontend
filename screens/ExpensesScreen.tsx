@@ -13,6 +13,7 @@ import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDispla
 import { formatDate } from "./ExpenseDetailsScreen";
 import Button from "../components/buttons/Button";
 import styles from "../constants/Styles";
+import ExpenseFilter, { ApplyFilter } from "../components/expenseFilter"
 
 type ExpenseDisplayPropsOrDate = ExpenseDisplayProps | string;
 
@@ -102,11 +103,27 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         redirect: 'ifUnauthorized',
     });
     useRefresh(() => refetch({ passwordHash }));
+    const [filters, setFilters] = useState<filterSet>({
+        date: {},
+        category: [],
+        merchant: [],
+    })
+
     const processedExpenses = useMemo(() => {
-        if (data?.expenses.__typename === 'ExpensesSuccess')
-            return processExpenses(data.expenses.expenses, (id) => navigation.navigate('ExpenseDetails', { expenseId: id }));
+        if (data?.expenses.__typename === 'ExpensesSuccess') {
+            const filteredExpenses = ApplyFilter(data.expenses.expenses, filters)
+            return processExpenses(filteredExpenses, (id) => navigation.navigate('ExpenseDetails', { expenseId: id }));
+        }
         return [];
-    }, [data]);
+    }, [data, filters]);
+
+
+    interface filterSet {
+        date: any,
+        category: string[],
+        merchant: string[],
+    }
+
 
     const handleAddExpense = () => navigation.navigate('CreateExpense');
 
@@ -117,6 +134,10 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <View style={staticStyles.screen}>
+                <View>
+
+                    <ExpenseFilter onApplyFilter={setFilters}></ExpenseFilter>
+                </View>
                 <>
                     {
                         processedExpenses.length === 0 &&
@@ -129,7 +150,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                     keyExtractor={keyExtractor}
                     maxToRenderPerBatch={30} />
                 <View style={staticStyles.addExpenseBtn}>
-                    <AddButton size={70} onPress={handleAddExpense} />
+                    <AddButton size={80} onPress={handleAddExpense} />
                 </View>
             </View>
         );

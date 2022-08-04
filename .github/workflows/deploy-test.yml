@@ -1,0 +1,16 @@
+name: Generate QR
+on:
+  workflow_dispatch:
+
+jobs:
+  run_tests:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.15.1
+      - run: npm install -g expo-cli
+      - run: npm install
+      - run: expo start --port 6000 > out.txt &
