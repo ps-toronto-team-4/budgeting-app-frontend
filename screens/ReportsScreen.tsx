@@ -46,7 +46,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
     return (
         <View style={styles.screen}>
             <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="always">
                 <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenses by Months</Text>
                 </View>
@@ -83,8 +83,10 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                 <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Total Expenses by Category</Text>
                 </View>
-                <View style={{ alignItems: 'center', marginBottom: 70 }}>
+                <View >
                     <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []} month={month} year={year}></ByCategory>
+                </View>
+                <View style={styles.btnContainer}>
                     <Button text='View More' onPress={() => navigation.navigate('ExpandWheel', { year, month })}></Button>
                 </View>
 
@@ -98,4 +100,9 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
     },
+    btnContainer: {
+        alignItems: 'center',
+        marginTop: 20,
+        marginBottom: 70,
+    }
 });
