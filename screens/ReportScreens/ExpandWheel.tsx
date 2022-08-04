@@ -326,6 +326,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                                     <PercentOfTotal categoryData=
                                         {monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
                                         categoryName={selectedCategory.name} />
+                                    <Text> of your {month.charAt(0) + month.substring(1, month.length).toLowerCase()} expenses</Text>
 
                                 </>
                             }
