@@ -13,4 +13,4 @@ jobs:
           node-version: 16.15.1
       - run: npm install -g expo-cli
       - run: npm install
-      - run: expo start --tunnel --port 6000 > index.html
+      - run: expo start --tunnel --port 6000 > index.txt
