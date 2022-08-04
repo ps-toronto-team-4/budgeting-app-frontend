@@ -57,7 +57,7 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
                     </View>
                 ))}
             <View style={styles.addBtnContainer}>
-                <AddButton size={100} onPress={() => navigation.navigate('CreateCategory')} />
+                <AddButton size={70} onPress={() => navigation.navigate('CreateCategory')} />
             </View>
         </View>
     );

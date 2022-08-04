@@ -79,6 +79,13 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         Keyboard.addListener('keyboardDidShow', (e) => {
             setKeyboardScreenY(e.endCoordinates.screenY);
         });
+        Keyboard.addListener('keyboardDidHide', (e) => {
+            setKeyboardScreenY(e.endCoordinates.screenY);
+        });
+        return () => {
+            Keyboard.removeAllListeners('keyboardDidShow');
+            Keyboard.removeAllListeners('keyboardDidHide');
+        };
     }, []);
 
     useEffect(() => {
@@ -110,12 +117,12 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         setFocused(false);
     };
 
-    const handlePress = useCallback(() => {
+    const handlePress = () => {
         setFocused(true);
         scrollViewStartRef.current?.measureInWindow((x, y) => {
             setScrollViewScreenY(y);
         });
-    }, []);
+    };
 
     function handlePressCreateNew() {
         onCreateNew && onCreateNew(value);
@@ -138,10 +145,15 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                             onBlur={() => setFocused(false)}
                             value={value}
                             onChangeText={setValue} />
-                        <AntDesign
-                            name={focused ? 'up' : 'down'}
-                            size={20}
-                            color="black" />
+                        <TouchableHighlight
+                            style={styles.arrowIconContainer}
+                            underlayColor="rgba(0,0,0,0.1)"
+                            onPress={() => { setFocused(oldFocused => !oldFocused) }}>
+                            <AntDesign
+                                name={focused ? 'up' : 'down'}
+                                size={20}
+                                color="black" />
+                        </TouchableHighlight>
                     </View>
                     {
                         errorMessage.length > 0 && !focused &&
@@ -203,6 +215,13 @@ const styles = StyleSheet.create({
         fontSize: Forms.fontSize,
         fontWeight: '600',
         paddingVertical: 3,
+    },
+    arrowIconContainer: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     scrollView: {
         position: 'absolute',

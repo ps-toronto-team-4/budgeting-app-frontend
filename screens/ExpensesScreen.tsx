@@ -129,7 +129,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                     keyExtractor={keyExtractor}
                     maxToRenderPerBatch={30} />
                 <View style={staticStyles.addExpenseBtn}>
-                    <AddButton size={100} onPress={handleAddExpense} />
+                    <AddButton size={70} onPress={handleAddExpense} />
                 </View>
             </View>
         );
@@ -154,8 +154,8 @@ const staticStyles = StyleSheet.create({
     },
     addExpenseBtn: {
         position: 'absolute',
-        right: 20,
-        bottom: 20,
+        right: 15,
+        bottom: 15,
     },
     dateContainer: {
         paddingTop: 20,

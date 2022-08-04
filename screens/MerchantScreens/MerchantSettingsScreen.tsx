@@ -52,7 +52,7 @@ export default function MerchantSettingsScreen({ navigation }: RootStackScreenPr
                     </View>
                 ))}
             <View style={styles.addBtnContainer}>
-                <AddButton size={100} onPress={() => navigation.navigate('CreateMerchant')} />
+                <AddButton size={70} onPress={() => navigation.navigate('CreateMerchant')} />
             </View>
         </View>
     );
