@@ -16,6 +16,7 @@ import { InputRow } from "../../components/forms/InputRow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { InputField } from "../../components/forms/InputField";
 import { DropdownField } from "../../components/forms/DropdownField";
+import { TrashButton } from "../../components/buttons/TrashButton";
 
 export default function UpdateMerchantScreen({ navigation, route }: RootStackScreenProps<'UpdateMerchant'>) {
     const [getMerchants, { data: manyMerchantsData }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
@@ -63,9 +64,7 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
 
     const DeleteButton = () => {
         return (
-            <TouchableOpacity onPress={() => { setConfirmDelete(true) }} style={styles.deleteButton}>
-                <AntDesign name="delete" size={24} color={(confirmDelete ? 'grey' : 'red')} />
-            </TouchableOpacity>
+            <TrashButton onPress={() => setConfirmDelete(true)} />
         );
     }
 
@@ -111,6 +110,10 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
         if (newName && !merchantTaken()) updateMerchant();
     }
 
+    function handleCreateCategory(value: string) {
+        navigation.navigate('CreateCategory', { name: value });
+    }
+
     return (
         <Form>
             <View style={styles.container}>
@@ -135,7 +138,9 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
                                 return { id: cat.id.toString(), value: cat.name, color: '#' + cat.colourHex }
                             }) : []
                     }
-                    onChange={handleCategorySelect} />
+                    onChange={handleCategorySelect}
+                    onCreateNew={handleCreateCategory}
+                    labelForCreateNew="category" />
                 <View style={styles.buttonContainer}>
                     <Button text={"Update Merchant"} disabled={confirmDelete} accessibilityLabel={"Button to Update Merchant"} onPress={handleMerchant} />
                 </View>

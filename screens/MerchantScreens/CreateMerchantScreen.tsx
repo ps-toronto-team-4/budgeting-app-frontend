@@ -99,6 +99,10 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
         if (merchantName && !merchantTaken()) createMerchant();
     };
 
+    function handleCreateCategory(value: string) {
+        navigation.navigate('CreateCategory', { name: value });
+    }
+
     return (
         <Form>
             <View style={styles.container}>
@@ -119,7 +123,9 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                             categoryData.categories.categories.map(x => { return { id: x.id.toString(), value: x.name, color: '#' + x.colourHex } }) : []
                     }
                     defaultValue={category?.name}
-                    onChange={handleCategorySelect} />
+                    onChange={handleCategorySelect}
+                    onCreateNew={handleCreateCategory}
+                    labelForCreateNew="category" />
                 <View style={styles.buttonContainer}>
                     <Button text="Save Merchant"
                         accessibilityLabel="Save Merchant"

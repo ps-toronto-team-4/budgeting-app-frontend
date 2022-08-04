@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
-import { Budget, BudgetCategory, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, MonthType } from '../components/generated';
+import { Budget, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, GetMonthTotalsDocument, GetMonthTotalsQuery, MonthType } from '../components/generated';
 import MonthlyExpenseGraph from '../components/graphs/MonthlyExpenses';
 import { useLazyQuery } from '@apollo/client';
 import ByCategory from '../components/graphs/ByCategory';
@@ -47,8 +47,10 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
         <View style={styles.screen}>
             <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
             <ScrollView>
-
                 <View>
+                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenses by Months</Text>
+                </View>
+                <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <MonthlyExpenseGraph
                         data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
                         monthSelector={month}
@@ -56,24 +58,32 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                     <Button text='View More' onPress={() => navigation.navigate('ExpandExpenses', { year, month })}></Button>
                 </View>
                 <View>
+                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Budget and Expenses by Month</Text>
+                </View>
+                <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <MonthlyVsBudgeted
                         data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
                         monthSelector={month}
                         yearSelector={year} />
                     <Button text='View More' onPress={() => navigation.navigate('ExpandBudget', { year, month })}></Button>
                 </View>
-
                 <View>
+                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Budget and Expenses by Category</Text>
+                </View>
+                <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <MonthlyVsBudgetedCategory
                         data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
                         budgetReferenceData={budgetsData?.budgets.__typename === 'BudgetsSuccess' ?
                             budgetsData.budgets.budgets.find(ele => {
                                 return ele.month == month && ele.year == year
                             }) as Budget : undefined} />
+                    <View style={{ height: 20 }}></View>
                     <Button text='View More' onPress={() => navigation.navigate('ExpandBarCat', { year, month })}></Button>
                 </View>
-
                 <View>
+                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Total Expenses by Category</Text>
+                </View>
+                <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []} month={month} year={year}></ByCategory>
                     <Button text='View More' onPress={() => navigation.navigate('ExpandWheel', { year, month })}></Button>
                 </View>

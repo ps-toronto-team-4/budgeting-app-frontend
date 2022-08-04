@@ -46,7 +46,7 @@ export default function CategorySettingsScreen({ navigation }: RootStackScreenPr
             {loading ? (<ActivityIndicator size='large' />) : (
                 data?.categories.__typename === "CategoriesSuccess" ? (
                     <FlatList
-                        data={data.categories.categories}
+                        data={data.categories.categories.slice().sort((cat1, cat2) => cat1.name > cat2.name ? 1 : -1)}
                         renderItem={renderCategory}
                         ListFooterComponent={<View style={{ height: 20 }} />}
                     />

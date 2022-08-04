@@ -11,6 +11,8 @@ import { useRefresh } from "../hooks/useRefresh";
 import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
 import { formatDate } from "./ExpenseDetailsScreen";
+import Button from "../components/buttons/Button";
+import styles from "../constants/Styles";
 
 type ExpenseDisplayPropsOrDate = ExpenseDisplayProps | string;
 
@@ -92,7 +94,9 @@ function keyExtractor(item: ExpenseDisplayPropsOrDate) {
 }
 
 export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
-    const [getExpenses, { data, refetch }] = useLazyQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument);
+    const [getExpenses, { data, refetch }] = useLazyQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
+        fetchPolicy: 'no-cache',
+    });
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => getExpenses({ variables: { passwordHash } }),
         redirect: 'ifUnauthorized',
@@ -113,6 +117,12 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <View style={staticStyles.screen}>
+                <>
+                    {
+                        processedExpenses.length === 0 &&
+                        <Text style={staticStyles.noExpensesText}>You have no expenses. Press the '+' button to add one!</Text>
+                    }
+                </>
                 <FlatList
                     data={processedExpenses}
                     renderItem={renderItem}
@@ -135,6 +145,12 @@ const staticStyles = StyleSheet.create({
         flex: 1,
         flexBasis: 2,
         backgroundColor: '#c9c9c9',
+    },
+    noExpensesText: {
+        alignSelf: 'center',
+        fontSize: 15,
+        width: 300,
+        marginTop: 20,
     },
     addExpenseBtn: {
         position: 'absolute',
