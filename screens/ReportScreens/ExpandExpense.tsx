@@ -51,8 +51,9 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
         }
 
         return (
-            <Text style={{ fontWeight: 'bold' }}>{topMerchant}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{topMerchant}</Text>
         );
+
     }
 
     const PercentCalculation = () => {
@@ -75,7 +76,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
 
         return (
-            <Text style={{ fontWeight: 'bold' }}>{percent}% {moreOrLess ? "more" : "less"}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{percent}% {moreOrLess ? "more" : "less"}</Text>
         );
     }
 
@@ -94,24 +95,31 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 yearSelector={year} />
         </View>
 
-        <View style={{ justifyContent: "center", alignContent: 'center' }}>
-            <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                <RetrieveTopMerchant />
-                <Text style={{ paddingLeft: 5, flexWrap: 'wrap', width: 200 }}>is your top spending Merchant</Text>
+        <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+            <View style={{ justifyContent: "center" }}>
+                <Text style={{ justifyContent: 'center', textAlign: 'center' }}>
+                    <RetrieveTopMerchant />
+                    <Text style={{ paddingLeft: 5, width: 300, fontSize: 26 }}>is your top spending Merchant</Text>
+                </Text>
             </View>
         </View>
 
-        <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 20 }}>
-            <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                <Text>You spent </Text>
-                <PercentCalculation />
+        <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+            <View style={{ justifyContent: "center" }}>
+                <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                    <Text style={{ paddingLeft: 5, width: 300, fontSize: 26 }}>You spent </Text>
+                    <PercentCalculation />
+                    <Text style={{ paddingLeft: 5, width: 300, fontSize: 26 }}> this month than the previous month</Text>
+                </Text>
+            </View>
+        </View>
+
+        {/* <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 20 }}>
+            <View style={{ flexDirection: 'row', justifyContent: "center", marginRight: 50, flexWrap: 'wrap' }}>
+                
             </View>
 
-        </View>
-
-        <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-            <Text> this month than the previous month</Text>
-        </View>
+        </View> */}
     </View >
 }
 
