@@ -62,6 +62,18 @@ export default function UpdateMerchantScreen({ navigation, route }: RootStackScr
 
     useRefresh(() => refetch({ passwordHash }));
 
+    useRefresh(() => {
+        AsyncStorage.getItem('New Category')
+        .then((val) => {
+            if (val) {
+                setNewCategory(JSON.parse(val));
+            }
+        })
+        .catch((err) => {
+            console.log("Couldn't retrieve new category: " + err)
+        });
+    }), [categoryData];
+
     const DeleteButton = () => {
         return (
             <TrashButton onPress={() => setConfirmDelete(true)} />

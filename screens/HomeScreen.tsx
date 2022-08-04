@@ -148,7 +148,6 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                         <Text>Your total spendings this month so far</Text>
                     </View>
                 </View>
-                {/* <View style={{width: 1, height: '90%', backgroundColor: 'gray'}}/> */}
                 <View style={style.halfSummary}>
                     <View style={style.dateContainer}>
                         <Text style={style.dateText}>{year}</Text>
@@ -164,10 +163,10 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Text style={style.subtitle}>Upcoming Expenses:</Text>
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', padding: 15 }}>
-                            <View style={{ backgroundColor: 'rgb(22, 89, 193)', paddingHorizontal: 9, paddingVertical: 3, borderRadius: 90, marginRight: 15 }}>
-                            <Text style={{ fontSize: 16, color: 'white', textAlign: 'center', textAlignVertical: 'center'}}>
+                            <View style={{ backgroundColor: 'rgb(22, 89, 193)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 9, paddingVertical: 3, borderRadius: 90, marginRight: 15 }}>
+                                <Text style={{ fontSize: 16, color: 'white', textAlign: 'center', textAlignVertical: 'center'}}>
                                 {upcoming.length}
-                            </Text>
+                                </Text>
                             </View>
                             <AntDesign
                                 name={expanded ? 'up' : 'down'}
@@ -241,29 +240,32 @@ const style = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        padding: 10,
         textAlign: 'center'
     },
     halfSummary: {
-        width: '42%',
+        width: '45%',
+        maxWidth: 300,
         alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 10
     },
     summaryData: {
         fontWeight: 'bold',
-        fontSize: 32,
+        fontSize: 28,
+        textAlignVertical: 'center',
+        textAlign: 'center'
     },
     summaryDataContainer: {
-        borderBottomLeftRadius: 8,
-        borderBottomRightRadius: 8,
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
         borderWidth: 1,
         padding: 10,
         width: '100%'
     },
     dateContainer: {
         backgroundColor: '#A780D9',
-        borderTopLeftRadius: 8,
-        borderTopRightRadius: 8,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
         borderWidth: 1,
         paddingHorizontal: 10,
         paddingVertical: 5,

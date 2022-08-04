@@ -29,18 +29,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [disabledButton, setDisabledButton] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
 
-    const preFillCategory = () => {
-        AsyncStorage.getItem('New Category')
-            .then((val) => {
-                if (val) {
-                    setCategory(JSON.parse(val));
-                }
-            })
-            .catch((err) => {
-                console.log("Couldn't retrieve new category: " + err)
-            })
-    }
-
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: category?.id },
         onError: (error => {
@@ -61,9 +49,20 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [getMerchants, { data: manyMerchantsData }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
 
     useRefresh(() => {
-        preFillCategory();
         refetch({ passwordHash });
     });
+    
+    useRefresh(() => {
+        AsyncStorage.getItem('New Category')
+        .then((val) => {
+            if (val) {
+                setCategory(JSON.parse(val));
+            }
+        })
+        .catch((err) => {
+            console.log("Couldn't retrieve new category: " + err)
+        });
+    }), [categoryData];
 
     const merchantTaken = () => {
         if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName) {

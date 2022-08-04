@@ -75,7 +75,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                         }).filter((data) => data.amountSpent != 0)
 
                     }
-                    labels={({ datum }) => (datum.category.name.length < 5) ? datum.category.name : datum.category.name.substring(0, 4) + "..."}
+                    labels={({ datum }) => (datum.category.name.length < 15) ? datum.category.name : datum.category.name.substring(0, 13) + "..."}
                     y={"amountSpent"}
                     width={900}
                     height={300}
