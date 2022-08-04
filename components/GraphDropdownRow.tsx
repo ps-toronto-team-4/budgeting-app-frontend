@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { StyleSheet, View, Text, TextInput, FlatList, TouchableHighlight, Keyboard, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import Colors from "../constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
-import { Row } from "./Row";
+import { Row } from "./forms/Row";
 
 export function DropdownItem({ name, onSelect }: { name: string, onSelect: (name: string) => void }) {
     return ( // todo fix below

@@ -274,6 +274,7 @@ mutation createMerchant($passwordHash: String!, $name: String!, $description: St
     }
   }
 }
+
 query getMerchant ($passwordHash: String!, $id: Int!){
     merchant(passwordHash: $passwordHash, id: $id){
         __typename
@@ -297,7 +298,6 @@ query getMerchant ($passwordHash: String!, $id: Int!){
         }
     }
 }
-
 
 query getBudgets($passwordHash: String!){
  budgets(passwordHash:$passwordHash){
@@ -441,18 +441,16 @@ query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
     }
 }
 
-query getMonthTotals($passwordHash: String!){
-    monthsTotals(passwordHash: $passwordHash){
-        ... on MonthsTotals{
-            averageSpent
-            byMonth{
-                amountBudgeted
-                amountSpent
-                month
-                year
+
+mutation copyBudget($passwordHash: String!, $month:MonthType!, $year:Int!, $id:Int!){
+    copyBudget(passwordHash: $passwordHash,month: $month,year: $year, id:$id){
+        __typename
+        ... on BudgetSuccess{
+            budget{
+                id
             }
-        } 
-        ... on FailurePayload {
+        }
+        ... on FailurePayload{
             errorMessage
             exceptionName
         }
@@ -484,21 +482,6 @@ query getExpensesInMonth($month: MonthType!, $year: Int!, $passwordHash: String!
     }
 }
 
-mutation copyBudget($passwordHash: String!, $month:MonthType!, $year:Int!, $id:Int!){
-    copyBudget(passwordHash: $passwordHash, month: $month, year: $year, id: $id){
-        __typename
-        ... on BudgetSuccess{
-            budget{
-                id
-            }
-        }
-        ... on FailurePayload{
-            errorMessage
-            exceptionName
-        }
-    }
-}
-
 mutation deleteMerchant($passwordHash: String!, $id: Int!){
     deleteMerchant(passwordHash: $passwordHash, id: $id){
         __typename
@@ -514,6 +497,25 @@ mutation deleteMerchant($passwordHash: String!, $id: Int!){
 
 }
 
+query getMonthTotals($passwordHash: String!){
+    monthsTotals(passwordHash: $passwordHash){
+        ... on MonthsTotals{
+            byMonth{
+                amountBudgeted
+                amountSpent
+                amountSpentPlanned
+                amountSpentUnplanned
+                month
+                year
+            }
+            averageSpent
+        } 
+        ... on FailurePayload {
+            errorMessage
+            exceptionName
+        }
+    }
+}
 # Used by ExpenseEditForm. Do not change.
 query merchantsAndCategories($passwordHash: String!) {
     __typename
@@ -525,6 +527,10 @@ query merchantsAndCategories($passwordHash: String!) {
             merchants {
                 id
                 name
+                defaultCategory {
+                    id
+                    name
+                }
             }
         }
 

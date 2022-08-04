@@ -7,12 +7,13 @@ interface HeaderButtonProps {
     onPress?: () => void;
     marginLeft?: number;
     marginRight?: number;
+    alignItems?: 'center' | 'flex-end' | 'flex-start';
 }
 
-function ArrowButton({ direction, onPress, marginLeft, marginRight }: HeaderButtonProps) {
+function ArrowButton({ direction, onPress, marginLeft, marginRight, alignItems }: HeaderButtonProps) {
     return (
         <TouchableHighlight onPress={onPress} style={{
-            alignItems: 'center',
+            alignItems: alignItems ? alignItems : 'center',
             justifyContent: 'center',
             marginLeft: marginLeft,
             marginRight: marginRight,

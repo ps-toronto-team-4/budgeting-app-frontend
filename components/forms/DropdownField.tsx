@@ -51,21 +51,27 @@ export interface DropdownFieldProps {
      * Only does anything if onCreateNew is defined.
      */
     labelForCreateNew?: string;
+    /**
+     * This is not a controlled component!! The cached value is the value that reappers when the user exits the dropdown without making a
+     * new selection or whenever the dropdown is collapsed. This component may change the cachedValue internally even when the prop is
+     * given.
+     */
+    cachedValue?: string;
 }
 
 /**
  * This component has a lot of moving parts. Modification can result in unexpected behaviour and is
  * done at your own risk. If you need any changes to this component, ask Hark.
  */
-export function DropdownField({ label, placeholder, data, defaultValue, onChange, onFocus, required, check, onCreateNew, labelForCreateNew }: DropdownFieldProps) {
+export function DropdownField(props: DropdownFieldProps) {
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const scrollViewStartRef = useRef<View>(null);
-    const [value, setValue] = useState(defaultValue || '');
-    const [cachedValue, setCachedValue] = useState(defaultValue || '');
+    const [value, setValue] = useState(props.defaultValue || '');
+    const [cachedValue, setCachedValue] = useState(props.defaultValue || props.cachedValue || '');
     const filteredData = useMemo(() => {
-        return data.filter(datum => datum.value.toLowerCase().startsWith(value.toLowerCase()));
-    }, [data, value]);
+        return props.data.filter(datum => datum.value.toLowerCase().startsWith(value.toLowerCase()));
+    }, [props.data, value]);
     const backgroundColor = focused ? 'rgba(0,0,0,0.1)' : 'white';
     const containerStyle = useMemo(() => {
         return [styles.container, { backgroundColor, zIndex: -1, elevation: -1 }]
@@ -79,20 +85,32 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
         Keyboard.addListener('keyboardDidShow', (e) => {
             setKeyboardScreenY(e.endCoordinates.screenY);
         });
+        Keyboard.addListener('keyboardDidHide', (e) => {
+            setKeyboardScreenY(e.endCoordinates.screenY);
+        });
+        return () => {
+            Keyboard.removeAllListeners('keyboardDidShow');
+            Keyboard.removeAllListeners('keyboardDidHide');
+        };
     }, []);
 
     useEffect(() => {
-        if (required && check && !cachedValue) setErrorMessage('This field is required.');
-    }, [check]);
+        setCachedValue(props.cachedValue || '');
+        if (!focused) setValue(props.cachedValue || '');
+    }, [props.cachedValue]);
+
+    useEffect(() => {
+        if (props.required && props.check && !cachedValue) setErrorMessage('This field is required.');
+    }, [props.check]);
 
     useEffect(() => {
         if (focused) {
-            onFocus && onFocus();
+            props.onFocus && props.onFocus();
             inputRef.current?.focus();
             setValue('');
         } else {
             setValue(cachedValue);
-            if (required && !cachedValue) {
+            if (props.required && !cachedValue) {
                 setErrorMessage('This field is required.');
             } else {
                 setErrorMessage('');
@@ -105,20 +123,20 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
     });
 
     const handleItemPress = (itemId: string, itemValue: string) => {
-        onChange(itemId);
+        props.onChange(itemId);
         setCachedValue(itemValue);
         setFocused(false);
     };
 
-    const handlePress = useCallback(() => {
+    const handlePress = () => {
         setFocused(true);
         scrollViewStartRef.current?.measureInWindow((x, y) => {
             setScrollViewScreenY(y);
         });
-    }, []);
+    };
 
     function handlePressCreateNew() {
-        onCreateNew && onCreateNew(value);
+        props.onCreateNew && props.onCreateNew(value);
         setCachedValue(value);
         setFocused(false);
     }
@@ -128,20 +146,25 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
             <TouchableHighlight style={containerStyle} onPress={handlePress} underlayColor="rgba(0,0,0,0.1)">
                 <>
                     <View style={styles.content}>
-                        <Text style={styles.label}>{label}</Text>
+                        <Text style={styles.label}>{props.label}</Text>
                         <TextInput
                             style={styles.input}
                             placeholderTextColor="grey"
-                            placeholder={!focused ? placeholder : 'start typing to search'}
+                            placeholder={!focused ? props.placeholder : 'start typing to search'}
                             editable={focused}
                             ref={inputRef}
                             onBlur={() => setFocused(false)}
                             value={value}
                             onChangeText={setValue} />
-                        <AntDesign
-                            name={focused ? 'up' : 'down'}
-                            size={20}
-                            color="black" />
+                        <TouchableHighlight
+                            style={styles.arrowIconContainer}
+                            underlayColor="rgba(0,0,0,0.1)"
+                            onPress={() => { setFocused(oldFocused => !oldFocused) }}>
+                            <AntDesign
+                                name={focused ? 'up' : 'down'}
+                                size={20}
+                                color="black" />
+                        </TouchableHighlight>
                     </View>
                     {
                         errorMessage.length > 0 && !focused &&
@@ -162,9 +185,9 @@ export function DropdownField({ label, placeholder, data, defaultValue, onChange
                             )
                         }
                         {
-                            onCreateNew &&
+                            props.onCreateNew &&
                             <DropdownItem
-                                item={{ id: 'new', value: value ? `Add "${value}"` : `Create new ${labelForCreateNew || label.toLowerCase()}`, color: 'plus' }}
+                                item={{ id: 'new', value: value ? `Add "${value}"` : `Create new ${props.labelForCreateNew || props.label.toLowerCase()}`, color: 'plus' }}
                                 onPress={handlePressCreateNew} />
                         }
                     </ScrollView>
@@ -203,6 +226,13 @@ const styles = StyleSheet.create({
         fontSize: Forms.fontSize,
         fontWeight: '600',
         paddingVertical: 3,
+    },
+    arrowIconContainer: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     scrollView: {
         position: 'absolute',
