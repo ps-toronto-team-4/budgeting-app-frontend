@@ -67,13 +67,11 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
             let totalSpent = monthlyBreakdownData.monthBreakdown.totalSpent;
             let categoryIndex = categoryData.findIndex(e => e.category?.name === categoryName);
             let currentCategorySpent = categoryData[categoryIndex].amountSpent;
-            let delta = (currentCategorySpent) - (totalSpent); //193.68
-            let avg = (currentCategorySpent + totalSpent) / (2); //563.18
-            let division = delta / avg;
+            let delta = (currentCategorySpent) / (totalSpent);
 
             if (delta > 0) {
                 setExisting(true);
-                setPercent(Math.abs((100 * (division))).toFixed(1) + "%");
+                setPercent(Math.abs((100 * (delta))).toFixed(1) + "%");
             } else {
                 setExisting(false);
                 setPercent("");
