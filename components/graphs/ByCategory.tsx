@@ -39,7 +39,6 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
 
     useEffect(() => {
         if (month !== selectedMonth) {
-            console.log("Clearing mutations.")
             clearMutations();
         }
     }, [categoryData])
@@ -80,7 +79,6 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 eventKey: "all",
                 mutation: (props: any) => {
                     if (id === props.datum.category.id) {
-                        console.log(id + " AND " + props.datum.category.id);
                         return props = { radius: 120, innerRadius: 90, labelRadius: 120 };
                     } else {
                         return props = { radius: 100, innerRadius: 70 }
@@ -125,12 +123,10 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
     }
 
     function handleCategorySelect(categoryName: string | undefined) {
-        console.log("I got into handleCategorySelect after clicking on category");
         if (categoriesData?.categories.__typename == "CategoriesSuccess") {
             const foundCategory = categoriesData.categories.categories.find(x => x.name == categoryName);
 
             if (foundCategory !== undefined) {
-                console.log(foundCategory?.name);
                 handleCategory(foundCategory.id);
                 setSelectedMonth(month);
                 setCategory(foundCategory);
@@ -181,23 +177,6 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                         [{
                             target: "data",
                             eventHandlers: {
-                                onPressIn: () => {
-                                    return (
-                                        [{
-                                            target: "labels",
-                                            mutation: (props) => {
-                                                return props.text.charAt(0) === "$" ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
-                                            }
-                                        },
-                                        {
-                                            target: "data",
-                                            mutation: (props) => {
-                                                return props.radius === 100 ? { radius: 120, innerRadius: 90 } : { radius: 100, innerRadius: 70 };
-                                            }
-                                        }
-                                        ]
-                                    );
-                                },
                                 onClick: () => {
                                     return (
                                         [{

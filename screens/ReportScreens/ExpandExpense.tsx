@@ -10,15 +10,6 @@ import MonthlyExpenseGraph from '../../components/graphs/MonthlyExpenses';
 import { TopBar } from "../../components/budget/TopBar";
 
 
-interface MonthlyDatum {
-    month: string,
-    year: number,
-    amountSpent: number,
-    id?: number,
-}
-
-
-
 
 export default function ExpandExpense({ navigation, route }: RootStackScreenProps<'ExpandExpenses'>) {
     const passwordHash = useAuth({
@@ -46,6 +37,11 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
         monthTotalsRefetch();
     })
 
+    useEffect(() => {
+        RetrieveTopMerchant();
+        PercentCalculation();
+    }, [])
+
 
     const RetrieveTopMerchant = () => {
         if (!monthBreakdownLoading && monthBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
@@ -64,14 +60,17 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
             let previousMonthIndex = monthTotalsData.monthsTotals.byMonth.findIndex(e => e.month === month) - 1;
             let currentMonthSpent = monthTotalsData.monthsTotals.byMonth[previousMonthIndex + 1].amountSpent;
             let previousMonthSpent = monthTotalsData.monthsTotals.byMonth[previousMonthIndex].amountSpent;
-            let delta = (currentMonthSpent - previousMonthSpent) / (previousMonthSpent);
+            let delta = (currentMonthSpent) - (previousMonthSpent); //193.68
+            let avg = (currentMonthSpent + previousMonthSpent) / (2); //563.18
+            let division = delta / avg;
 
             if (delta > 0) {
-                setMoreOrLess(true)
+                setMoreOrLess(true);
+                setPercent(Math.abs((100 * (division))).toFixed(1));
+            } else {
+                setPercent(Math.abs((100 * (division))).toFixed(1));
             }
 
-            setPercent(Math.abs((100 * (delta))).toFixed(1))
-            console.log();
         }
 
 
@@ -100,9 +99,6 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 <RetrieveTopMerchant />
                 <Text style={{ paddingLeft: 5, flexWrap: 'wrap', width: 200 }}>is your top spending Merchant</Text>
             </View>
-            {/* <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                <Text style={{ fontWeight: 'bold', paddingLeft: 5 }}>Merchant</Text>
-            </View> */}
         </View>
 
         <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 20 }}>
