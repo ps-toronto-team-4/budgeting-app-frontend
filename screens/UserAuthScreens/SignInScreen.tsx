@@ -10,6 +10,7 @@ import { LoginDocument, LoginQuery, LoginQueryVariables } from "../../components
 import Styles from "../../constants/Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../../hooks/useAuth";
+import { Form } from "../../components/forms/Form";
 
 export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
     const [username, setUsername] = useState('');
@@ -51,7 +52,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
     }
 
     return (
-        <View style={styles.screen}>
+        <Form>
             <Text style={styles.title}>Sign into your account</Text>
             {!loading ? (
                 data?.signIn.__typename === 'SignInSuccess' ? (
@@ -85,7 +86,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
             <View style={styles.buttonContainer}>
                 <Button text="Sign In" onPress={() => handleLogin()} accessibilityLabel={"Sign In Button"} />
             </View>
-        </View>
+        </Form>
     );
 }
 
