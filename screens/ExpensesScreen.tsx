@@ -129,7 +129,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
                     keyExtractor={keyExtractor}
                     maxToRenderPerBatch={30} />
                 <View style={staticStyles.addExpenseBtn}>
-                    <AddButton size={70} onPress={handleAddExpense} />
+                    <AddButton size={80} onPress={handleAddExpense} />
                 </View>
             </View>
         );
