@@ -45,11 +45,11 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
     function spendingInsight(changeFactor: number | undefined, name: string) {
         if (changeFactor === undefined || changeFactor === 1) {
-            return <Text style={staticStyles.text}>Your {name} is unchanged</Text>
+            return <Text style={staticStyles.text}>Your {name} is unchanged from last month</Text>
         } else if (changeFactor > 1) {
-            return <Text style={staticStyles.text}>Your {name} has increased by {((changeFactor - 1) * 100).toFixed()}%</Text>
+            return <Text style={staticStyles.text}>Your {name} has increased by {((changeFactor - 1) * 100).toFixed()}% from last month</Text>
         } else {
-            return <Text style={staticStyles.text}>Your {name} has decreased by {((changeFactor) * 100).toFixed()}%</Text>
+            return <Text style={staticStyles.text}>Your {name} has decreased by {((changeFactor) * 100).toFixed()}% from last month</Text>
         }
     }
 
@@ -57,9 +57,9 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
         if (changeFactor === undefined || changeFactor === 1) {
             return <Text style={staticStyles.text}>Your expense match you budget</Text>
         } else if (changeFactor > 1) {
-            return <Text style={staticStyles.text}>Your expense are {((changeFactor - 1) * 100).toFixed()}% in excess of you budget</Text>
+            return <Text style={staticStyles.text}>Your expense are {((changeFactor - 1) * 100).toFixed()}% in excess of your budget</Text>
         } else {
-            return <Text style={staticStyles.text}>Your expense are {((changeFactor) * 100).toFixed()}% under budget</Text>
+            return <Text style={staticStyles.text}>Your expense are {((changeFactor) * 100).toFixed()}% under your budget</Text>
         }
     }
 

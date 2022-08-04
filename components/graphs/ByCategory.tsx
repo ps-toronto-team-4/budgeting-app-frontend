@@ -1,12 +1,13 @@
 import { useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, StyleSheet } from "react-native";
 import { VictoryLegend, VictoryPie } from "victory-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { useAuth } from "../../hooks/useAuth";
 import { RootStackScreenProps } from "../../types";
 import { GetCategoriesDocument, GetCategoriesQuery, MonthBreakdownCategory } from "../generated";
 import { DropdownRow } from "../forms/DropdownRow";
+import { DropdownField } from "../forms/DropdownField";
 
 type byCategoryProps = {
     categoryData: MonthBreakdownCategory[];
@@ -14,21 +15,11 @@ type byCategoryProps = {
     year: number;
 }
 
-interface ExternalMutation {
-    target: string,
-    eventKey: string,
-    mutation: Function,
-    callback: Function
-}
-
 export default function ByCategory({ categoryData, month, year }: byCategoryProps, { navigation }: RootStackScreenProps<'CreateMerchant'>) {
 
     const passwordHash = useAuth();
-    const [category, setCategory] = useState<{ id: number, name: string } | undefined>();
-    const [categoryOpen, setCategoryOpen] = useState(false);
-    const [mutations, setMutations] = useState<Array<ExternalMutation>>([])
+    const [category, setCategory] = useState<{ id: number, name: string }>();
     const [selectedMonth, setSelectedMonth] = useState("");
-
 
     const { data: categoriesData, refetch } = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
         variables: { passwordHash: passwordHash },
@@ -37,113 +28,23 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
         }),
     });
 
-    useEffect(() => {
-        if (month !== selectedMonth) {
-            console.log("Clearing mutations.")
-            clearMutations();
-        }
-    }, [categoryData])
-
-    const clearMutations = () => {
-        setMutations([
-            {
-                target: "data",
-                eventKey: "all",
-                mutation: (props: any) => {
-                    return props = { radius: 100, innerRadius: 70 }
-                },
-                callback: () => {
-                    if (mutations.length === 0) {
-                        setMutations([])
-                    }
-                }
-            },
-            {
-                eventKey: "all",
-                target: "labels",
-                mutation: (props: any) => {
-                    return props = { text: props.datum.category.name.substring(0, 3) + "..." };
-                },
-                callback: () => {
-                    if (mutations.length === 0) {
-                        setMutations([])
-                    }
-                }
-            }
-        ])
-    }
-
-    const handleCategory = (id: number) => {
-        setMutations([
-            {
-                target: "data",
-                eventKey: "all",
-                mutation: (props: any) => {
-                    if (id === props.datum.category.id) {
-                        console.log(id + " AND " + props.datum.category.id);
-                        return props = { radius: 120, innerRadius: 90, labelRadius: 120 };
-                    } else {
-                        return props = { radius: 100, innerRadius: 70 }
-                    }
-
-                },
-                callback: () => {
-                    if (mutations.length === 0) {
-                        setMutations([])
-                    }
-                }
-            },
-            {
-                eventKey: "all",
-                target: "labels",
-                mutation: (props: any) => {
-                    if (id === props.datum.category.id) {
-                        return props = { text: "$" + props.datum.amountSpent.toFixed(2) };
-                    } else {
-                        return props = { text: props.datum.category.name.substring(0, 3) + "..." };
-                    }
-
-
-                },
-                callback: () => {
-                    if (mutations.length === 0) {
-                        setMutations([])
-                    }
-                }
-            }
-        ])
-    }
-
-    const onPressClickHandler = () => {
-        return [{
-            target: "data",
-            mutation: (props: any) => {
-                handleCategory(props.datum.category.id);
-                return null;
-            }
-        }]
-    }
-
-    function handleCategorySelect(categoryName: string | undefined) {
-        console.log("I got into handleCategorySelect after clicking on category");
+    function handleCategorySelect(categoryId: string | undefined) {
         if (categoriesData?.categories.__typename == "CategoriesSuccess") {
-            const foundCategory = categoriesData.categories.categories.find(x => x.name == categoryName);
+            const foundCategory = categoriesData.categories.categories.find(x => x.id.toString() == categoryId);
 
             if (foundCategory !== undefined) {
-                console.log(foundCategory?.name);
-                handleCategory(foundCategory.id);
+                console.log('found the category');
                 setSelectedMonth(month);
                 setCategory(foundCategory);
+            } else {
+                console.log('could not find the category!');
             }
         }
     }
 
-
-
     return (
-
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <View>
+        <>
+            <View style={styles.graphContainer}>
                 <View style={{ position: "absolute", height: '100%', width: '100%', justifyContent: "center", alignItems: "center" }}>
                     <Text>{year}</Text>
                     <Text>{month}</Text>
@@ -151,7 +52,8 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 <VictoryPie
                     padAngle={2}
                     labelRadius={135}
-                    innerRadius={70}
+                    radius={({ datum }) => datum.category.name === category?.name ? 120 : 100}
+                    innerRadius={({ datum }) => datum.category.name === category?.name ? 90 : 70}
                     data={
                         categoryData.map((data) => {
                             if (data.category === null) {
@@ -176,42 +78,31 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                         data:
                             { fill: (d) => "#" + d.datum.category.colourHex }
                     }}
-                    externalEventMutations={mutations as EventCallbackInterface<string | string[], StringOrNumberOrList>[]}
                     events={
                         [{
                             target: "data",
                             eventHandlers: {
-                                onPressIn: () => {
+                                onPress: () => {
                                     return (
-                                        [{
-                                            target: "labels",
-                                            mutation: (props) => {
-                                                return props.text.charAt(0) === "$" ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
+                                        [
+                                            {
+                                                target: "data",
+                                                mutation: (props) => {
+                                                    setCategory({ id: props.datum.category.id, name: props.datum.category.name });
+                                                }
                                             }
-                                        },
-                                        {
-                                            target: "data",
-                                            mutation: (props) => {
-                                                return props.radius === 100 ? { radius: 120, innerRadius: 90 } : { radius: 100, innerRadius: 70 };
-                                            }
-                                        }
                                         ]
                                     );
                                 },
                                 onClick: () => {
                                     return (
-                                        [{
-                                            target: "labels",
-                                            mutation: (props) => {
-                                                return props.text === "$" + props.datum.amountSpent ? null : { text: "$" + props.datum.amountSpent.toFixed(2) };
+                                        [
+                                            {
+                                                target: "data",
+                                                mutation: (props) => {
+                                                    setCategory({ id: props.datum.category.id, name: props.datum.category.name });
+                                                }
                                             }
-                                        },
-                                        {
-                                            target: "data",
-                                            mutation: (props) => {
-                                                return props.radius === 100 ? { radius: 120, innerRadius: 90, labelRadius: 120 } : { radius: 100 };
-                                            }
-                                        }
                                         ]
                                     );
                                 }
@@ -220,14 +111,13 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                         ]}
                 />
 
-            </View>
+            </View >
             {
                 categoryData.length !== 0 && <VictoryLegend
                     centerTitle={true}
                     orientation="horizontal"
                     colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
                     data={
-
                         categoryData.filter((data) => data.amountSpent != 0).map((data) => {
                             if (data.category === null) {
                                 return {
@@ -245,33 +135,28 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                                 }
                             }
                         })
-
-
                     }
                     itemsPerRow={3}
                     gutter={20}
                     height={100}
                 />
             }
-            <DropdownRow
+
+            <DropdownField
                 label="Category"
+                placeholder="choose a category"
                 data={
                     categoriesData?.categories.__typename == "CategoriesSuccess" ?
-                        categoriesData.categories.categories.map(x => { return { id: x.id, name: x.name } }) : []
+                        categoriesData.categories.categories.map(x => { return { id: x.id.toString(), value: x.name } }) : []
                 }
-                onSelect={(month === selectedMonth) ? handleCategorySelect : (name: string) => { }}
-                expanded={categoryOpen}
-                onExpand={() => setCategoryOpen(true)}
-                onCollapse={() => setCategoryOpen(false)}
-                topBorder
-                bottomBorder={!categoryOpen}
-                createLabel="Category"
-                defaultValue={category?.name}
-            />
-
-        </View>
-
-
+                onChange={handleCategorySelect}
+                cachedValue={category?.name} />
+        </>
     );
-
 }
+
+const styles = StyleSheet.create({
+    graphContainer: {
+        alignItems: 'center',
+    }
+});
