@@ -95,10 +95,8 @@ export function DropdownField(props: DropdownFieldProps) {
     }, []);
 
     useEffect(() => {
-        if (props.cachedValue !== undefined) {
-            setCachedValue(props.cachedValue);
-            if (!focused) setValue(props.cachedValue);
-        }
+        setCachedValue(props.cachedValue || '');
+        if (!focused) setValue(props.cachedValue || '');
     }, [props.cachedValue]);
 
     useEffect(() => {

@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { View, Text, Alert, StyleSheet } from "react-native";
 import { VictoryLegend, VictoryPie } from "victory-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
@@ -16,7 +16,6 @@ type byCategoryProps = {
 }
 
 export default function ByCategory({ categoryData, month, year }: byCategoryProps, { navigation }: RootStackScreenProps<'CreateMerchant'>) {
-
     const passwordHash = useAuth();
     const [category, setCategory] = useState<{ id: number, name: string }>();
     const [selectedMonth, setSelectedMonth] = useState("");
@@ -28,16 +27,21 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
         }),
     });
 
+    useEffect(() => {
+        setCategory(undefined);
+    }, [month]);
+
+    const filteredCategoryData = useMemo(() => {
+        return categoryData.slice().filter(x => !!x.category && x.amountSpent > 0);
+    }, [categoryData]);
+
     function handleCategorySelect(categoryId: string | undefined) {
         if (categoriesData?.categories.__typename == "CategoriesSuccess") {
             const foundCategory = categoriesData.categories.categories.find(x => x.id.toString() == categoryId);
 
             if (foundCategory !== undefined) {
-                console.log('found the category');
                 setSelectedMonth(month);
                 setCategory(foundCategory);
-            } else {
-                console.log('could not find the category!');
             }
         }
     }
@@ -146,8 +150,9 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                 label="Category"
                 placeholder="choose a category"
                 data={
-                    categoriesData?.categories.__typename == "CategoriesSuccess" ?
-                        categoriesData.categories.categories.map(x => { return { id: x.id.toString(), value: x.name } }) : []
+                    filteredCategoryData.map(x => {
+                        return { id: x.category?.id.toString() || '-1', value: x.category?.name || '' }
+                    })
                 }
                 onChange={handleCategorySelect}
                 cachedValue={category?.name} />
