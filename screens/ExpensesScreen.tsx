@@ -109,7 +109,13 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         return [];
     }, [data]);
 
-    const [filters, setFilters] = useState({
+
+    interface filterSet {
+        date: any,
+        category: string[],
+        merchant: string[],
+    }
+    const [filters, setFilters] = useState<filterSet>({
         date: [],
         category: [],
         merchant: [],

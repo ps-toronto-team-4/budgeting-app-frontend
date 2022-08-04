@@ -1,14 +1,15 @@
 import { useLazyQuery } from "@apollo/client";
+import { isFor } from "@babel/types";
 import React, { useState } from "react";
 import { useMemo } from "react";
 import { useEffect } from "react";
-import { Alert, Modal, StyleSheet, Text, Pressable, View, ImageBackground, TouchableOpacity } from "react-native";
+import { Alert, Modal, StyleSheet, Text, Pressable, View, ImageBackground, TouchableOpacity, ScrollView } from "react-native";
 import { useAuth } from "../hooks/useAuth";
 import { useRefresh } from "../hooks/useRefresh";
 import Button from "./buttons/Button"
 import { GetCategoriesDocument, GetCategoriesQuery, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "./generated";
 
-const ApplyFilter = () => {
+const ApplyFilter = (inputdata) => {
 
     const filters = useState({
         date: [],
@@ -63,7 +64,6 @@ interface filterSet {
 }
 
 interface ExpenseFilterParams {
-    passwordHash: string,
     filters: filterSet,
     setFilters: (item: filterSet) => void,
 }
@@ -106,21 +106,52 @@ const ExpenseFilter = ({ filters, setFilters }: ExpenseFilterParams) => {
         let newFilter = JSON.parse(JSON.stringify(filters));
         newFilter[group] = copyArray
         setFilters(newFilter)
+    }
 
+    function handleYearPress(year: string) {
+        console.log("CLVIN")
+        const copyDate = JSON.parse(JSON.stringify(filters.date))
+        const previousSelected = year in filters.date
+        if (previousSelected) {
+            delete copyDate[year]
+        } else {
+            copyDate[year] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        }
+        let newFilter = JSON.parse(JSON.stringify(filters));
+        newFilter.date = copyDate
+        setFilters(newFilter)
+    }
+
+    function handleMonthPress(year: string, month: string) {
+        const copyDate = JSON.parse(JSON.stringify(filters.date))
+        const index = filters.date[year].findIndex((mon: string) => mon == month)
+        if (index != -1) {
+            copyDate[year].splice(index, 1);
+            if (copyDate[year].length == 0) {
+                delete copyDate[year]
+            }
+        } else {
+            copyDate[year].push(month)
+        }
+        let newFilter = JSON.parse(JSON.stringify(filters));
+        newFilter.date = copyDate
+        setFilters(newFilter)
     }
 
     const orderDates = useMemo(() => {
         let yearDict: any = {}
         if (dateData?.monthsTotals.__typename == 'MonthsTotals') {
             dateData.monthsTotals.byMonth.forEach(ele => {
-                if (ele.year in yearDict) {
+                if (!(ele.year in yearDict)) {
                     yearDict[ele.year] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
                 }
             })
         }
-
+        return yearDict
     }, [dateData])
 
+
+    console.log('ca', orderDates)
 
     return (
         <View style={styles.centeredView}>
@@ -135,60 +166,63 @@ const ExpenseFilter = ({ filters, setFilters }: ExpenseFilterParams) => {
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <View style={{ flexDirection: 'row' }}>
+                        <View style={{ width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
 
                             <Text style={styles.modalText}>Filters</Text>
                             <View>
 
-                                <Pressable
+                                {/* <Pressable
                                     style={[styles.button, styles.buttonClose]}
                                     onPress={() => setModalVisible(!modalVisible)}
                                 >
                                     <Text style={styles.textStyle}>Close</Text>
-                                </Pressable>
+                                </Pressable> */}
                             </View>
                         </View>
 
-                        <View>
+                        <ScrollView style={{ width: "100%" }}>
 
-                            <Text style={styles.typeDivitor}>Date</Text>
+                            <View style={{ width: "100%" }}>
 
-                            {/* {orderDates.map( (ele,index)=>{
-                                return <RadioButton key={index} text={ele}
-                            })} */}
+                                <Text style={styles.typeDivitor}>Date</Text>
 
-                            {/* {dateData?.monthsTotals.__typename == 'MonthsTotals' &&
-                                dateData.monthsTotals.byMonth.map((ele, index) => {
-                                    const selected = filters.date.findIndex(fEle => fEle === ele.name) !== -1
-                                    return <RadioButton key={index} selected={selected} text={ele.name} onPress={() => handleSelect(ele.name, 'merchant')}></RadioButton>
-                                })} */}
-
-                            <Text style={styles.typeDivitor}>Merchant</Text>
-                            {merchantData?.merchants.__typename == 'MerchantsSuccess' &&
-                                merchantData.merchants.merchants.map((ele, index) => {
-                                    const selected = filters.merchant.findIndex(fEle => fEle === ele.name) !== -1
-                                    return <RadioButton key={index} selected={selected} text={ele.name} onPress={() => handleSelect(ele.name, 'merchant')}></RadioButton>
+                                {Object.keys(orderDates).map((ele, index) => {
+                                    const selected = ele in filters.date
+                                    return <View key={index}>
+                                        <RadioButton selected={selected} text={ele} onPress={() => handleYearPress(ele)} />
+                                        {selected &&
+                                            <View style={styles.monthContainer}>
+                                                {orderDates[ele].map((month: string, mIndex: number) => {
+                                                    const selectedMonth = filters.date[ele].find((searchMon: string) => searchMon == month)
+                                                    return <RadioButton key={mIndex} selected={selectedMonth} text={month} onPress={() => handleMonthPress(ele, month)} />
+                                                })}
+                                            </View>}
+                                    </View>
                                 })}
 
-                            <Text style={styles.typeDivitor}>Category</Text>
-                            {categroyData?.categories.__typename == 'CategoriesSuccess' &&
-                                categroyData.categories.categories.map((ele, index) => {
-                                    const selected = filters.category.findIndex(fEle => fEle === ele.name) !== -1
-                                    return <RadioButton key={index} selected={selected} text={ele.name} onPress={() => handleSelect(ele.name, 'category')}></RadioButton>
-                                })}
+                                <Text style={styles.typeDivitor}>Merchant</Text>
+                                {merchantData?.merchants.__typename == 'MerchantsSuccess' &&
+                                    merchantData.merchants.merchants.map((ele, index) => {
+                                        const selected = filters.merchant.findIndex(fEle => fEle === ele.name) !== -1
+                                        return <RadioButton key={index} selected={selected} text={ele.name} onPress={() => handleSelect(ele.name, 'merchant')}></RadioButton>
+                                    })}
 
-                        </View>
+                                <Text style={styles.typeDivitor}>Category</Text>
+                                {categroyData?.categories.__typename == 'CategoriesSuccess' &&
+                                    categroyData.categories.categories.map((ele, index) => {
+                                        const selected = filters.category.findIndex(fEle => fEle === ele.name) !== -1
+                                        return <RadioButton key={index} selected={selected} text={ele.name} onPress={() => handleSelect(ele.name, 'category')}></RadioButton>
+                                    })}
 
+                            </View>
+
+                        </ScrollView>
+
+                        <Button text="Save Filter" onPress={() => setModalVisible(!modalVisible)} />
                     </View>
                 </View>
             </Modal>
             <Button text="filters" onPress={() => setModalVisible(true)}></Button>
-            <Pressable
-                style={[styles.button, styles.buttonOpen]}
-                onPress={() => setModalVisible(true)}
-            >
-                <Text style={styles.textStyle}>Show Modal</Text>
-            </Pressable>
         </View>
     );
 };
@@ -201,7 +235,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 22
+        marginTop: 22,
     },
     modalView: {
         margin: 20,
@@ -216,7 +250,9 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
-        elevation: 5
+        elevation: 5,
+        width: "90%",
+        height: "90%",
     },
     button: {
         borderRadius: 20,
@@ -240,7 +276,11 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     typeDivitor: {
+        marginTop: 20,
         fontSize: 26,
+    },
+    monthContainer: {
+        marginLeft: 50
     }
 });
 
