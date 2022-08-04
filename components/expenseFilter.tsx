@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useMemo } from "react";
 import { useEffect } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View, ImageBackground, TouchableOpacity, ScrollView } from "react-native";
+import { GET_SHORT_MONTH } from "../constants/Months";
 import { useAuth } from "../hooks/useAuth";
 import { useRefresh } from "../hooks/useRefresh";
 import Button from "./buttons/Button"
@@ -48,8 +49,23 @@ const ApplyFilter = (expenses: Expenses, filters: filterSet) => {
 
 
     //date filter
+    const dateFiltered = categoryFiltered.filter((ele) => {
+        if (Object.keys(filters.date).length == 0) {
+            return true
+        }
+        const year = ele.date.split('-')[0]
+        const month = GET_SHORT_MONTH()[parseInt(ele.date.split('-')[1]) - 1]
+        if (!(year in filters.date)) {
+            return false
+        }
+        const selectedYear = filters.date[year]
 
-    return categoryFiltered
+        const foundIndex = selectedYear.findIndex((mon: string) => mon == month)
+        return foundIndex != -1
+    })
+
+
+    return dateFiltered
 
 }
 
@@ -91,11 +107,16 @@ interface filterSet {
 }
 
 interface ExpenseFilterParams {
-    filters: filterSet,
-    setFilters: (item: filterSet) => void,
+    onApplyFilter: (item: filterSet) => void,
 }
 
-const ExpenseFilter = ({ filters, setFilters }: ExpenseFilterParams) => {
+const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
+
+    const [filters, setFilters] = useState<filterSet>({
+        date: {},
+        category: [],
+        merchant: [],
+    })
     const [modalVisible, setModalVisible] = useState(false);
 
     const passwordHash = useAuth({
@@ -136,13 +157,13 @@ const ExpenseFilter = ({ filters, setFilters }: ExpenseFilterParams) => {
     }
 
     function handleYearPress(year: string) {
-        console.log("CLVIN")
+        const stringYear = year.toString()
         const copyDate = JSON.parse(JSON.stringify(filters.date))
         const previousSelected = year in filters.date
         if (previousSelected) {
             delete copyDate[year]
         } else {
-            copyDate[year] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            copyDate[year] = GET_SHORT_MONTH()
         }
         let newFilter = JSON.parse(JSON.stringify(filters));
         newFilter.date = copyDate
@@ -170,7 +191,7 @@ const ExpenseFilter = ({ filters, setFilters }: ExpenseFilterParams) => {
         if (dateData?.monthsTotals.__typename == 'MonthsTotals') {
             dateData.monthsTotals.byMonth.forEach(ele => {
                 if (!(ele.year in yearDict)) {
-                    yearDict[ele.year] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                    yearDict[ele.year] = GET_SHORT_MONTH()
                 }
             })
         }
@@ -178,7 +199,6 @@ const ExpenseFilter = ({ filters, setFilters }: ExpenseFilterParams) => {
     }, [dateData])
 
 
-    console.log('ca', orderDates)
 
     return (
         <View style={styles.centeredView}>
@@ -216,12 +236,12 @@ const ExpenseFilter = ({ filters, setFilters }: ExpenseFilterParams) => {
                                 {Object.keys(orderDates).map((ele, index) => {
                                     const selected = ele in filters.date
                                     return <View key={index}>
-                                        <RadioButton selected={selected} text={ele} onPress={() => handleYearPress(ele)} />
+                                        <RadioButton selected={selected} text={ele} onPress={() => handleYearPress(ele.toString())} />
                                         {selected &&
                                             <View style={styles.monthContainer}>
                                                 {orderDates[ele].map((month: string, mIndex: number) => {
                                                     const selectedMonth = filters.date[ele].find((searchMon: string) => searchMon == month)
-                                                    return <RadioButton key={mIndex} selected={selectedMonth} text={month} onPress={() => handleMonthPress(ele, month)} />
+                                                    return <RadioButton key={mIndex} selected={selectedMonth} text={month} onPress={() => handleMonthPress(ele.toString(), month)} />
                                                 })}
                                             </View>}
                                     </View>
@@ -245,7 +265,10 @@ const ExpenseFilter = ({ filters, setFilters }: ExpenseFilterParams) => {
 
                         </ScrollView>
 
-                        <Button text="Save Filter" onPress={() => setModalVisible(!modalVisible)} />
+                        <Button text="Save Filter" onPress={() => {
+                            setModalVisible(!modalVisible)
+                            onApplyFilter(filters)
+                        }} />
                     </View>
                 </View>
             </Modal>

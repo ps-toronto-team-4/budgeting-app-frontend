@@ -27,3 +27,7 @@ export const MONTH_TO_NUM_STRING = (month: string) => {
     }
     return monthString
 }
+
+export const GET_SHORT_MONTH = () => {
+    return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+}

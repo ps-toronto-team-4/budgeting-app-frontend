@@ -104,7 +104,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     });
     useRefresh(() => refetch({ passwordHash }));
     const [filters, setFilters] = useState<filterSet>({
-        date: [],
+        date: {},
         category: [],
         merchant: [],
     })
@@ -134,7 +134,10 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <View style={staticStyles.screen}>
-                <ExpenseFilter filters={filters} setFilters={setFilters}></ExpenseFilter>
+                <View>
+
+                    <ExpenseFilter onApplyFilter={setFilters}></ExpenseFilter>
+                </View>
                 <>
                     {
                         processedExpenses.length === 0 &&
