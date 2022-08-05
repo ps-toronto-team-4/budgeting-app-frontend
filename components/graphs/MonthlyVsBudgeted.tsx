@@ -184,11 +184,22 @@ interface MonthlyVsBudgetedParameters {
 }
 
 const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yearSelector }: MonthlyVsBudgetedParameters) => {
+
+    function selectByMonthYear() {
+        const indexOfFoundSelectedTime = data.findIndex(ele => {
+            return ele.month == monthSelector && ele.year == yearSelector
+        })
+        if (indexOfFoundSelectedTime != -1) {
+            return (Math.max(0, Math.min(data.length - displayAmountNumber,
+                indexOfFoundSelectedTime - Math.floor(displayAmountNumber / 2))))
+        }
+        return undefined
+    }
     const displayAmountNumber = displayAmount ? displayAmount : 5
     const jumpAmountNumber = jumpAmount ? jumpAmount : 3
     const inputData = data
 
-    const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
+    const [sliceEnd, setSliceEnd] = useState(selectByMonthYear() || inputData.length - displayAmountNumber)
 
     useEffect(() => {
         setSliceEnd(inputData.length - displayAmountNumber)
@@ -196,13 +207,7 @@ const MonthlyVsBudgeted = ({ displayAmount, jumpAmount, data, monthSelector, yea
 
     useEffect(
         () => {
-            const indexOfFoundSelectedTime = data.findIndex(ele => {
-                return ele.month == monthSelector && ele.year == yearSelector
-            })
-            if (indexOfFoundSelectedTime != -1) {
-                setSliceEnd(Math.max(0, Math.min(data.length - displayAmountNumber,
-                    indexOfFoundSelectedTime - Math.floor(displayAmountNumber / 2))))
-            }
+            setSliceEnd(selectByMonthYear() || sliceEnd)
         }, [monthSelector, yearSelector])
 
     const showArrows = inputData.length > displayAmountNumber
