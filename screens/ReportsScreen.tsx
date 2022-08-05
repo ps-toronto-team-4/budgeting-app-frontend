@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import { useAuth } from "../hooks/useAuth";
@@ -12,7 +12,8 @@ import MonthlyVsBudgeted from '../components/graphs/MonthlyVsBudgeted';
 import { useRefresh } from '../hooks/useRefresh';
 import Button from '../components/buttons/Button';
 import MonthlyVsBudgetedCategory from '../components/graphs/monthlyVsBudgetedCategory';
-import { useEffect } from 'react';
+import { HeaderButton } from './Budget/BudgetScreen';
+
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
     const passwordHash = useAuth({
@@ -32,6 +33,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
         monthTotalsRefetch()
         budgetsRefetch()
     })
+
     const [getMonthlyBreakdown, { loading: monthlyBreakdownLoading, data: monthlyBreakdownData, refetch: monthlyBreakdownRefetch }] = useLazyQuery<GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables>(GetMonthBreakdownDocument,
         { variables: { passwordHash, month: month as MonthType, year } });
     const [getMonthTotals, { loading: monthTotalsLoading, data: monthTotalsData, refetch: monthTotalsRefetch }] = useLazyQuery<GetMonthTotalsQuery>(GetMonthTotalsDocument,
@@ -44,9 +46,40 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
         setMonth(newMonth);
     }
 
+    const months = MONTHS_ORDER;
+
+    const backAMonth = () => {
+        const curIndex = months.indexOf(month)
+        if (curIndex === 0) {
+            setMonth(months[months.length - 1])
+            setYear((prevYear) => prevYear - 1);
+        } else {
+            setMonth((prevMonth) => months[months.indexOf(prevMonth) - 1]);
+        }
+    };
+
+    const forwardAMonth = () => {
+        const curIndex = months.indexOf(month)
+        if (curIndex === months.length - 1) {
+            setMonth(months[0]);
+            setYear((prevYear) => prevYear + 1);
+        } else {
+            setMonth((prevMonth) => months[months.indexOf(prevMonth) + 1]);
+        }
+    };
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerTitle: `${month} ${year}`,
+            headerBackVisible: false,
+            headerLeft: () => <HeaderButton direction="left" marginLeft={10} onPress={backAMonth} />,
+            headerRight: () => <HeaderButton direction="right" marginRight={10} onPress={forwardAMonth} />,
+        });
+    }, [month]);
+
     return (
         <View style={styles.screen}>
-            <TopBar month={month} year={year} setMonth={handleSetMonth} setYear={setYear} />
+            {/* <TopBar month={month} year={year} setMonth={handleSetMonth} setYear={setYear} /> */}
             <ScrollView keyboardShouldPersistTaps="always">
                 <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenses by Months</Text>

@@ -64,7 +64,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                             <Text style={staticStyles.text}>Your </Text>
                             <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{name}</Text>
                             <Text style={staticStyles.text}> has increased by </Text>
-                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((changeFactor - 1) * 100).toFixed()}$</Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>${((changeFactor - 1) * 100).toFixed()}</Text>
                             <Text style={staticStyles.text}> from last month</Text>
                         </Text>
                     </View>
@@ -94,7 +94,9 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
                     <View style={{ justifyContent: "center" }}>
                         <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
-                            <Text style={staticStyles.text}>Your expense matches your budget</Text>
+                            <Text style={staticStyles.text}>Your </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>expenses</Text>
+                            <Text> matches your budget</Text>
                         </Text>
                     </View>
                 </View>
@@ -104,7 +106,9 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
                     <View style={{ justifyContent: "center" }}>
                         <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
-                            <Text style={staticStyles.text}>Your expense are </Text>
+                            <Text style={staticStyles.text}>Your </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>expenses</Text>
+                            <Text style={staticStyles.text}> are </Text>
                             <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((changeFactor - 1) * 100).toFixed()}%</Text>
                             <Text style={staticStyles.text}> in excess of your budget</Text>
                         </Text>
@@ -116,7 +120,9 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
                     <View style={{ justifyContent: "center" }}>
                         <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
-                            <Text style={staticStyles.text}>Your expense are </Text>
+                            <Text style={staticStyles.text}>Your </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>expenses</Text>
+                            <Text style={staticStyles.text}> are </Text>
                             <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((changeFactor) * 100).toFixed()}%</Text>
                             <Text style={staticStyles.text}> under your budget</Text>
                         </Text>
@@ -128,13 +134,15 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
 
     return (<View style={staticStyles.screen}>
-        <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
 
         <ScrollView>
 
             <View>
-                <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenditure VS Budgeted by Month</Text>
+                <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20, marginHorizontal: 40, fontSize: 26 }}>
+                    Budgeted and Planned Comparison for {month.charAt(0) + month.substring(1, month.length).toLowerCase()} {year}
+                </Text>
             </View>
+
             <View style={{ alignItems: 'center', marginBottom: 70 }}>
                 <MonthlyVsBudgeted
                     displayAmount={3}
@@ -153,7 +161,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                     < View style={[staticStyles.textContainer]}>
                         {spendingInsight(deltaInSpending, 'spending')}
                     </View>
-                    < View style={[staticStyles.textContainer]}>
+                    < View style={[staticStyles.textContainer, { paddingBottom: 70 }]}>
                         {spendingInsight(deltaInBudget, 'budget')}
                     </View>
                 </>
