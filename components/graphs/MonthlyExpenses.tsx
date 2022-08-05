@@ -172,32 +172,22 @@ function HeaderButton({ direction, onPress, marginLeft, marginRight }: HeaderBut
 }
 
 const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearSelector }: MonthlyExpenses) => {
-    function selectByMonthYear() {
-        const indexOfFoundSelectedTime = data.findIndex(ele => {
-            return ele.month == monthSelector && ele.year == yearSelector
-        })
-        if (indexOfFoundSelectedTime != -1) {
-            return (Math.max(0, Math.min(data.length - displayAmountNumber,
-                indexOfFoundSelectedTime - Math.floor(displayAmountNumber / 2))))
-        }
-        return undefined
-    }
     const displayAmountNumber = displayAmount ? displayAmount : 5
     const jumpAmountNumber = jumpAmount ? jumpAmount : 3
     const inputData = data.map((ele, index) => { return { ...ele, id: index } })
-    const [sliceEnd, setSliceEnd] = useState<number>(selectByMonthYear() || inputData.length - displayAmountNumber)
-
-    useEffect(
-        () => {
-            setSliceEnd(inputData.length - displayAmountNumber)
-        }
-        , [data])
+    const [sliceEnd, setSliceEnd] = useState<number>(inputData.length - displayAmountNumber)
 
 
     useEffect(
         () => {
-            setSliceEnd(selectByMonthYear() || sliceEnd)
-        }, [monthSelector, yearSelector])
+            const indexOfFoundSelectedTime = data.findIndex(ele => {
+                return ele.month == monthSelector && ele.year == yearSelector
+            })
+            if (indexOfFoundSelectedTime != -1) {
+                setSliceEnd(Math.max(0, Math.min(data.length - displayAmountNumber,
+                    indexOfFoundSelectedTime - Math.floor(displayAmountNumber / 2))))
+            }
+        }, [monthSelector, yearSelector, data])
 
     const showArrows = inputData.length > displayAmountNumber
     return (<>
