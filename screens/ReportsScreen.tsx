@@ -30,7 +30,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
     const [year, setYear] = useState(date.getFullYear());
     useRefresh(() => {
         monthlyBreakdownRefetch()
-        monthTotalsRefetch()
+        // monthTotalsRefetch()
         budgetsRefetch()
     })
 
@@ -118,7 +118,7 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                                     }) as Budget : undefined
 
                                 const foundPair = foundBudget?.budgetCategories?.find(cat => cat.category.name == ele.category?.name)
-                                console.log("pari", foundPair, ele)
+                                // console.log("pari", foundPair, ele)
                                 return !(ele.amountSpent == 0 && (foundPair === undefined || foundPair.amount == 0))// && (foundPair === undefined || foundPair.amount == 0)
                             }) : []}
                         budgetReferenceData={budgetsData?.budgets.__typename === 'BudgetsSuccess' ?
