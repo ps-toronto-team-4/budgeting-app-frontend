@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native"
-import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLegend, VictoryStack } from "victory-native";
+import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLabel, VictoryLegend, VictoryStack } from "victory-native";
 import ArrowButton from "../buttons/ArrowButton";
 import { Budget, BudgetCategory } from "../generated";
 
@@ -42,6 +42,13 @@ const RenderGraph = ({ data }: GraphParameters) => {
         }];
     }
 
+    const [undefY, setUndefY] = useState<number | undefined>(100)
+    //to combat Y being undefined at the start which caused an label error
+    useEffect(() => {
+        setUndefY(0)
+        setTimeout(() => setUndefY(undefined), 100);
+    }, [data])
+
     return (<>
         <VictoryChart>
             <VictoryAxis
@@ -52,7 +59,10 @@ const RenderGraph = ({ data }: GraphParameters) => {
 
             <VictoryGroup offset={20}
             >
-                <VictoryStack colorScale={['#aa3377', '#e0b4cd']}>
+                <VictoryStack colorScale={['#aa3377', '#e0b4cd']}
+                    labels={filteredData.map(ele => '$' + ele.amountSpent.toFixed(2))}
+                    labelComponent={<VictoryLabel y={undefY} dx={-20} />}
+                >
 
 
                     <VictoryBar
@@ -100,7 +110,10 @@ const RenderGraph = ({ data }: GraphParameters) => {
 
                     />
                 </VictoryStack>
-                <VictoryStack colorScale={['#008866', '#008866']}>
+                <VictoryStack colorScale={['#008866', '#008866']}
+                    labels={filteredData.map(ele => '$' + ele.amountBudgeted.toFixed(2))}
+                    labelComponent={<VictoryLabel y={undefY} dx={20} />}
+                >
 
 
                     <VictoryBar
@@ -147,7 +160,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                 </VictoryStack>
             </VictoryGroup>
         </VictoryChart>
-        <VictoryLegend x={75} y={0}
+        <VictoryLegend x={50} y={0}
             centerTitle={true}
             orientation="horizontal"
 

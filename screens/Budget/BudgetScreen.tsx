@@ -23,7 +23,7 @@ interface HeaderButtonProps {
     marginRight?: number;
 }
 
-function HeaderButton({ direction, onPress, marginLeft, marginRight }: HeaderButtonProps) {
+export function HeaderButton({ direction, onPress, marginLeft, marginRight }: HeaderButtonProps) {
     return (
         <TouchableHighlight onPress={onPress} style={{
             alignItems: 'center',

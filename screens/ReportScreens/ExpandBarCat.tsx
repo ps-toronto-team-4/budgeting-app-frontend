@@ -3,7 +3,6 @@ import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { RootStackScreenProps } from "../../types";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { TopBar } from '../../components/budget/TopBar';
 import { useLazyQuery } from '@apollo/client';
 import { Budget, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, MonthType } from "../../components/generated";
 import MonthlyVsBudgetedCategory from '../../components/graphs/monthlyVsBudgetedCategory';
@@ -51,94 +50,67 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
     const totalCategories = monthlyBreakdownData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthlyBreakdownData.monthBreakdown.byCategory.length : 0
 
-    return <View style={staticStyles.screen}>
-        <TopBar month={month} year={year} setMonth={setMonth} setYear={setYear} />
-        <ScrollView>
 
+    return <View style={staticStyles.screen}>
+        <ScrollView>
+            <View>
+                <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20, marginHorizontal: 20, fontSize: 26 }}>
+                    Budgeted and Planned Comparison By Category for {month.charAt(0) + month.substring(1, month.length).toLowerCase()} {year}
+                </Text>
+            </View>
             <MonthlyVsBudgetedCategory
+                displayAmount={3}
+                jumpAmount={1}
                 data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
                 budgetReferenceData={currentBudget} />
             <View>
-                <View style={{ flex: 1, flexGrow: 1, flexDirection: 'column', alignItems: 'center' }}>
-                    <View style={{ flex: 1, marginTop: 55, marginBottom: 5, marginLeft: 75, marginRight: 75 }}>
-                        <Text style={{ fontSize: 26, textAlign: 'center' }}>
+                <View style={{ flex: 1, marginTop: 55, marginBottom: 5, marginLeft: 60, marginRight: 60 }}>
+                    <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                        {
+                            overBudgetedCategories.length === 0 || totalCategories === 0 ?
+                                <>
+                                    <View style={{ justifyContent: "center" }}>
+                                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                                            <Text style={{ textAlign: 'center' }}>Congratulations! None of your budgets were exceeded</Text>
+                                        </Text>
+                                    </View>
 
-                            {overBudgetedCategories.length === 0 || totalCategories === 0 ? "Congraduations! None of your budgets were exceeded" :
-                                ((100 * overBudgetedCategories.length / totalCategories).toFixed()) + "% of your categories were over budget"}
-                        </Text>
+                                </> :
+                                <>
+                                    <View style={{ justifyContent: "center" }}>
+                                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((100 * overBudgetedCategories.length / totalCategories).toFixed(1))}%</Text>
+                                            <Text style={{ fontSize: 26 }}> of your categories were </Text>
+                                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>over </Text>
+                                            <Text style={{ fontSize: 26 }}>budget</Text>
+                                        </Text>
+                                    </View>
+
+                                </>
+                            // <><PercentOverBudget></PercentOverBudget><Text> of your categories were over budget</Text></>
+
+                        }
                     </View>
+                </View>
+                <View style={{ flex: 1, flexGrow: 1, flexDirection: 'column', alignItems: 'center' }}>
 
                     {overBudgetedCategories.length !== 0 &&
-                        <View style={{ flex: 1, marginTop: 5, marginBottom: 5, marginLeft: 75, marginRight: 75 }}>
-                            <Text style={{ fontSize: 26, textAlign: 'center' }}>You are over budget in..</Text>
+                        <View style={{ flex: 1, marginTop: 50, marginBottom: 50, marginLeft: 60, marginRight: 60 }}>
+                            <Text style={{ paddingBottom: 10 }}>
+                                <Text style={{ fontSize: 26, textAlign: 'center' }}>You are </Text>
+                                <Text style={{ fontSize: 26, fontWeight: 'bold' }}>over </Text>
+                                <Text style={{ fontSize: 26, textAlign: 'center' }}> budget in..</Text>
+                            </Text>
 
                             {overBudgetedCategories.map((ele, index) => {
                                 return (
                                     <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <AntDesign name='right' size={32} color="black" />
-                                        <Text style={{ fontSize: 16 }}>{ele.category?.name || 'Uncategorized'}</Text>
+                                        <Text style={{ fontSize: 26 }}>{ele.category?.name || 'Uncategorized'}</Text>
                                     </View>
                                 )
                             })}
                         </View>}
-
-                    {/* <View style={{ flexDirection: 'row' }}>
-
-                        <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
-                            <View style={{ borderBottomColor: 'black', borderBottomWidth: 1 }}>
-                                <Text style={{ textAlign: 'center', fontSize: 18 }}>
-                                    Highest Expenditure
-                                </Text>
-                            </View>
-                            <View style={{ margin: 5 }}>
-                                <Text>
-                                    {highestExpense}
-                                </Text>
-                            </View>
-                        </View>
-                        <View style={{ flexBasis: 5, marginLeft: 5, marginRight: 5 }} />
-
-                        <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
-                            <View style={{ borderBottomColor: 'black', borderBottomWidth: 1 }}>
-                                <Text style={{ textAlign: 'center', fontSize: 18 }}>
-                                    Lowest  Expenditure
-                                </Text>
-                            </View>
-                            <View style={{ margin: 5 }}>
-                                <Text>
-
-                                    {lowestExpense}
-                                </Text>
-                            </View>
-                        </View>
-                    </View> */}
-
-                    {/* <View style={{ flex: 1, width: 300, marginTop: 30 }}>
-                    <Text style={{ textAlign: 'center', fontSize: 18, borderBottomColor: 'black', borderBottomWidth: 1 }}> All overbudgeted categories</Text>
-                    <View>
-                    {monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" &&
-                    monthlyBreakdownData.monthBreakdown.byCategory.map(ele => {
-                        const curBudget = currentBudget ? currentBudget.budgetCategories?.find(x => x.category.name == ele.category?.name) : undefined
-
-                                const delta = curBudget ? curBudget.amount - ele.amountSpent : -ele.amountSpent
-                                if (delta < 0) {
-                                    return <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-                                        <View style={{ flex: 1 }}>
-                                            <Text style={{ textAlign: 'right' }}>{ele.category?.name || 'Uncategorized'}</Text>
-                                        </View>
-                                        <View style={{ flexBasis: 25 }} />
-                                        <View style={{ flex: 1 }}>
-                                            <Text>{Math.abs(delta)}</Text>
-                                        </View>
-                                    </View>
-                                } else {
-                                    return <></>
-                                }
-                            })
-
-                        }
-                    </View>
-                </View> */}
 
                 </View>
             </View>

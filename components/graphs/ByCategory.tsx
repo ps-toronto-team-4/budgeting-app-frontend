@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useEffect, useMemo, useState } from "react";
-import { View, Text, Alert, StyleSheet } from "react-native";
+import { View, Text, Alert, StyleSheet, ScrollView } from "react-native";
 import { VictoryLegend, VictoryPie } from "victory-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { useAuth } from "../../hooks/useAuth";
@@ -13,9 +13,10 @@ type byCategoryProps = {
     categoryData: MonthBreakdownCategory[];
     month: string;
     year: number;
+    onChangeCategory?: (newCategory?: { id: number, name: string }) => void;
 }
 
-export default function ByCategory({ categoryData, month, year }: byCategoryProps, { navigation }: RootStackScreenProps<'CreateMerchant'>) {
+export default function ByCategory({ categoryData, month, year, onChangeCategory }: byCategoryProps, { navigation }: RootStackScreenProps<'CreateMerchant'>) {
     const passwordHash = useAuth();
     const [category, setCategory] = useState<{ id: number, name: string }>();
     const [selectedMonth, setSelectedMonth] = useState("");
@@ -30,6 +31,12 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
     useEffect(() => {
         setCategory(undefined);
     }, [month]);
+
+    useEffect(() => {
+        if (onChangeCategory) {
+            onChangeCategory(category);
+        }
+    }, [category])
 
     const filteredCategoryData = useMemo(() => {
         return categoryData.slice().filter(x => !!x.category && x.amountSpent > 0);
@@ -75,7 +82,7 @@ export default function ByCategory({ categoryData, month, year }: byCategoryProp
                         }).filter((data) => data.amountSpent != 0)
 
                     }
-                    labels={({ datum }) => (datum.category.name.length < 15) ? datum.category.name : datum.category.name.substring(0, 13) + "..."}
+                    labels={({ datum }) => datum.category.name === category?.name ? "$" + datum.amountSpent.toFixed(2) : datum.category.name.substring(0, 10) + "..."}
                     y={"amountSpent"}
                     width={900}
                     height={300}
