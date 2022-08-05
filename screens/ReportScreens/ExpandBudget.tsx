@@ -45,21 +45,84 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
     function spendingInsight(changeFactor: number | undefined, name: string) {
         if (changeFactor === undefined || changeFactor === 1) {
-            return <Text style={staticStyles.text}>Your {name} is unchanged from last month</Text>
+            return (
+                <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                    <View style={{ justifyContent: "center" }}>
+                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                            <Text style={staticStyles.text}>Your </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{name}</Text>
+                            <Text style={staticStyles.text}> is unchanged from last month</Text>
+                        </Text>
+                    </View>
+                </View>
+            );
         } else if (changeFactor > 1) {
-            return <Text style={staticStyles.text}>Your {name} has increased by {((changeFactor - 1) * 100).toFixed()}% from last month</Text>
+            return (
+                <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                    <View style={{ justifyContent: "center" }}>
+                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                            <Text style={staticStyles.text}>Your </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{name}</Text>
+                            <Text style={staticStyles.text}> has increased by </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((changeFactor - 1) * 100).toFixed()}$</Text>
+                            <Text style={staticStyles.text}> from last month</Text>
+                        </Text>
+                    </View>
+                </View>
+            );
         } else {
-            return <Text style={staticStyles.text}>Your {name} has decreased by {((changeFactor) * 100).toFixed()}% from last month</Text>
+            return (
+                <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                    <View style={{ justifyContent: "center" }}>
+                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                            <Text style={staticStyles.text}>Your </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{name}</Text>
+                            <Text style={staticStyles.text}> has decreased by </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((changeFactor) * 100).toFixed()}%</Text>
+                            <Text style={staticStyles.text}> from last month</Text>
+                        </Text>
+                    </View>
+                </View>
+
+            );
         }
     }
 
     function budgetVSSpendingInsight(changeFactor: number | undefined) {
         if (changeFactor === undefined || changeFactor === 1) {
-            return <Text style={staticStyles.text}>Your expense match you budget</Text>
+            return (
+                <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                    <View style={{ justifyContent: "center" }}>
+                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                            <Text style={staticStyles.text}>Your expense matches your budget</Text>
+                        </Text>
+                    </View>
+                </View>
+            );
         } else if (changeFactor > 1) {
-            return <Text style={staticStyles.text}>Your expense are {((changeFactor - 1) * 100).toFixed()}% in excess of your budget</Text>
+            return (
+                <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                    <View style={{ justifyContent: "center" }}>
+                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                            <Text style={staticStyles.text}>Your expense are </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((changeFactor - 1) * 100).toFixed()}%</Text>
+                            <Text style={staticStyles.text}> in excess of your budget</Text>
+                        </Text>
+                    </View>
+                </View>
+            );
         } else {
-            return <Text style={staticStyles.text}>Your expense are {((changeFactor) * 100).toFixed()}% under your budget</Text>
+            return (
+                <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
+                    <View style={{ justifyContent: "center" }}>
+                        <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
+                            <Text style={staticStyles.text}>Your expense are </Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((changeFactor) * 100).toFixed()}%</Text>
+                            <Text style={staticStyles.text}> under your budget</Text>
+                        </Text>
+                    </View>
+                </View>
+            );
         }
     }
 

@@ -123,16 +123,6 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                 labels={({ datum }) => datum.amountSpent.toFixed(2)}
                 barRatio={0.5}
                 style={{ data: { fill: mainColour ? mainColour : "#2e8f48" } }}
-            // events={[
-            //     {
-            //         target: "data",
-            //         eventHandlers: {
-            //             onClick: onPressClickHandler,
-            //             onPressIn: onPressClickHandler,
-
-            //         }
-            //     }
-            // ]}
             />
         </VictoryChart>
         {/* </Svg> */}
