@@ -82,7 +82,7 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                         }).filter((data) => data.amountSpent != 0)
 
                     }
-                    labels={({ datum }) => datum.category.name === category?.name ? "$" + datum.amountSpent.toFixed(2) : datum.category.name.substring(0, 4) + "..."}
+                    labels={({ datum }) => datum.category.name === category?.name ? "$" + datum.amountSpent.toFixed(2) : datum.category.name.substring(0, 10) + "..."}
                     y={"amountSpent"}
                     width={900}
                     height={300}
