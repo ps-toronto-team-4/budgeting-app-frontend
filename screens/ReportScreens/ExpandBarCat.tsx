@@ -3,7 +3,6 @@ import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { RootStackScreenProps } from "../../types";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { TopBar } from '../../components/budget/TopBar';
 import { useLazyQuery } from '@apollo/client';
 import { Budget, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, MonthType } from "../../components/generated";
 import MonthlyVsBudgetedCategory from '../../components/graphs/monthlyVsBudgetedCategory';
@@ -51,20 +50,19 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
     const totalCategories = monthlyBreakdownData?.monthBreakdown.__typename == 'MonthBreakdown' ? monthlyBreakdownData.monthBreakdown.byCategory.length : 0
 
-    const PercentOverBudget = () => {
-        return (
-            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((100 * overBudgetedCategories.length / totalCategories).toFixed(1))}%</Text>
-        );
-    }
 
     return <View style={staticStyles.screen}>
         <ScrollView>
-
+            <View>
+                <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20, marginHorizontal: 20, fontSize: 26 }}>
+                    Budgeted and Planned Comparison By Category for {month.charAt(0) + month.substring(1, month.length).toLowerCase()} {year}
+                </Text>
+            </View>
             <MonthlyVsBudgetedCategory
                 data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
                 budgetReferenceData={currentBudget} />
             <View>
-                <View style={{ flex: 1, marginTop: 55, marginBottom: 5, marginLeft: 90, marginRight: 90 }}>
+                <View style={{ flex: 1, marginTop: 55, marginBottom: 5, marginLeft: 60, marginRight: 60 }}>
                     <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
                         {
                             overBudgetedCategories.length === 0 || totalCategories === 0 ?
@@ -79,7 +77,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                                 <>
                                     <View style={{ justifyContent: "center" }}>
                                         <Text style={{ justifyContent: 'center', textAlign: 'center', flexWrap: 'wrap' }}>
-                                            <PercentOverBudget />
+                                            <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{((100 * overBudgetedCategories.length / totalCategories).toFixed(1))}%</Text>
                                             <Text style={{ fontSize: 26 }}> of your categories were </Text>
                                             <Text style={{ fontSize: 26, fontWeight: 'bold' }}>over </Text>
                                             <Text style={{ fontSize: 26 }}>budget</Text>
@@ -95,8 +93,12 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 <View style={{ flex: 1, flexGrow: 1, flexDirection: 'column', alignItems: 'center' }}>
 
                     {overBudgetedCategories.length !== 0 &&
-                        <View style={{ flex: 1, marginTop: 5, marginBottom: 5, marginLeft: 90, marginRight: 90 }}>
-                            <Text style={{ fontSize: 26, textAlign: 'center' }}>You are over budget in..</Text>
+                        <View style={{ flex: 1, marginTop: 50, marginBottom: 50, marginLeft: 60, marginRight: 60 }}>
+                            <Text style={{ paddingBottom: 10 }}>
+                                <Text style={{ fontSize: 26, textAlign: 'center' }}>You are </Text>
+                                <Text style={{ fontSize: 26, fontWeight: 'bold' }}>over </Text>
+                                <Text style={{ fontSize: 26, textAlign: 'center' }}> budget in..</Text>
+                            </Text>
 
                             {overBudgetedCategories.map((ele, index) => {
                                 return (

@@ -35,11 +35,12 @@ export function TopBar({ month, year, setMonth, setYear }: TopBarProps) {
     return <View style={{ flexBasis: 80, flexDirection: 'row', justifyContent: "space-between", marginTop: -2 }}>
         <AntDesign onPress={backAMonth} style={{ flex: 1 }} name="left" size={32} color="black" />
         <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
-            Budget of {year} {month}
+            {month} {year}
         </Text>
         <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <AntDesign onPress={forwardAMonth} style={{ flex: 1 }} name="right" size={32} color="black" />
         </View>
 
     </View>
+
 }
