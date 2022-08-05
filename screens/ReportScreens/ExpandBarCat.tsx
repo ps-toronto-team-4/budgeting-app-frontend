@@ -59,6 +59,8 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 </Text>
             </View>
             <MonthlyVsBudgetedCategory
+                displayAmount={3}
+                jumpAmount={1}
                 data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
                 budgetReferenceData={currentBudget} />
             <View>

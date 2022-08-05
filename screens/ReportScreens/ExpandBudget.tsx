@@ -145,6 +145,8 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
             <View style={{ alignItems: 'center', marginBottom: 70 }}>
                 <MonthlyVsBudgeted
+                    displayAmount={3}
+                    jumpAmount={1}
                     data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
                     monthSelector={month}
                     yearSelector={year} />
