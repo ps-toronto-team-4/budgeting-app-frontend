@@ -123,16 +123,6 @@ const MonthlyExpenseGraph = ({ data, monthSelectedCallback, mainColour, highligh
                 labels={({ datum }) => datum.amountSpent.toFixed(2)}
                 barRatio={0.5}
                 style={{ data: { fill: mainColour ? mainColour : "#2e8f48" } }}
-            // events={[
-            //     {
-            //         target: "data",
-            //         eventHandlers: {
-            //             onClick: onPressClickHandler,
-            //             onPressIn: onPressClickHandler,
-
-            //         }
-            //     }
-            // ]}
             />
         </VictoryChart>
         {/* </Svg> */}
@@ -175,13 +165,7 @@ const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearS
     const displayAmountNumber = displayAmount ? displayAmount : 5
     const jumpAmountNumber = jumpAmount ? jumpAmount : 3
     const inputData = data.map((ele, index) => { return { ...ele, id: index } })
-    const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
-
-    useEffect(
-        () => {
-            setSliceEnd(inputData.length - displayAmountNumber)
-        }
-        , [data])
+    const [sliceEnd, setSliceEnd] = useState<number>(inputData.length - displayAmountNumber)
 
 
     useEffect(
@@ -193,7 +177,7 @@ const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearS
                 setSliceEnd(Math.max(0, Math.min(data.length - displayAmountNumber,
                     indexOfFoundSelectedTime - Math.floor(displayAmountNumber / 2))))
             }
-        }, [monthSelector, yearSelector])
+        }, [monthSelector, yearSelector, data])
 
     const showArrows = inputData.length > displayAmountNumber
     return (<>
