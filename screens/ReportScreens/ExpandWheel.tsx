@@ -92,7 +92,6 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     }
 
     useEffect(() => {
-        console.log(selectedCategory);
     }, [selectedCategory])
 
 

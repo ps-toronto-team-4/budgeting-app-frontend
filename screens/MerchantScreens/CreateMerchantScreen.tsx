@@ -47,7 +47,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
             Alert.alert(error.message);
         }),
         onCompleted: () => {
-            console.log('Completed Mutation.');
             navigation.canGoBack() ? navigation.goBack() : navigation.navigate('MerchantSettings');
         }
     });

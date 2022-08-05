@@ -41,7 +41,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
             }
         },
         onError: (data) => {
-            console.log(data);
+            // console.log(data);
         }
     });
 
