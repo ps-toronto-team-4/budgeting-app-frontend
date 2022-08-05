@@ -1,10 +1,14 @@
-import { ActivityIndicator, AppRegistry, StyleSheet } from 'react-native';
+import { ActivityIndicator, AppRegistry, Platform, StyleSheet } from 'react-native';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
+LogBox.ignoreAllLogs();//Ignore all log notifications
 
 // Initialize Apollo Client
 const client = new ApolloClient({
@@ -25,8 +29,8 @@ export default function App() {
     return (
       <ApolloProvider client={client}>
         <SafeAreaProvider>
+          <StatusBar backgroundColor='black' style={Platform.OS === 'android' ? 'light' : 'dark'} />
           <Navigation colorScheme={colorScheme} />
-          <StatusBar backgroundColor='black' />
         </SafeAreaProvider>
       </ApolloProvider>
     );

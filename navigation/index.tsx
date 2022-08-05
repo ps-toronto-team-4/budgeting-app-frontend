@@ -3,36 +3,44 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { Feather, FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable, TouchableOpacity } from 'react-native';
-
-import Colors from '../constants/Colors';
-import useColorScheme from '../hooks/useColorScheme';
-
-import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import { Animated, ColorSchemeName, Keyboard } from 'react-native';
+import ForgotPasswordScreen from '../screens/UserAuthScreens/ForgotPasswordScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import SignInScreen from '../screens/SignInScreen';
-import SignUpScreen from '../screens/SignUpScreen/SignUpScreen';
-import WelcomeScreen from '../screens/WelcomeScreen';
-import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
+import SignInScreen from '../screens/UserAuthScreens/SignInScreen';
+import SignUpScreen from '../screens/UserAuthScreens/SignUpScreen';
+import WelcomeScreen from '../screens/UserAuthScreens/WelcomeScreen';
+import { RootStackParamList, RootTabParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import ExpensesScreen from '../screens/ExpensesScreen';
-import BudgetScreen from '../screens/BudgetScreen';
+import BudgetScreen from '../screens/Budget/BudgetScreen';
 import ReportsScreen from '../screens/ReportsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 import ExpenseDetailsScreen from '../screens/ExpenseDetailsScreen';
 import CreateCategoryScreen from '../screens/CategoryScreens/CreateCategoryScreen';
-import CreateMerchant from '../screens/CreateMerchantScreen';
 import CreateExpenseScreen from '../screens/CreateExpenseScreen';
+import CreateBudgetScreen from '../screens/Budget/CreateBudgetScreen';
+import UpdateBudgetScreen from '../screens/Budget/UpdateBudgetScreen';
 
-import { View } from '../components/Themed';
 import UpdateExpenseScreen from '../screens/UpdateExpenseScreen';
 import EditCategoryScreen from '../screens/CategoryScreens/EditCategoryScreen';
 import CategorySettingsScreen from '../screens/CategoryScreens/CategorySettingsScreen';
+import UpdateMerchantScreen from '../screens/MerchantScreens/UpdateMerchantScreen';
+import CreateMerchant from '../screens/MerchantScreens/CreateMerchantScreen';
+import MerchantSettingsScreen from '../screens/MerchantScreens/MerchantSettingsScreen';
+import ExpandExpenseScreen from '../screens/ReportScreens/ExpandExpense';
+import ExpandBudgetScreen from '../screens/ReportScreens/ExpandBudget';
+import ExpandWheelScreen from '../screens/ReportScreens/ExpandWheel';
+import ExpandBarCatScreen from '../screens/ReportScreens/ExpandBarCat';
+
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '../constants/Colors';
+import HomeScreen from '../screens/HomeScreen';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 // declare global {
 //   namespace ReactNavigation{
@@ -70,10 +78,18 @@ function RootNavigator() {
         <Stack.Screen name="CreateMerchant" component={CreateMerchant} options={{ title: 'Create Merchant' }} />
         <Stack.Screen name="CreateExpense" component={CreateExpenseScreen} options={{ title: 'Create Expense' }} />
         <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} options={{ title: 'Expense Details' }} />
-        <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{ title: 'Category Settings' }} />
+        <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} options={{ title: 'Categories' }} />
         <Stack.Screen name="EditCategory" component={EditCategoryScreen} options={{ title: 'Edit Category' }} />
         <Stack.Screen name="CreateCategory" component={CreateCategoryScreen} options={{ headerTitle: 'Create Category' }} />
         <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: 'Edit Expense' }} />
+        <Stack.Screen name="EditBudget" component={UpdateBudgetScreen} options={{ headerTitle: 'Edit Budget' }} />
+        <Stack.Screen name="CreateBudget" component={CreateBudgetScreen} options={{ headerTitle: 'Create Budget' }} />
+        <Stack.Screen name="ExpandExpenses" component={ExpandExpenseScreen} options={{ headerTitle: 'Expand Expenses' }} />
+        <Stack.Screen name="ExpandBudget" component={ExpandBudgetScreen} options={{ headerTitle: 'Expand Budget' }} />
+        <Stack.Screen name="ExpandWheel" component={ExpandWheelScreen} options={{ headerTitle: 'Expand Wheel' }} />
+        <Stack.Screen name="ExpandBarCat" component={ExpandBarCatScreen} options={{ headerTitle: 'Expand BarCat' }} />
+        <Stack.Screen name="MerchantSettings" component={MerchantSettingsScreen} options={{ headerTitle: 'Merchants' }} />
+        <Stack.Screen name="UpdateMerchant" component={UpdateMerchantScreen} options={{ headerTitle: 'Update Merchant' }} />
       </Stack.Group>
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ headerShown: false, title: 'Oops!' }} />
       <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}></Stack.Screen>
@@ -87,13 +103,39 @@ function RootNavigator() {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 function Root() {
+  const [tabBarVisible, setTabBarVisible] = useState(true);
+
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', () => {
+      setTabBarVisible(false);
+    });
+    Keyboard.addListener('keyboardDidHide', () => {
+      setTabBarVisible(true);
+    });
+    return () => {
+      Keyboard.removeAllListeners('keyboardDidShow');
+      Keyboard.removeAllListeners('keyboardDidHide');
+    };
+  }, []);
+
   return (
-    <Tab.Navigator>
-      <Tab.Group screenOptions={{ headerShadowVisible: false, headerTitleAlign: 'center', headerTitleStyle: { fontWeight: 'bold' } }}>
-        <Tab.Screen name="Expenses" component={ExpensesScreen} />
-        <Tab.Screen name="Budget" component={BudgetScreen} />
-        <Tab.Screen name="Reports" component={ReportsScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+    <Tab.Navigator initialRouteName='Home'>
+      <Tab.Group screenOptions={{
+
+        headerShadowVisible: false,
+        headerTitleAlign: 'center',
+        headerTitleStyle: { fontWeight: 'bold', fontSize: 24 },
+        tabBarLabelStyle: { fontSize: 12 },
+        tabBarStyle: { paddingBottom: 25, paddingTop: 5, height: 70, display: tabBarVisible ? 'flex' : 'none' },
+        tabBarAllowFontScaling: true,
+        tabBarActiveTintColor: Colors.light.tabIconSelected,
+        tabBarInactiveTintColor: Colors.light.btnBackground,
+      }}>
+        <Tab.Screen name="Expenses" component={ExpensesScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="pricetags" size={24} color={color} />, }} />
+        <Tab.Screen name="Budget" component={BudgetScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="wallet" size={24} color={color} /> }} />
+        <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false, tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} /> }} />
+        <Tab.Screen name="Reports" component={ReportsScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="pie-chart" size={24} color={color} /> }} />
+        <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="settings-sharp" size={24} color={color} /> }} />
       </Tab.Group>
     </Tab.Navigator>
   );

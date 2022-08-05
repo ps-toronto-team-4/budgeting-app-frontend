@@ -1,4 +1,4 @@
-query getPasswordHash($username: String!, $password: String!) {
+query login($username: String!, $password: String!) {
     signIn(username: $username , password: $password) {
         __typename
         ...on SignInSuccess {
@@ -35,6 +35,23 @@ query getGreetings {
     greeting
 }
 
+query getUser($passwordHash: String!) {
+    user(passwordHash: $passwordHash) {
+        __typename
+        ...on User {
+            lastName
+            firstName
+            username
+            email
+            phoneNumber
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
 
 query getCategories($passwordHash: String!) {
     categories(passwordHash: $passwordHash) {
@@ -116,6 +133,7 @@ mutation deleteCategory($passwordHash: String!, $id: Int!) {
 
 query getExpenses ($passwordHash: String!) {
     expenses(passwordHash: $passwordHash) {
+        __typename
         ... on ExpensesSuccess {
             expenses {
                 amount
@@ -124,6 +142,9 @@ query getExpenses ($passwordHash: String!) {
                 description
                 category {
                     colourHex
+                    name
+                }
+                merchant {
                     name
                 }
             }
@@ -208,6 +229,7 @@ mutation deleteExpense($passwordHash: String!, $id: Int!) {
 
 query getMerchants($passwordHash: String!) {
     merchants(passwordHash: $passwordHash) {
+        __typename
         ...on MerchantsSuccess {
             merchants {
                 id
@@ -252,6 +274,7 @@ mutation createMerchant($passwordHash: String!, $name: String!, $description: St
     }
   }
 }
+
 query getMerchant ($passwordHash: String!, $id: Int!){
     merchant(passwordHash: $passwordHash, id: $id){
         __typename
@@ -276,3 +299,312 @@ query getMerchant ($passwordHash: String!, $id: Int!){
     }
 }
 
+query getBudgets($passwordHash: String!){
+ budgets(passwordHash:$passwordHash){
+        __typename
+        ... on BudgetsSuccess{
+            budgets{
+                id
+                year
+                month
+                budgetCategories{
+                    amount
+                    category{
+                        id
+                        name
+                        colourHex
+                    }
+                    id
+                }
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+mutation createBudget($passwordHash: String!, $month:MonthType!, $year:Int!){
+    createBudget(passwordHash: $passwordHash,month: $month,year: $year){
+        __typename
+        ... on BudgetSuccess{
+            budget{
+                id
+                month
+                year
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+
+}
+
+mutation createBudgetCategory($passwordHash: String!, $budgetId:Int!, $categoryId: Int!, $amount: Float!){
+    createBudgetCategory(passwordHash: $passwordHash, budgetId: $budgetId, categoryId: $categoryId, amount: $amount){
+        __typename
+        ... on BudgetCategorySuccess{
+            budgetCategory{
+                id
+                category {
+                    id
+                    name
+                    colourHex
+                }
+                amount
+                budget {
+                    id
+                    month
+                    year
+                }
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+mutation updateBudgetCategory($passwordHash: String!, $id:Int!, $amount: Float!){
+    updateBudgetCategory(passwordHash: $passwordHash, id: $id, amount: $amount){
+        __typename
+        ... on BudgetCategorySuccess{
+            budgetCategory{
+                id
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+mutation updateMerchant($passwordHash: String!, $id:Int!, $name: String!, $description: String, $defaultCategoryId: Int){
+    updateMerchant(passwordHash: $passwordHash, id:$id, name: $name, description:$description, defaultCategoryId:$defaultCategoryId){
+        __typename
+        ...on MerchantSuccess{
+            merchant {
+                id
+                name
+                description
+                defaultCategory {
+                    id
+                    name
+                    colourHex
+                    description
+                }
+            }
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation deleteBudgetCategory($passwordHash: String!, $id:Int!){
+    deleteBudgetCategory(passwordHash: $passwordHash, id: $id){
+        __typename
+        ... on DeleteSuccess{
+            successMessage
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+query getMonthBreakdown($passwordHash: String!, $month:MonthType!, $year:Int!){
+    monthBreakdown(passwordHash:$passwordHash,month:$month,year:$year){
+        ...on MonthBreakdown {
+            byCategory{
+                amountSpent
+                category{
+                    colourHex
+                    name
+                    id
+                }
+            }
+            byMerchant{
+                merchant{
+                    id
+                    name
+                    description
+                }
+                amountSpent
+            }
+            topMerchant{
+                merchant{
+                    id
+                    name
+                }
+                amountSpent
+            }
+            month
+            year
+            totalSpent
+        }
+
+        ...on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+
+mutation copyBudget($passwordHash: String!, $month:MonthType!, $year:Int!, $id:Int!){
+    copyBudget(passwordHash: $passwordHash,month: $month,year: $year, id:$id){
+        __typename
+        ... on BudgetSuccess{
+            budget{
+                id
+            }
+        }
+        ... on FailurePayload{
+            errorMessage
+            exceptionName
+        }
+    }
+}
+
+query getExpensesInMonth($month: MonthType!, $year: Int!, $passwordHash: String!) {
+    expensesInMonth(month: $month, year: $year, passwordHash: $passwordHash) {
+        __typename
+        ...on ExpensesSuccess {
+            expenses {
+                id
+                date
+                amount
+                category {
+                    name
+                    colourHex
+                }
+                merchant {
+                    name
+                }
+                description
+            }
+        }
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+mutation deleteMerchant($passwordHash: String!, $id: Int!){
+    deleteMerchant(passwordHash: $passwordHash, id: $id){
+        __typename
+        ...on DeleteSuccess{
+            successMessage
+        }
+
+        ...on FailurePayload{
+            exceptionName
+            errorMessage
+        }
+    }
+
+}
+
+query getMonthTotals($passwordHash: String!){
+    monthsTotals(passwordHash: $passwordHash){
+        ... on MonthsTotals{
+            byMonth{
+                amountBudgeted
+                amountSpent
+                amountSpentPlanned
+                amountSpentUnplanned
+                month
+                year
+            }
+            averageSpent
+        } 
+        ... on FailurePayload {
+            errorMessage
+            exceptionName
+        }
+    }
+}
+# Used by ExpenseEditForm. Do not change.
+query merchantsAndCategories($passwordHash: String!) {
+    __typename
+
+    merchants(passwordHash: $passwordHash) {
+        __typename
+        ...on MerchantsSuccess {
+            __typename
+            merchants {
+                id
+                name
+                defaultCategory {
+                    id
+                    name
+                }
+            }
+        }
+
+        ...on FailurePayload {
+            __typename
+            exceptionName
+            errorMessage
+        }
+    }
+
+    categories(passwordHash: $passwordHash) {
+        __typename
+        ...on CategoriesSuccess {
+            __typename
+            categories {
+                id
+                name
+                colourHex
+            }
+        }
+
+        ...on FailurePayload {
+            __typename
+            exceptionName
+            errorMessage
+        }
+    }
+}
+
+query homePageData($passwordHash: String!, $month: MonthType!, $year: Int!) {
+    budgetDetailsByDate(passwordHash: $passwordHash, month: $month, year: $year) {
+        __typename
+        ...on BudgetDetails {
+          totalActual
+          byCategory {
+            category {
+            	name
+            	expenses {
+                    amount
+                    date
+                    id
+                    category {
+                        name
+                        colourHex
+                        id
+                    }
+                }
+          	} 
+            amountActual
+            amountBudgeted
+          }
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}

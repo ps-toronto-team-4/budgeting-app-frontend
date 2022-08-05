@@ -1,76 +1,93 @@
-import { useQuery } from "@apollo/client";
-import { Category, GetCategoriesDocument, GetCategoriesQuery } from "../../components/generated";
-import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { Category, GetCategoriesDocument, GetCategoriesQuery, GetCategoriesQueryVariables } from "../../components/generated";
+import { ActivityIndicator, Alert, TouchableOpacity, StyleSheet, TouchableHighlight } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { RootTabScreenProps } from "../../types";
-import Button from "../../components/Button";
+import React from 'react';
+import { View, Text } from 'react-native';
+import { RootStackScreenProps } from "../../types";
+import Button from "../../components/buttons/Button";
 import { useAuth } from "../../hooks/useAuth";
-import { FlatList, ScrollView } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { useUnauthRedirect } from "../../hooks/useUnauthRedirect";
-import { Screen } from "../../components/Screen";
+import { FlatList } from "react-native";
+import Styles from "../../constants/Styles";
+import { useRefresh } from "../../hooks/useRefresh";
+import { Form } from "../../components/forms/Form";
+import AddButton from "../../components/buttons/AddButton";
+import { ColorCircle } from "../../components/ColorCircle";
 
-export default function CategorySettingsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
-    
-    const passwordHash = useAuth();
-
-    useUnauthRedirect();
-
-    const {data, loading, refetch} = useQuery<GetCategoriesQuery>(GetCategoriesDocument, {
-        variables: { passwordHash },
-        onError: (error => {
-          Alert.alert(error.message);
-        })
+export default function CategorySettingsScreen({ navigation }: RootStackScreenProps<'CategorySettings'>) {
+    const [getCategories, { data, loading, refetch }] = useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, {
+        onError: (error) => Alert.alert(error.message),
     });
-    
-    useFocusEffect(
-        React.useCallback(() => {
-          refetch();
-        },[])
-    );
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => getCategories({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
+    });
+    useRefresh(() => refetch({ passwordHash }));
 
-      const renderCategory = ({item}: {item: Category}) => {
+    const renderCategory = ({ item }: { item: Category }) => {
         return (
-        <TouchableOpacity style={style.category} onPress={() => navigation.navigate("EditCategory", {id: item.id, name: item.name, color: item.colourHex, details: item.description})}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 30, marginHorizontal: 15, height: 30, backgroundColor: "#" + item.colourHex, borderRadius: 90, borderWidth: 1 }} />
-            <Text style={{ fontSize: 18, marginHorizontal: 5 }}>{item.name}</Text>
-            </View>
-            <MaterialIcons name="navigate-next" size={24} color="black" />
-        </TouchableOpacity>
-      )}
+            <TouchableHighlight
+                style={styles.row}
+                onPress={() => navigation.navigate("EditCategory", { id: item.id, name: item.name, color: item.colourHex, details: item.description })}
+                underlayColor="rgba(0,0,0,0.1)">
+                <View style={styles.itemContainer}>
+                    <View style={styles.colorAndNameContainer}>
+                        <ColorCircle color={'#' + item.colourHex} size={24} />
+                        <Text style={{ fontSize: 22, marginHorizontal: 5, marginLeft: 15, fontWeight: 'bold' }}>{item.name}</Text>
+                    </View>
+                    <MaterialIcons name="navigate-next" size={28} color="black" />
+                </View>
+            </TouchableHighlight>
+        );
+    }
 
     return (
-        <Screen>
-            <Text>Hello from category settings!</Text>
-            <Button text="Create New Category" accessibilityLabel="Create Category Link" onPress={() => navigation.navigate('CreateCategory')}/>
-                { loading ? (<ActivityIndicator size='large'/>) : (
-                    data?.categories.__typename === "CategoriesSuccess" ? (
-                        <FlatList
-                            data={data.categories.categories}
-                            renderItem={renderCategory}
-                        />
-                    ) : (
+        <View style={styles.screen}>
+            {loading ? (<ActivityIndicator size='large' />) : (
+                data?.categories.__typename === "CategoriesSuccess" ? (
+                    <FlatList
+                        data={data.categories.categories.slice().sort((cat1, cat2) => cat1.name > cat2.name ? 1 : -1)}
+                        renderItem={renderCategory}
+                        ListFooterComponent={<View style={{ height: 20 }} />}
+                    />
+                ) : (
                     <View>
                         <Text>{data?.categories.exceptionName}</Text>
                         <Text>{data?.categories.errorMessage}</Text>
                     </View>
                 ))}
-        </Screen>
+            <View style={styles.addBtnContainer}>
+                <AddButton size={80} onPress={() => navigation.navigate('CreateCategory')} />
+            </View>
+        </View>
     );
 }
 
-const style = StyleSheet.create ({
-    category: {
-        flexDirection: "row",
+const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
+    addBtnContainer: {
+        position: 'absolute',
+        right: 15,
+        bottom: 15,
+    },
+    row: {
+        alignItems: 'center',
+        paddingVertical: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0,0,0,0.1)'
+    },
+    itemContainer: {
+        width: 300,
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        width: '100%',
-        height: 50,
-        backgroundColor: 'white',
-        marginVertical: 5,
-        padding: 10
-    }
+    },
+    colorAndNameContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: 250,
+    },
 });

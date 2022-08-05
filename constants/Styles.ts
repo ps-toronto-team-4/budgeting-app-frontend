@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         marginBottom: 8,
         maxWidth: 250,
+        alignSelf: 'center',
         textAlign: 'center'
     },
     separator: {
@@ -37,6 +38,16 @@ const styles = StyleSheet.create({
     palette: {
         width: '75%',
         marginBottom: 25
+    }, 
+    list: {
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        height: 50,
+        backgroundColor: 'white',
+        marginVertical: 5,
+        padding: 10
     }
 });
 

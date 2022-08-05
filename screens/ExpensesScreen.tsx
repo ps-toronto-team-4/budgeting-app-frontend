@@ -1,270 +1,195 @@
-import { useQuery } from "@apollo/client";
-import { ReactElement, useEffect, useRef, useState } from "react";
-import { Category, GetExpensesDocument, GetExpensesQuery } from "../components/generated";
-import { Button, ColorValue, TouchableHighlight } from "react-native"
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useLazyQuery } from "@apollo/client";
+import { useMemo, useState } from "react";
+import { GetExpensesDocument, GetExpensesQuery, GetExpensesQueryVariables } from "../components/generated";
+import { FlatList } from "react-native";
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  View,
-  Text,
-  StatusBar,
-  FlatList,
-  ScrollView,
-} from 'react-native';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/buttons/AddButton";
 import { useAuth } from "../hooks/useAuth";
-import { useUnauthRedirect } from "../hooks/useUnauthRedirect";
-import { Screen } from "../components/Screen";
 import { useRefresh } from "../hooks/useRefresh";
+import Colors from "../constants/Colors";
+import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
+import { formatDate } from "./ExpenseDetailsScreen";
+import Button from "../components/buttons/Button";
+import styles from "../constants/Styles";
+import ExpenseFilter, { ApplyFilter } from "../components/expenseFilter"
 
-//TODO
-// - *IMPORTANT* fix virtualization issue
-// - Have special names for today and yesterday
-// - close delete on back navigate
-// - make deltet a trash can
-// - lazy render of lists
+type ExpenseDisplayPropsOrDate = ExpenseDisplayProps | string;
 
+type Expenses = {
+    __typename?: "Expense" | undefined;
+    amount: number;
+    id: number;
+    date: string;
+    description?: string | null | undefined;
+    category?: {
+        __typename?: "Category" | undefined;
+        colourHex: string;
+        name: string;
+    } | null | undefined;
+    merchant?: {
+        __typename?: "Merchant" | undefined;
+        name: string;
+    } | null | undefined;
+}[];
 
-const Separator = () => <View style={styles.itemSeparator} />;
-const LeftSwipeActions = (selectedColor: String) => {
-  return (
-    <View
-      style={{ flex: 1, backgroundColor: selectedColor as ColorValue, justifyContent: 'center' }}
-    >
-      <Text style={styles.seeDetailsText}>
-        {`See details >>>`}
-      </Text>
-    </View>
-  );
-};
-const rightSwipeActions = ({ id }: { id: number | null | undefined }) => {
-  return (
-    <View style={styles.deleteContainer}>
-      <Text style={styles.deleteText}>
-        Delete
-      </Text>
-    </View>
-  );
-};
-const swipeFromLeftOpen = ({ id, navigateCallBack, swipeableRef }
-  : { id: number | null | undefined, navigateCallBack: Function, swipeableRef: React.MutableRefObject<any> }) => {
-  if (swipeableRef.current != null) {
-    const casted = swipeableRef as React.MutableRefObject<Swipeable>
-    casted.current.close()
-  }
-  navigateCallBack(id)
-};
-const ListItem = ({ id, title, amount, description, category, navigateCallBack }:
-  {
-    id?: number | null | undefined,
-    title?: String | null | undefined,
-    amount?: Number | null | undefined,
-    description?: String | null | undefined,
-    category?: Category | null | undefined,
-    navigateCallBack: Function
-  }) => {
-  const swipeableRef = useRef(null);
-  const selectedColor = (category?.colourHex) ? '#' + category.colourHex : '#03c2fc'
-  return (
-    <Swipeable
-      ref={swipeableRef}
-      // renderLeftActions={() => LeftSwipeActions(selectedColor)}
-      renderRightActions={() => rightSwipeActions({ id })}
-      onSwipeableLeftOpen={() => swipeFromLeftOpen({ id, navigateCallBack, swipeableRef })}
-    >
-      <View style={styles.expenseItemWrapper}>
-        <View style={{ flexBasis: 10, width: 10, backgroundColor: selectedColor }}></View>
-        <TouchableHighlight
-          style={{ flex: 1 }}
-          onPress={() => navigateCallBack(id)}
-        >
-          <View style={styles.expenseItemDisplayContainer}>
-            <Text style={{ flex: 1, fontSize: 24 }}>
-              {category?.name || 'Uncategorized'}
-            </Text>
-            <Text style={{ fontSize: 24 }}>
-              ${amount}
-            </Text>
-          </View>
-        </TouchableHighlight>
-      </View>
-    </Swipeable>
-  )
-};
+/**
+ * Takes a list of expenses, sorts it by date, and prcoesses into an object that ExpenseDisplayProps
+ * can display.
+ * @param expenses The list of expenses to process.
+ * @param onPress Callback that is passed to the ExpenseDisplay component.
+ * @returns List of expenses that ExpenseDisplay can understand.
+ */
+function processExpenses(expenses: Expenses, onPress: (id: number) => void): ExpenseDisplayPropsOrDate[] {
+    if (expenses.length === 0) return [];
 
-export default function ExpensesScreen({ navigation, route }: RootTabScreenProps<'Expenses'>) {
-  const passwordHash = useAuth();
-  useUnauthRedirect();
-  const [amountToRender, setAmountToRender] = useState(20);
-  const { loading, error, data, refetch } = useQuery<GetExpensesQuery>(GetExpensesDocument, {
-    variables: { passwordHash }
-  });
-  useRefresh(refetch, [passwordHash]);
-  const navigateCallBack = (id: number | null | undefined) => {
-    if (id === undefined || id == null) {
-      alert("Transaction could not be found!")
-    } else {
-      navigation.navigate('ExpenseDetails', { expenseId: id })
-    }
-
-  }
-  const dailyGrouping = splitTransationsOnDate(data, amountToRender)
-  function handleAddExpense() {
-    navigation.navigate('CreateExpense');
-  }
-
-  const FakeFlatList = (
-    {
-      data,
-      title,
-      renderItem,
-      ItemSeparatorComponent }:
-      {
-        data: Array<any>,
-        title: string,
-        key: number | string,
-        renderItem: (item: any) => ReactElement,
-        ItemSeparatorComponent: () => ReactElement
-      }) => {
-
-    const itemsRender = data.map((item: any, index: number) => {
-
-      return (<View key={index}>
-        {index != 0 && ItemSeparatorComponent()}
-        {renderItem({ item })}
-      </View>)
-    })
-
-    return (<View>
-      <Text>{title}</Text>
-      {itemsRender}
-      {/* <Text>hi</Text> */}
-    </View>)
-  }
-
-
-  return (
-    <Screen>
-      <ScrollView>
-        {dailyGrouping && (
-          <View>
-            {dailyGrouping.map((gItem, index) => {
-              return (<FakeFlatList
-                data={gItem.item}
-                title={gItem.key}
-                key={index}
-                renderItem={({ item }) => <ListItem {...item} navigateCallBack={navigateCallBack} />}
-                ItemSeparatorComponent={() => <Separator />}
-              />)
-            })}
-            <Button title="Load More Expenses" onPress={() => setAmountToRender(amountToRender + 20)} />
-          </View>)
+    // Call map first to copy the array and avoid mutating it while extracting the necessary info
+    const preProcessed = expenses.map((expense) => {
+        return {
+            id: expense.id,
+            name: expense.category?.name || 'Uncategorized',
+            color: `#${expense.category?.colourHex || Colors.light.uncategorizedColor}`,
+            amount: expense.amount,
+            onPress: onPress,
+            date: expense.date.split(' ')[0], // ignore the time
+            merchant: expense.merchant?.name || '',
+        };
+    }).sort((ex1, ex2) => { // Sort by date
+        if (ex1.date > ex2.date) {
+            return -1;
+        } else {
+            return 1;
         }
-        {data?.expenses.__typename == 'FailurePayload' && <View>
-          <Text>{data.expenses.errorMessage}</Text>
-          <Text>{data.expenses.exceptionName}</Text>
-        </View>}
-      </ScrollView>
-      <View style={styles.addExpenseBtn}>
-        <AddButton size={100} onPress={handleAddExpense} />
-      </View>
-    </Screen>
-  );
+    });
+
+    let processed: ExpenseDisplayPropsOrDate[] = [];
+
+    // Add dates to the array whenever the date is different between neighbouring expenses
+    for (let i = preProcessed.length - 1; i >= 0; i--) {
+        const { date, ...otherProps } = preProcessed[i];
+        processed.unshift({ ...otherProps });
+        if (i === 0 || preProcessed[i].date !== preProcessed[i - 1].date) {
+            processed.unshift(`${preProcessed[i].date}`);
+        }
+    }
+
+    return processed;
 }
 
-const splitTransationsOnDate = (data: GetExpensesQuery | undefined, amountToRender: number) => {
-  if (data === undefined || data?.expenses.__typename == 'FailurePayload') {
-    return undefined
-  }
-
-  let dailyGrouping: { [key: string]: Array<any> } = {}
-
-  if (data.expenses.__typename == 'ExpensesSuccess') {
-    const listOfEle = JSON.parse(JSON.stringify(data.expenses.expenses));
-
-    listOfEle.sort((a: any, b: any) => {
-      if (a === undefined || b === undefined || a == null || b == null) {
-        return 0
-      }
-      if (a.date > b.date) {
-        return -1
-      } else if (a.date < b.date) {
-        return 1
-      }
-      return 0
-    })
-    listOfEle.slice(0, amountToRender).forEach((item: any) => { // REMOIVE THIS AFTER DEMO- TOO LAGGY WITH OUT
-      if (item?.date == undefined) {
-        console.warn("date is undefined for transation")
-        return
-      }
-      const date = item?.date.split(' ')[0]
-      if (!(date in dailyGrouping)) {
-        dailyGrouping[date] = []
-      }
-      dailyGrouping[date].push(item)
-    })
-  }
-  const orderDays: Array<{ key: string, item: Array<any> }> = Object.keys(dailyGrouping).map(key => {
-    return {
-      key: key,
-      item: dailyGrouping[key]
+function renderItem({ item }: { item: ExpenseDisplayPropsOrDate }) {
+    if (typeof item === 'string') {
+        return (
+            <View style={staticStyles.dateContainer}>
+                <Text style={staticStyles.date}>{formatDate(item)}</Text>
+            </View>
+        );
+    } else {
+        return <ExpenseDisplay {...item} />
     }
-  }).sort((a, b) => {
-    if (a.key < b.key) {
-      return 1
-    } else if (a.key > b.key) {
-      return -1
-    }
-    return 0
-  })
-  return orderDays
 }
 
-const styles = StyleSheet.create({
-  itemSeparator: {
-    flex: 1,
-    flexBasis: 2,
-    backgroundColor: '#c9c9c9',
-  },
-  seeDetailsText: {
-    color: '#40394a',
-    paddingHorizontal: 10,
-    fontWeight: '100',
-    fontSize: 30,
-    paddingVertical: 20,
-  },
-  deleteContainer: {
-    backgroundColor: '#fc0303',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-  },
-  deleteText: {
-    color: '#1b1a17',
-    paddingHorizontal: 10,
-    fontWeight: '600',
-    paddingVertical: 20,
-  },
-  expenseItemDisplayContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignContent: "space-between",
-    paddingHorizontal: 30,
-    paddingVertical: 20,
-    backgroundColor: 'white',
-  },
-  expenseItemWrapper: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  addExpenseBtn: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-  },
+function keyExtractor(item: ExpenseDisplayPropsOrDate) {
+    if (typeof item === 'string') return item;
+    return item.id.toString();
+}
+
+export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expenses'>) {
+    const [getExpenses, { data, refetch }] = useLazyQuery<GetExpensesQuery, GetExpensesQueryVariables>(GetExpensesDocument, {
+        fetchPolicy: 'no-cache',
+    });
+    const passwordHash = useAuth({
+        onRetrieved: (passwordHash) => getExpenses({ variables: { passwordHash } }),
+        redirect: 'ifUnauthorized',
+    });
+    useRefresh(() => refetch({ passwordHash }));
+    const [filters, setFilters] = useState<filterSet>({
+        date: {},
+        category: [],
+        merchant: [],
+    })
+
+    const processedExpenses = useMemo(() => {
+        if (data?.expenses.__typename === 'ExpensesSuccess') {
+            const filteredExpenses = ApplyFilter(data.expenses.expenses, filters)
+            return processExpenses(filteredExpenses, (id) => navigation.navigate('ExpenseDetails', { expenseId: id }));
+        }
+        return [];
+    }, [data, filters]);
+
+
+    interface filterSet {
+        date: any,
+        category: string[],
+        merchant: string[],
+    }
+
+
+    const handleAddExpense = () => navigation.navigate('CreateExpense');
+
+    if (data === undefined) {
+        return <View style={staticStyles.screen}><Text>Loading data...</Text></View>;
+    } else if (data.expenses.__typename !== 'ExpensesSuccess') {
+        return <View style={staticStyles.screen}><Text>Error fetching data.</Text></View>;
+    } else {
+        return (
+            <View style={staticStyles.screen}>
+                <View style={staticStyles.filterButton}>
+                    <ExpenseFilter onApplyFilter={setFilters}></ExpenseFilter>
+                </View>
+                <>
+                    {
+                        processedExpenses.length === 0 &&
+                        <Text style={staticStyles.noExpensesText}>You have no expenses. Press the '+' button to add one!</Text>
+                    }
+                </>
+                <FlatList
+                    data={processedExpenses}
+                    renderItem={renderItem}
+                    keyExtractor={keyExtractor}
+                    maxToRenderPerBatch={30} />
+                <View style={staticStyles.addExpenseBtn}>
+                    <AddButton size={80} onPress={handleAddExpense} />
+                </View>
+            </View>
+        );
+    }
+}
+
+const staticStyles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
+    itemSeparator: {
+        flex: 1,
+        flexBasis: 2,
+        backgroundColor: '#c9c9c9',
+    },
+    noExpensesText: {
+        alignSelf: 'center',
+        fontSize: 15,
+        width: 300,
+        marginTop: 20,
+    },
+    addExpenseBtn: {
+        position: 'absolute',
+        right: 15,
+        bottom: 15,
+    },
+    dateContainer: {
+        paddingTop: 20,
+        paddingBottom: 10,
+        width: 350,
+        alignSelf: 'center',
+    },
+    date: {
+        fontSize: 18,
+    },
+    filterButton: {
+        position: 'absolute',
+        right: 15,
+        top: 0,
+        zIndex: 10
+    }
 });
