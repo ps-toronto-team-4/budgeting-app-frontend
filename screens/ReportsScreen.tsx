@@ -63,6 +63,8 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                 </View>
                 <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <MonthlyVsBudgeted
+                        displayAmount={3}
+                        jumpAmount={1}
                         data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
                         monthSelector={month}
                         yearSelector={year} />
@@ -73,7 +75,19 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                 </View>
                 <View style={{ alignItems: 'center', marginBottom: 70 }}>
                     <MonthlyVsBudgetedCategory
-                        data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
+                        displayAmount={3}
+                        jumpAmount={1}
+                        data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ?
+                            monthlyBreakdownData.monthBreakdown.byCategory.filter(ele => {
+                                const foundBudget = budgetsData?.budgets.__typename == 'BudgetsSuccess' ?
+                                    budgetsData.budgets.budgets.find(bud => {
+                                        return bud.month == month && bud.year == year
+                                    }) as Budget : undefined
+
+                                const foundPair = foundBudget?.budgetCategories?.find(cat => cat.category.name == ele.category?.name)
+                                console.log("pari", foundPair, ele)
+                                return !(ele.amountSpent == 0 && (foundPair === undefined || foundPair.amount == 0))// && (foundPair === undefined || foundPair.amount == 0)
+                            }) : []}
                         budgetReferenceData={budgetsData?.budgets.__typename === 'BudgetsSuccess' ?
                             budgetsData.budgets.budgets.find(ele => {
                                 return ele.month == month && ele.year == year

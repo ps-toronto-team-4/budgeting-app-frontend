@@ -165,13 +165,7 @@ const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearS
     const displayAmountNumber = displayAmount ? displayAmount : 5
     const jumpAmountNumber = jumpAmount ? jumpAmount : 3
     const inputData = data.map((ele, index) => { return { ...ele, id: index } })
-    const [sliceEnd, setSliceEnd] = useState(inputData.length - displayAmountNumber)
-
-    useEffect(
-        () => {
-            setSliceEnd(inputData.length - displayAmountNumber)
-        }
-        , [data])
+    const [sliceEnd, setSliceEnd] = useState<number>(inputData.length - displayAmountNumber)
 
 
     useEffect(
@@ -183,7 +177,7 @@ const monthlyExpenses = ({ displayAmount, jumpAmount, data, monthSelector, yearS
                 setSliceEnd(Math.max(0, Math.min(data.length - displayAmountNumber,
                     indexOfFoundSelectedTime - Math.floor(displayAmountNumber / 2))))
             }
-        }, [monthSelector, yearSelector])
+        }, [monthSelector, yearSelector, data])
 
     const showArrows = inputData.length > displayAmountNumber
     return (<>
