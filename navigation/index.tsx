@@ -4,7 +4,7 @@
  *
  */
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme, useIsFocused } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { Animated, ColorSchemeName, Keyboard } from 'react-native';
@@ -103,20 +103,28 @@ function RootNavigator() {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 function Root() {
+  const focused = useIsFocused();
   const [tabBarVisible, setTabBarVisible] = useState(true);
 
   useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {
-      setTabBarVisible(false);
-    });
-    Keyboard.addListener('keyboardDidHide', () => {
-      setTabBarVisible(true);
-    });
-    return () => {
+    if (focused) {
+      Keyboard.addListener('keyboardDidShow', () => {
+        console.log('keyboard shown');
+        setTabBarVisible(false);
+      });
+      Keyboard.addListener('keyboardDidHide', () => {
+        console.log('keyboard hidden');
+        setTabBarVisible(true);
+      });
+    } else {
+      console.log('root unfocusing');
       Keyboard.removeAllListeners('keyboardDidShow');
       Keyboard.removeAllListeners('keyboardDidHide');
-    };
-  }, []);
+    }
+    // Having no return value should not cause a memory leak here because react navigation will
+    // set focused to false whenever root would have been unmounted. If memory leak occurs, add return
+    // function that clears all listeners.
+  }, [focused]);
 
   return (
     <Tab.Navigator initialRouteName='Home'>
