@@ -13,6 +13,7 @@ import { useRefresh } from '../hooks/useRefresh';
 import Button from '../components/buttons/Button';
 import MonthlyVsBudgetedCategory from '../components/graphs/monthlyVsBudgetedCategory';
 import { HeaderButton } from './Budget/BudgetScreen';
+import { Form } from '../components/forms/Form';
 
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
@@ -78,9 +79,8 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
     }, [month]);
 
     return (
-        <View style={styles.screen}>
-            {/* <TopBar month={month} year={year} setMonth={handleSetMonth} setYear={setYear} /> */}
-            <ScrollView keyboardShouldPersistTaps="always">
+        <ScrollView keyboardShouldPersistTaps="always">
+            <Form>
                 <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenses by Months</Text>
                 </View>
@@ -116,7 +116,6 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                                     budgetsData.budgets.budgets.find(bud => {
                                         return bud.month == month && bud.year == year
                                     }) as Budget : undefined
-
                                 const foundPair = foundBudget?.budgetCategories?.find(cat => cat.category.name == ele.category?.name)
                                 // console.log("pari", foundPair, ele)
                                 return !(ele.amountSpent == 0 && (foundPair === undefined || foundPair.amount == 0))// && (foundPair === undefined || foundPair.amount == 0)
@@ -140,9 +139,9 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                 <View style={styles.btnContainer}>
                     <Button text='View More' onPress={() => navigation.navigate('ExpandWheel', { year, month })}></Button>
                 </View>
+            </Form>
 
-            </ScrollView>
-        </View>
+        </ScrollView>
     );
 }
 

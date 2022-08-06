@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useEffect, useMemo, useState } from "react";
-import { View, Text, Alert, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Alert, StyleSheet, ScrollView, Keyboard } from "react-native";
 import { VictoryLegend, VictoryPie } from "victory-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { useAuth } from "../../hooks/useAuth";
@@ -90,8 +90,8 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                         data:
                             { fill: (d) => "#" + d.datum.category.colourHex }
                     }}
-                    events={
-                        [{
+                    events={[
+                        {
                             target: "data",
                             eventHandlers: {
                                 onPress: () => {
@@ -106,21 +106,30 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                                         ]
                                     );
                                 },
-                                onClick: () => {
-                                    return (
-                                        [
-                                            {
-                                                target: "data",
-                                                mutation: (props) => {
-                                                    setCategory({ id: props.datum.category.id, name: props.datum.category.name });
-                                                }
-                                            }
-                                        ]
-                                    );
-                                }
+                                onClick: () => [
+                                    {
+                                        target: "data",
+                                        mutation: (props) => {
+                                            setCategory({ id: props.datum.category.id, name: props.datum.category.name });
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            target: 'parent',
+                            eventHandlers: {
+                                onPress: () => [
+                                    {
+                                        target: 'data',
+                                        callback: () => {
+                                            Keyboard.dismiss();
+                                        }
+                                    }
+                                ],
                             }
                         }
-                        ]}
+                    ]}
                 />
 
             </View >
@@ -151,6 +160,21 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                     itemsPerRow={3}
                     gutter={20}
                     height={100}
+                    events={[
+                        {
+                            target: 'parent',
+                            eventHandlers: {
+                                onPress: () => [
+                                    {
+                                        target: 'parent',
+                                        callback: () => {
+                                            Keyboard.dismiss();
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]}
                 />
             }
 
