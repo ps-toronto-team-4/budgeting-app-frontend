@@ -109,15 +109,12 @@ function Root() {
   useEffect(() => {
     if (focused) {
       Keyboard.addListener('keyboardDidShow', () => {
-        console.log('keyboard shown');
         setTabBarVisible(false);
       });
       Keyboard.addListener('keyboardDidHide', () => {
-        console.log('keyboard hidden');
         setTabBarVisible(true);
       });
     } else {
-      console.log('root unfocusing');
       Keyboard.removeAllListeners('keyboardDidShow');
       Keyboard.removeAllListeners('keyboardDidHide');
     }
