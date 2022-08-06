@@ -82,6 +82,8 @@ export function DropdownField(props: DropdownFieldProps) {
     const maxScrollViewHeight = keyboardScreenY - scrollViewScreenY - (Platform.OS === 'android' ? 25 : 0);
     const [errorMessage, setErrorMessage] = useState('');
 
+    useEffect(() => console.log('scroll view height: ' + maxScrollViewHeight), [maxScrollViewHeight]);
+
     useEffect(() => {
         Keyboard.addListener('keyboardDidShow', (e) => {
             setKeyboardScreenY(e.endCoordinates.screenY);
@@ -136,6 +138,15 @@ export function DropdownField(props: DropdownFieldProps) {
         });
     };
 
+    const handlePressArrow = () => {
+        if (!focused) {
+            scrollViewStartRef.current?.measureInWindow((x, y) => {
+                setScrollViewScreenY(y);
+            });
+        }
+        setFocused(oldFocused => !oldFocused);
+    };
+
     function handlePressCreateNew() {
         props.onCreateNew && props.onCreateNew(value);
         setCachedValue(value);
@@ -160,7 +171,7 @@ export function DropdownField(props: DropdownFieldProps) {
                         <TouchableHighlight
                             style={styles.arrowIconContainer}
                             underlayColor="rgba(0,0,0,0.1)"
-                            onPress={() => { setFocused(oldFocused => !oldFocused) }}>
+                            onPress={handlePressArrow}>
                             <AntDesign
                                 name={focused ? 'up' : 'down'}
                                 size={20}
@@ -177,7 +188,7 @@ export function DropdownField(props: DropdownFieldProps) {
             <View>
                 {
                     focused &&
-                    <ScrollView style={[styles.scrollView, { maxHeight: maxScrollViewHeight }]} keyboardShouldPersistTaps="always">
+                    <ScrollView style={[styles.scrollView, { maxHeight: maxScrollViewHeight }]} keyboardShouldPersistTaps="always" nestedScrollEnabled={true}>
                         {
                             filteredData.map(datum =>
                                 <DropdownItem item={datum} onPress={handleItemPress} key={datum.id} />
