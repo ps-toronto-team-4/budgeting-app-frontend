@@ -14,6 +14,9 @@ import Button from '../components/buttons/Button';
 import MonthlyVsBudgetedCategory from '../components/graphs/monthlyVsBudgetedCategory';
 import { HeaderButton } from './Budget/BudgetScreen';
 import { Form } from '../components/forms/Form';
+import { Card } from '../components/reports/Card';
+import { VictoryPie } from 'victory-native';
+import { ExpensesByMonth } from '../components/reports/graphs/ExpensesByMonth';
 
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
@@ -81,6 +84,14 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
     return (
         <ScrollView keyboardShouldPersistTaps="always">
             <Form>
+                <Card title='Expenses by Month'
+                    graph={
+                        <ExpensesByMonth month={month as MonthType}
+                            data={
+                                monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth.map(x => ({ month: x.month, amount: x.amountSpent })) : []
+                            } />
+                    }
+                    onViewDetails={() => navigation.navigate('ExpandExpenses', { year, month })} />
                 <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenses by Months</Text>
                 </View>
