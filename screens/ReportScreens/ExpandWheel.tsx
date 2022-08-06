@@ -10,6 +10,7 @@ import { VictoryLegend, VictoryPie } from "victory-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { DropdownField } from "../../components/forms/DropdownField";
 import ByCategory from "../../components/graphs/ByCategory";
+import { Form } from "../../components/forms/Form";
 
 type ByCategoryProps = {
     categoryData: MonthBreakdownCategory[];
@@ -96,7 +97,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
 
     return (
-        <View style={[staticStyles.screen]}>
+        <Form>
             <ScrollView keyboardShouldPersistTaps="always">
                 <View>
                     <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20, marginHorizontal: 40, fontSize: 26 }}>
@@ -112,7 +113,6 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                     {
                         selectedCategory !== undefined &&
                         <>
-
                             <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50, marginHorizontal: 80 }}>
                                 <View style={{ justifyContent: "center" }}>
                                     <Text style={{ justifyContent: 'center', textAlign: 'center' }}>
@@ -132,14 +132,10 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                                 </View>
                             </View>
                         </>
-
                     }
                 </View>
-
-
             </ScrollView>
-
-        </View >
+        </Form>
     );
 
 }
