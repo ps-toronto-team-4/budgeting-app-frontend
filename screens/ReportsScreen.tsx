@@ -115,18 +115,6 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                     }
                     onViewDetails={() => navigation.navigate('ExpandBudget', { year, month })} />
                 <View>
-                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Budget and Expenses by Month</Text>
-                </View>
-                <View style={{ alignItems: 'center', marginBottom: 70 }}>
-                    <MonthlyVsBudgeted
-                        displayAmount={3}
-                        jumpAmount={1}
-                        data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
-                        monthSelector={month}
-                        yearSelector={year} />
-                    <Button text='View More' onPress={() => navigation.navigate('ExpandBudget', { year, month })}></Button>
-                </View>
-                <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Budget and Expenses by Category</Text>
                 </View>
                 <View style={{ alignItems: 'center', marginBottom: 70 }}>

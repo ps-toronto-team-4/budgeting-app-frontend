@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Rect, VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLabel, VictoryStack } from "victory-native";
+import { Rect, VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLabel, VictoryLegend, VictoryStack } from "victory-native";
 import { MONTHS_ORDER } from "../../../constants/Months";
 import { SliderButton } from "../../buttons/SliderButton";
 import { MonthType } from "../../generated";
@@ -162,6 +162,17 @@ export function BudgetsByMonth(props: BudgetsByMonthProps) {
                     <SliderButton direction="right" size={40} onPress={incrementDomainEnd} />
                 </View>
             }
+            <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                <VictoryLegend
+                    height={55}
+                    colorScale={['#4477aa', '#aa3377', '#e0b4cd']}
+                    data={[{ name: 'Budgeted' }, { name: 'Planned Expenses' }, { name: 'Unplanned Expenses' }]}
+                    width={320}
+                    orientation="horizontal"
+                    itemsPerRow={2}
+                    padding={20}
+                    gutter={0} />
+            </View>
         </View>
     );
 }
