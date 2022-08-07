@@ -131,63 +131,66 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                         }
                     ]}
                 />
-
             </View >
             {
-                categoryData.length !== 0 && <VictoryLegend
-                    centerTitle={true}
-                    orientation="horizontal"
-                    colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
-                    data={
-                        categoryData.filter((data) => data.amountSpent != 0).map((data) => {
-                            if (data.category === null) {
-                                return {
-                                    name: "Uncategorized",
-                                    symbol: {
-                                        fill: "#757575",
-                                    }
-                                }
-                            } else {
-                                return {
-                                    name: data.category?.name,
-                                    symbol: {
-                                        fill: "#" + data.category?.colourHex
-                                    }
-                                }
-                            }
-                        })
-                    }
-                    itemsPerRow={3}
-                    gutter={20}
-                    height={100}
-                    events={[
-                        {
-                            target: 'parent',
-                            eventHandlers: {
-                                onPress: () => [
-                                    {
-                                        target: 'parent',
-                                        callback: () => {
-                                            Keyboard.dismiss();
+                categoryData.length !== 0 &&
+                <View style={{ alignItems: 'center', marginBottom: 15, marginTop: 25 }}>
+                    <VictoryLegend
+                        width={320}
+                        orientation="horizontal"
+                        colorScale={categoryData.map((data) => data.category ? "#" + data.category.colourHex : "gray")}
+                        data={
+                            categoryData.filter((data) => data.amountSpent != 0).map((data) => {
+                                if (data.category === null) {
+                                    return {
+                                        name: "Uncategorized",
+                                        symbol: {
+                                            fill: "#757575",
                                         }
                                     }
-                                ]
-                            }
+                                } else {
+                                    return {
+                                        name: data.category?.name,
+                                        symbol: {
+                                            fill: "#" + data.category?.colourHex
+                                        }
+                                    }
+                                }
+                            })
                         }
-                    ]}
-                />
+                        itemsPerRow={2}
+                        gutter={20}
+                        height={32 * (categoryData.filter((data) => data.amountSpent != 0).length / 2)}
+                        events={[
+                            {
+                                target: 'parent',
+                                eventHandlers: {
+                                    onPress: () => [
+                                        {
+                                            target: 'parent',
+                                            callback: () => {
+                                                Keyboard.dismiss();
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]}
+                    />
+                </View>
             }
-
-            <DropdownField
-                label="Category"
-                placeholder="choose a category"
-                data={
-                    [...filteredCategoryData.map(x => {
-                        return { id: x.category?.id.toString() || '-2', value: x.category?.name || '' }
-                    }), { id: '-1', value: 'Uncategorized' }]
-                }
-                onChange={handleCategorySelect}
-                cachedValue={category?.name} />
+            <View style={styles.dropdownContainer}>
+                <DropdownField
+                    label="Category"
+                    placeholder="choose a category"
+                    data={
+                        [...filteredCategoryData.map(x => {
+                            return { id: x.category?.id.toString() || '-2', value: x.category?.name || '' }
+                        }), { id: '-1', value: 'Uncategorized' }]
+                    }
+                    onChange={handleCategorySelect}
+                    cachedValue={category?.name} />
+            </View>
         </>
     );
 }
@@ -195,5 +198,10 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
 const styles = StyleSheet.create({
     graphContainer: {
         alignItems: 'center',
+    },
+    dropdownContainer: {
+        marginBottom: 20,
+        zIndex: 1,
+        elevation: 1,
     }
 });

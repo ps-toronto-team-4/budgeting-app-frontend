@@ -84,10 +84,10 @@ function RootNavigator() {
         <Stack.Screen name="UpdateExpense" component={UpdateExpenseScreen} options={{ headerTitle: 'Edit Expense' }} />
         <Stack.Screen name="EditBudget" component={UpdateBudgetScreen} options={{ headerTitle: 'Edit Budget' }} />
         <Stack.Screen name="CreateBudget" component={CreateBudgetScreen} options={{ headerTitle: 'Create Budget' }} />
-        <Stack.Screen name="ExpandExpenses" component={ExpandExpenseScreen} options={{ headerTitle: 'Expand Expenses' }} />
-        <Stack.Screen name="ExpandBudget" component={ExpandBudgetScreen} options={{ headerTitle: 'Expand Budget' }} />
-        <Stack.Screen name="ExpandWheel" component={ExpandWheelScreen} options={{ headerTitle: 'Expand Wheel' }} />
-        <Stack.Screen name="ExpandBarCat" component={ExpandBarCatScreen} options={{ headerTitle: 'Expand BarCat' }} />
+        <Stack.Screen name="ExpandExpenses" component={ExpandExpenseScreen} options={{ headerTitle: 'Insights' }} />
+        <Stack.Screen name="ExpandBudget" component={ExpandBudgetScreen} options={{ headerTitle: 'Insights' }} />
+        <Stack.Screen name="ExpandWheel" component={ExpandWheelScreen} options={{ headerTitle: 'Insights' }} />
+        <Stack.Screen name="ExpandBarCat" component={ExpandBarCatScreen} options={{ headerTitle: 'Insights' }} />
         <Stack.Screen name="MerchantSettings" component={MerchantSettingsScreen} options={{ headerTitle: 'Merchants' }} />
         <Stack.Screen name="UpdateMerchant" component={UpdateMerchantScreen} options={{ headerTitle: 'Update Merchant' }} />
       </Stack.Group>

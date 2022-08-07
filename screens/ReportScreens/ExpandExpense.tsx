@@ -9,8 +9,6 @@ import { GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthTotalsDocume
 import MonthlyExpenseGraph from '../../components/graphs/MonthlyExpenses';
 import { TopBar } from "../../components/budget/TopBar";
 
-
-
 export default function ExpandExpense({ navigation, route }: RootStackScreenProps<'ExpandExpenses'>) {
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => {
@@ -53,12 +51,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                 setMerchantExist(true);
             }
         }
-    });
-
-
-    useEffect(() => {
-        // console.log(percent);
-    }, [percent]);
+    }, [monthTotalsData]);
 
     const RetrieveTopMerchant = () => {
         if (!monthBreakdownLoading && monthBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {

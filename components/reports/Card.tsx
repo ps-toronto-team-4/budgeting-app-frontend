@@ -37,9 +37,11 @@ const styles = StyleSheet.create({
         fontSize: 22,
     },
     graphContainer: {
-        alignItems: 'center',
+        alignItems: 'center'
     },
     btnContainer: {
         marginBottom: 30,
+        zIndex: -1,
+        elevation: -1,
     },
 });

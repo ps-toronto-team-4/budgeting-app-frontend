@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { View, Text } from "react-native"
+import { View, Text, StyleSheet } from "react-native"
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLabel, VictoryLegend, VictoryStack } from "victory-native";
 import ArrowButton from "../buttons/ArrowButton";
+import { SliderButton } from "../buttons/SliderButton";
 import { Budget, BudgetCategory } from "../generated";
-
-
-
 
 interface GraphDatum {
     "amountSpent": number,
@@ -17,11 +15,12 @@ interface GraphDatum {
 }
 
 interface GraphParameters {
-    data: GraphDatum[]
+    data: GraphDatum[];
+    onPressLeft?: () => void;
+    onPressRight?: () => void;
 }
 
-const RenderGraph = ({ data }: GraphParameters) => {
-
+const RenderGraph = ({ data, onPressLeft, onPressRight }: GraphParameters) => {
     const filteredData = data.map((ele, index) => {
         return {
             ...ele,
@@ -31,16 +30,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
             amountPlanned: ele.amountBudgeted !== 0 ? ele.amountSpent : 0,
             zero: 0
         }
-    })
-
-    const onPressClickHandler = () => {
-        return [{
-            target: "data",
-            mutation: (props: any) => {
-                return null
-            }
-        }];
-    }
+    });
 
     const [undefY, setUndefY] = useState<number | undefined>(100)
     //to combat Y being undefined at the start which caused an label error
@@ -51,20 +41,32 @@ const RenderGraph = ({ data }: GraphParameters) => {
 
     return (<>
         <VictoryChart>
-            <VictoryAxis
-                style={{
-                    grid: { stroke: "none" },
-                }}
-            />
-
-            <VictoryGroup offset={20}
-            >
+            <VictoryAxis style={{ grid: { stroke: "none" } }} />
+            <VictoryGroup offset={20}>
+                <VictoryStack colorScale={['#4477aa', '#4477aa']}
+                    labelComponent={<VictoryLabel y={undefY} dx={-20} />}>
+                    <VictoryBar
+                        categories={{ x: filteredData.map(ele => ele.shortCat) }}
+                        barWidth={20}
+                        data={filteredData.map(ele => {
+                            return {
+                                x: ele.shortCat,
+                                y: ele.amountBudgeted,
+                                label: ele.amountBudgeted ? '$' + ele.amountBudgeted.toFixed(2) : null
+                            }
+                        })} />
+                    <VictoryBar
+                        categories={{ x: filteredData.map(ele => ele.shortCat) }}
+                        barWidth={20}
+                        data={filteredData.map(ele => {
+                            return {
+                                x: ele.shortCat,
+                                y: ele.zero
+                            }
+                        })} />
+                </VictoryStack>
                 <VictoryStack colorScale={['#aa3377', '#e0b4cd']}
-                    labels={filteredData.map(ele => '$' + ele.amountSpent.toFixed(2))}
-                    labelComponent={<VictoryLabel y={undefY} dx={-20} />}
-                >
-
-
+                    labelComponent={<VictoryLabel y={undefY} dx={20} />}>
                     <VictoryBar
                         categories={{ x: filteredData.map(ele => ele.shortCat) }}
                         name="bar-1"
@@ -74,19 +76,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                                 x: ele.shortCat,
                                 y: ele.amountPlanned
                             }
-                        })}
-                        events={[
-                            {
-                                target: "data",
-                                eventHandlers: {
-                                    onClick: onPressClickHandler,
-                                    onPressIn: onPressClickHandler,
-
-                                }
-                            }
-                        ]}
-
-                    />
+                        })} />
                     <VictoryBar
                         categories={{ x: filteredData.map(ele => ele.shortCat) }}
                         name="bar-2"
@@ -94,85 +84,30 @@ const RenderGraph = ({ data }: GraphParameters) => {
                         data={filteredData.map(ele => {
                             return {
                                 x: ele.shortCat,
-                                y: ele.amountUnplanned
+                                y: ele.amountUnplanned,
+                                label: ele.amountSpent ? '$' + ele.amountSpent.toFixed(2) : null,
                             }
-                        })}
-                        events={[
-                            {
-                                target: "data",
-                                eventHandlers: {
-                                    onClick: onPressClickHandler,
-                                    onPressIn: onPressClickHandler,
-
-                                }
-                            }
-                        ]}
-
-                    />
-                </VictoryStack>
-                <VictoryStack colorScale={['#008866', '#008866']}
-                    labels={filteredData.map(ele => '$' + ele.amountBudgeted.toFixed(2))}
-                    labelComponent={<VictoryLabel y={undefY} dx={20} />}
-                >
-
-
-                    <VictoryBar
-                        categories={{ x: filteredData.map(ele => ele.shortCat) }}
-                        barWidth={20}
-                        data={filteredData.map(ele => {
-                            return {
-                                x: ele.shortCat,
-                                y: ele.amountBudgeted
-                            }
-                        })}
-                        events={[
-                            {
-                                target: "data",
-                                eventHandlers: {
-                                    onClick: onPressClickHandler,
-                                    onPressIn: onPressClickHandler,
-
-                                }
-                            }
-                        ]}
-
-                    />
-                    <VictoryBar
-                        categories={{ x: filteredData.map(ele => ele.shortCat) }}
-                        barWidth={20}
-                        data={filteredData.map(ele => {
-                            return {
-                                x: ele.shortCat,
-                                y: ele.zero
-                            }
-                        })}
-                        events={[
-                            {
-                                target: "data",
-                                eventHandlers: {
-                                    onClick: onPressClickHandler,
-                                    onPressIn: onPressClickHandler,
-
-                                }
-                            }
-                        ]}
-                    />
+                        })} />
                 </VictoryStack>
             </VictoryGroup>
         </VictoryChart>
-        <VictoryLegend x={50} y={0}
-            centerTitle={true}
-            orientation="horizontal"
-
-            itemsPerRow={2}
-            gutter={20}
-            height={60}
-            style={{ border: { stroke: "black" } }}
-            colorScale={["#aa3377", "#e0b4cd", "#008866"]}
-            data={[
-                { name: "Planned Expense" }, { name: "Unplanned Expense" }, { name: "Budgeted" }
-            ]}
-        />
+        <View style={styles.leftSliderContainer}>
+            <SliderButton direction="left" size={40} onPress={onPressLeft} />
+        </View>
+        <View style={styles.rightSliderContainer}>
+            <SliderButton direction="right" size={40} onPress={onPressRight} />
+        </View>
+        <View style={{ alignItems: 'center', marginBottom: 20 }}>
+            <VictoryLegend
+                height={55}
+                colorScale={['#4477aa', '#aa3377', '#e0b4cd']}
+                data={[{ name: 'Budgeted' }, { name: 'Planned Expenses' }, { name: 'Unplanned Expenses' }]}
+                width={320}
+                orientation="horizontal"
+                itemsPerRow={2}
+                padding={20}
+                gutter={0} />
+        </View>
     </>)
 }
 
@@ -218,12 +153,6 @@ const MonthlyVsBudgetedCategory = ({ displayAmount, jumpAmount, data, budgetRefe
     return (<View>
 
         <View style={{ flexDirection: 'row', width: "100%" }}>
-            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end", paddingBottom: 55 }}>
-                {showArrows && <ArrowButton direction="left" marginLeft={10} onPress={() => {
-                    const newSpot = sliceEnd - jumpAmountNumber
-                    setSliceEnd(newSpot < 0 ? newSpot + inputData.length : newSpot)
-                }} />}
-            </View>
             <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <View>
                     <RenderGraph data={inputData.length <= displayAmountNumber ? inputData :
@@ -231,18 +160,32 @@ const MonthlyVsBudgetedCategory = ({ displayAmount, jumpAmount, data, budgetRefe
                             (inputData.slice(0, (sliceEnd + displayAmountNumber) - (inputData.length)))
                         ) :
                             inputData.slice(sliceEnd, sliceEnd + displayAmountNumber)
-                    } />
+                    }
+                        onPressLeft={() => {
+                            const newSpot = sliceEnd - jumpAmountNumber
+                            setSliceEnd(newSpot < 0 ? newSpot + inputData.length : newSpot)
+                        }}
+                        onPressRight={() => {
+                            const newSpot = sliceEnd + jumpAmountNumber
+                            setSliceEnd(newSpot % inputData.length)
+                        }} />
                 </View>
-            </View>
-
-            <View style={{ flexBasis: 50, zIndex: 10, justifyContent: "flex-end", paddingBottom: 55 }}>
-                {showArrows && <ArrowButton direction="right" alignItems="flex-start" marginLeft={0} onPress={() => {
-                    const newSpot = sliceEnd + jumpAmountNumber
-                    setSliceEnd(newSpot % inputData.length)
-                }} />}
             </View>
         </View>
     </View >)
 }
+
+const styles = StyleSheet.create({
+    leftSliderContainer: {
+        position: 'absolute',
+        top: 245,
+        left: 8,
+    },
+    rightSliderContainer: {
+        position: 'absolute',
+        top: 245,
+        right: 8,
+    },
+});
 
 export default MonthlyVsBudgetedCategory;
