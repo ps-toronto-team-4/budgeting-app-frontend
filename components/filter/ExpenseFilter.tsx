@@ -2,11 +2,11 @@ import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { useMemo } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View, ImageBackground, TouchableOpacity, ScrollView } from "react-native";
-import { GET_SHORT_MONTH } from "../constants/Months";
-import { useAuth } from "../hooks/useAuth";
-import { useRefresh } from "../hooks/useRefresh";
-import Button from "./buttons/Button"
-import { GetCategoriesDocument, GetCategoriesQuery, GetMerchantsDocument, GetMerchantsQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "./generated";
+import { GET_SHORT_MONTH } from "../../constants/Months";
+import { useAuth } from "../../hooks/useAuth";
+import { useRefresh } from "../../hooks/useRefresh";
+import Button from "../buttons/Button"
+import { GetCategoriesDocument, GetCategoriesQuery, GetMerchantsDocument, GetMerchantsQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "../generated";
 
 type Expenses = {
     __typename?: "Expense" | undefined;

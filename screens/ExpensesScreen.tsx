@@ -10,7 +10,7 @@ import { useRefresh } from "../hooks/useRefresh";
 import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
 import { formatDate } from "./ExpenseDetailsScreen";
-import ExpenseFilter, { ApplyFilter } from "../components/ExpenseFilter"
+import ExpenseFilter, { ApplyFilter } from "../components/filter/ExpenseFilter"
 import { FilterButton } from "../components/buttons/FilterButton";
 import { TrashButton } from "../components/buttons/TrashButton";
 
