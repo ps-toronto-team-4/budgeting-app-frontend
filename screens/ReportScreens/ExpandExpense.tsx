@@ -5,9 +5,11 @@ import { useAuth } from "../../hooks/useAuth";
 import { useRefresh } from "../../hooks/useRefresh";
 import Button from "../../components/buttons/Button";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "../../components/generated";
+import { GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthTotalsDocument, GetMonthTotalsQuery, MonthType } from "../../components/generated";
 import MonthlyExpenseGraph from '../../components/graphs/MonthlyExpenses';
 import { TopBar } from "../../components/budget/TopBar";
+import { Card } from "../../components/reports/Card";
+import { ExpensesByMonth } from "../../components/reports/graphs/ExpensesByMonth";
 
 export default function ExpandExpense({ navigation, route }: RootStackScreenProps<'ExpandExpenses'>) {
     const passwordHash = useAuth({
@@ -80,17 +82,15 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
     return <View style={staticStyles.screen}>
         <ScrollView>
-            <View>
-                <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20 }}>
-                    Monthly Expenses for {route.params.month.charAt(0) + route.params.month.substring(1, route.params.month.length).toLowerCase()} {route.params.year}
-                </Text>
-            </View>
-            <View>
-                <MonthlyExpenseGraph
-                    data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
-                    monthSelector={route.params.month}
-                    yearSelector={route.params.year} />
-            </View>
+            <Card
+                title={`Expenses for ${route.params.year}`}
+                graph={
+                    <ExpensesByMonth
+                        month={route.params.month as MonthType}
+                        data={
+                            monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth.map(x => ({ month: x.month, amount: x.amountSpent })) : []
+                        } />
+                } />
             {
                 merchantExist && <>
 

@@ -62,7 +62,7 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                 </View>
                 <VictoryPie
                     padAngle={2}
-                    labelRadius={135}
+                    labelRadius={130}
                     radius={({ datum }) => datum.category.name === category?.name ? 120 : 100}
                     innerRadius={({ datum }) => datum.category.name === category?.name ? 90 : 70}
                     data={
@@ -82,7 +82,7 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                         }).filter((data) => data.amountSpent != 0)
 
                     }
-                    labels={({ datum }) => datum.category.name === category?.name ? "$" + datum.amountSpent.toFixed(2) : datum.category.name.substring(0, 10) + "..."}
+                    labels={({ datum }) => datum.category.name === category?.name ? "$" + datum.amountSpent.toFixed(2) : datum.category.name.substring(0, 7) + "..."}
                     y={"amountSpent"}
                     width={900}
                     height={300}
@@ -189,7 +189,8 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                         }), { id: '-1', value: 'Uncategorized' }]
                     }
                     onChange={handleCategorySelect}
-                    cachedValue={category?.name} />
+                    cachedValue={category?.name}
+                    disableScroll={true} />
             </View>
         </>
     );
@@ -198,6 +199,7 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
 const styles = StyleSheet.create({
     graphContainer: {
         alignItems: 'center',
+        marginTop: 20,
     },
     dropdownContainer: {
         marginBottom: 20,

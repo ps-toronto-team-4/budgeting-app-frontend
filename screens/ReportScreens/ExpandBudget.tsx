@@ -5,7 +5,9 @@ import MonthlyVsBudgeted from '../../components/graphs/MonthlyVsBudgeted';
 import { useAuth } from "../../hooks/useAuth";
 import { TopBar } from '../../components/budget/TopBar';
 import { useLazyQuery } from "@apollo/client";
-import { GetMonthTotalsDocument, GetMonthTotalsQuery } from "../../components/generated";
+import { GetMonthTotalsDocument, GetMonthTotalsQuery, MonthType } from "../../components/generated";
+import { Card } from "../../components/reports/Card";
+import { BudgetsByMonth } from "../../components/reports/graphs/BudgetsByMonth";
 
 
 
@@ -136,21 +138,24 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     return (<View style={staticStyles.screen}>
 
         <ScrollView>
-
-            <View>
-                <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20, marginHorizontal: 40, fontSize: 26 }}>
-                    Budgeted and Planned Comparison for {month.charAt(0) + month.substring(1, month.length).toLowerCase()} {year}
-                </Text>
-            </View>
-
-            <View style={{ alignItems: 'center', marginBottom: 70 }}>
-                <MonthlyVsBudgeted
-                    displayAmount={3}
-                    jumpAmount={1}
-                    data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
-                    monthSelector={month}
-                    yearSelector={year} />
-            </View>
+            <Card
+                title='Budgets by Month'
+                graph={
+                    <BudgetsByMonth
+                        month={month as MonthType}
+                        data={
+                            monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth.map(x => {
+                                return {
+                                    month: x.month,
+                                    budget: x.amountBudgeted,
+                                    spent: {
+                                        planned: x.amountSpentPlanned,
+                                        unplanned: x.amountSpentUnplanned,
+                                    },
+                                }
+                            }) : []
+                        } />
+                } />
             {currentMonth &&
                 <View style={[staticStyles.textContainer]}>
                     {budgetVSSpendingInsight(budgetDelta)}

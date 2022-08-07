@@ -58,6 +58,10 @@ export interface DropdownFieldProps {
      * given.
      */
     cachedValue?: string;
+    /**
+     * If true, will not try to calculate dropdown height based on keyboard, and will render the entire dropdown.
+     */
+    disableScroll?: boolean;
 }
 
 /**
@@ -188,7 +192,7 @@ export function DropdownField(props: DropdownFieldProps) {
             <View>
                 {
                     focused &&
-                    <ScrollView style={[styles.scrollView, { maxHeight: maxScrollViewHeight }]} keyboardShouldPersistTaps="always" nestedScrollEnabled={true}>
+                    <ScrollView style={[styles.scrollView, { maxHeight: props.disableScroll ? 1000 : maxScrollViewHeight }]} keyboardShouldPersistTaps="always" nestedScrollEnabled={true}>
                         {
                             filteredData.map(datum =>
                                 <DropdownItem item={datum} onPress={handleItemPress} key={datum.id} />
