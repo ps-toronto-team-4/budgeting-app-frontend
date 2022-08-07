@@ -45,10 +45,10 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
     const [year, setYear] = useState(now.year());
     const currentMonthIsNotPast = (year > now.year() || (year === now.year() && MONTHS_ORDER.indexOf(month) >= now.month()));
 
-    useRefresh(() => {
-        setMonth(MONTHS_ORDER[now.month()]);
-        setYear(now.year());
-    });
+    // useRefresh(() => {
+    //     setMonth(MONTHS_ORDER[now.month()]);
+    //     setYear(now.year());
+    // });
 
     const [getBudgets, { data: budgetData, refetch: budgetRefetch }] = useLazyQuery<GetBudgetsQuery, GetBudgetsQueryVariables>(GetBudgetsDocument);
     const [getMonthlyBreakdown, { data: monthData, refetch: monthRefetch }] = useLazyQuery<GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables>(GetMonthBreakdownDocument);
