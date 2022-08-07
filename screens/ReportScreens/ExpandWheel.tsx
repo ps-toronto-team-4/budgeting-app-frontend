@@ -86,6 +86,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     }
 
     const handleCategoryChange = (newCategory: { id: number, name: string } | undefined) => {
+        if (!newCategory) return;
         setSelectedCategory(newCategory);
         if (newCategory) {
             retrieveAmountSpent(newCategory.name);
@@ -120,7 +121,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
                         }
                         month={month}
                         year={year}
-                        onChangeCategory={setSelectedCategory} />
+                        onChangeCategory={handleCategoryChange} />
                 } />
             <View style={staticStyles.insightsContainer}>
                 {
