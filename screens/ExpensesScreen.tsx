@@ -1,8 +1,7 @@
 import { useLazyQuery } from "@apollo/client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GetExpensesDocument, GetExpensesQuery, GetExpensesQueryVariables } from "../components/generated";
 import { FlatList } from "react-native";
-import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RootTabScreenProps } from "../types";
 import AddButton from "../components/buttons/AddButton";
@@ -11,9 +10,9 @@ import { useRefresh } from "../hooks/useRefresh";
 import Colors from "../constants/Colors";
 import { ExpenseDisplay, ExpenseDisplayProps } from "../components/ExpenseDisplay";
 import { formatDate } from "./ExpenseDetailsScreen";
-import Button from "../components/buttons/Button";
-import styles from "../constants/Styles";
-import ExpenseFilter, { ApplyFilter } from "../components/expenseFilter"
+import ExpenseFilter, { ApplyFilter } from "../components/ExpenseFilter"
+import { FilterButton } from "../components/buttons/FilterButton";
+import { TrashButton } from "../components/buttons/TrashButton";
 
 type ExpenseDisplayPropsOrDate = ExpenseDisplayProps | string;
 
@@ -77,6 +76,12 @@ function processExpenses(expenses: Expenses, onPress: (id: number) => void): Exp
     return processed;
 }
 
+interface FilterSet {
+    date: any,
+    category: string[],
+    merchant: string[],
+}
+
 function renderItem({ item }: { item: ExpenseDisplayPropsOrDate }) {
     if (typeof item === 'string') {
         return (
@@ -103,11 +108,22 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         redirect: 'ifUnauthorized',
     });
     useRefresh(() => refetch({ passwordHash }));
-    const [filters, setFilters] = useState<filterSet>({
+    const [filters, setFilters] = useState<FilterSet>({
         date: {},
         category: [],
         merchant: [],
     })
+    const [modalVisible, setModalVisible] = useState(false);
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={staticStyles.filterBtnContainer}>
+                    <FilterButton onPress={() => setModalVisible(true)} />
+                </View>
+            )
+        });
+    }, []);
 
     const processedExpenses = useMemo(() => {
         if (data?.expenses.__typename === 'ExpensesSuccess') {
@@ -116,14 +132,6 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
         }
         return [];
     }, [data, filters]);
-
-
-    interface filterSet {
-        date: any,
-        category: string[],
-        merchant: string[],
-    }
-
 
     const handleAddExpense = () => navigation.navigate('CreateExpense');
 
@@ -134,9 +142,7 @@ export default function ExpensesScreen({ navigation }: RootTabScreenProps<'Expen
     } else {
         return (
             <View style={staticStyles.screen}>
-                <View style={staticStyles.filterButton}>
-                    <ExpenseFilter onApplyFilter={setFilters}></ExpenseFilter>
-                </View>
+                <ExpenseFilter onApplyFilter={setFilters} visible={modalVisible} onHide={() => setModalVisible(false)} />
                 <>
                     {
                         processedExpenses.length === 0 &&
@@ -160,6 +166,9 @@ const staticStyles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'white',
+    },
+    filterBtnContainer: {
+        paddingRight: 10,
     },
     itemSeparator: {
         flex: 1,

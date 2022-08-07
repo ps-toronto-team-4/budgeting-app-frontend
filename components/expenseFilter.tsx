@@ -1,13 +1,12 @@
 import { useLazyQuery } from "@apollo/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMemo } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View, ImageBackground, TouchableOpacity, ScrollView } from "react-native";
 import { GET_SHORT_MONTH } from "../constants/Months";
 import { useAuth } from "../hooks/useAuth";
 import { useRefresh } from "../hooks/useRefresh";
 import Button from "./buttons/Button"
-import { FilterButton } from "./buttons/FilterButton";
-import { GetCategoriesDocument, GetCategoriesQuery, GetMerchantQuery, GetMerchantsDocument, GetMerchantsQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "./generated";
+import { GetCategoriesDocument, GetCategoriesQuery, GetMerchantsDocument, GetMerchantsQuery, GetMonthTotalsDocument, GetMonthTotalsQuery } from "./generated";
 
 type Expenses = {
     __typename?: "Expense" | undefined;
@@ -26,7 +25,7 @@ type Expenses = {
     } | null | undefined;
 }[];
 
-const ApplyFilter = (expenses: Expenses, filters: filterSet) => {
+function ApplyFilter(expenses: Expenses, filters: filterSet): Expenses {
 
     //merchnat filter
     const merchnatFiltered = expenses.filter((ele) => {
@@ -71,7 +70,7 @@ const ApplyFilter = (expenses: Expenses, filters: filterSet) => {
 function RadioButton({ style, selected, text, onPress }: { style?: any, selected: boolean, text: string, onPress?: () => void }) {
     return (
         <TouchableOpacity onPress={onPress}>
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', marginVertical: 2 }}>
 
                 <View style={[{
                     height: 24,
@@ -93,7 +92,7 @@ function RadioButton({ style, selected, text, onPress }: { style?: any, selected
                             : null
                     }
                 </View>
-                <Text style={{ fontSize: 20 }}>{text}</Text>
+                <Text style={{ fontSize: 20, marginLeft: 10 }}>{text}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -107,16 +106,22 @@ interface filterSet {
 
 interface ExpenseFilterParams {
     onApplyFilter: (item: filterSet) => void,
+    visible: boolean;
+    onHide?: () => void;
 }
 
-const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
+const ExpenseFilter = ({ onApplyFilter, visible, onHide }: ExpenseFilterParams) => {
 
     const [filters, setFilters] = useState<filterSet>({
         date: {},
         category: [],
         merchant: [],
     })
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(visible);
+
+    useEffect(() => {
+        setModalVisible(visible);
+    }, [visible]);
 
     const passwordHash = useAuth({
         onRetrieved: (passwordHash) => {
@@ -200,7 +205,6 @@ const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
 
 
     return (<>
-        <FilterButton color='black' onPress={() => setModalVisible(true)}></FilterButton>
         <View style={styles.centeredView}>
 
             <Modal
@@ -263,12 +267,14 @@ const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
                                     })}
 
                             </View>
+                            <View style={{ height: 30 }} />
 
                         </ScrollView>
 
                         <Button text="Save Filter" onPress={() => {
-                            setModalVisible(!modalVisible)
-                            onApplyFilter(filters)
+                            onHide && onHide();
+                            setModalVisible(false);
+                            onApplyFilter(filters);
                         }} />
                     </View>
                 </View>
@@ -277,9 +283,6 @@ const ExpenseFilter = ({ onApplyFilter }: ExpenseFilterParams) => {
     </>
     );
 };
-
-
-
 
 const styles = StyleSheet.create({
     centeredView: {
@@ -328,6 +331,7 @@ const styles = StyleSheet.create({
     },
     typeDivitor: {
         marginTop: 20,
+        marginBottom: 8,
         fontSize: 26,
     },
     monthContainer: {

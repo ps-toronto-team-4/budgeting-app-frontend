@@ -1,16 +1,15 @@
 import { ColorValue, StyleSheet, TouchableHighlight } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
-export interface PencilButtonProps {
+export interface FilterButtonProps {
     onPress: () => void;
-    color?: ColorValue;
 }
 
-export function FilterButton(props: PencilButtonProps) {
+export function FilterButton(props: FilterButtonProps) {
     return (
         <TouchableHighlight style={styles.container} onPress={props.onPress}
             underlayColor="rgba(0,0,0,0.1)">
-            <Feather name="filter" size={24} color={props.color || 'orange'} />
+            <Feather name="filter" size={24} />
         </TouchableHighlight>
     );
 }
