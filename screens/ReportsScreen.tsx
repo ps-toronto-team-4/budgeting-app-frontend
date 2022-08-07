@@ -18,6 +18,7 @@ import { Card } from '../components/reports/Card';
 import { VictoryPie } from 'victory-native';
 import { ExpensesByMonth } from '../components/reports/graphs/ExpensesByMonth';
 import { BudgetsByMonth } from '../components/reports/graphs/BudgetsByMonth';
+import { BudgetsByCategory } from '../components/reports/graphs/BudgetsByCategory';
 
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
@@ -114,6 +115,21 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
                             } />
                     }
                     onViewDetails={() => navigation.navigate('ExpandBudget', { year, month })} />
+                <Card
+                    title='Budgets by Category'
+                    graph={
+                        <BudgetsByCategory data={
+                            monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ?
+                                monthlyBreakdownData.monthBreakdown.byCategory.filter(ele => {
+                                    const foundBudget = budgetsData?.budgets.__typename == 'BudgetsSuccess' ?
+                                        budgetsData.budgets.budgets.find(bud => {
+                                            return bud.month == month && bud.year == year
+                                        }) as Budget : undefined
+                                    const foundPair = foundBudget?.budgetCategories?.find(cat => cat.category.name == ele.category?.name)
+                                    return !(ele.amountSpent == 0 && (foundPair === undefined || foundPair.amount == 0))
+                                }).map(x => x.category.) : []
+                        } />
+                    } />
                 <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Budget and Expenses by Category</Text>
                 </View>
