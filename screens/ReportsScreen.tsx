@@ -17,6 +17,7 @@ import { Form } from '../components/forms/Form';
 import { Card } from '../components/reports/Card';
 import { VictoryPie } from 'victory-native';
 import { ExpensesByMonth } from '../components/reports/graphs/ExpensesByMonth';
+import { BudgetsByMonth } from '../components/reports/graphs/BudgetsByMonth';
 
 
 export default function ReportsScreen({ navigation }: RootTabScreenProps<'Reports'>) {
@@ -84,24 +85,35 @@ export default function ReportsScreen({ navigation }: RootTabScreenProps<'Report
     return (
         <ScrollView keyboardShouldPersistTaps="always">
             <Form>
-                <Card title='Expenses by Month'
+                <Card
+                    title='Expenses by Month'
                     graph={
-                        <ExpensesByMonth month={month as MonthType}
+                        <ExpensesByMonth
+                            month={month as MonthType}
                             data={
                                 monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth.map(x => ({ month: x.month, amount: x.amountSpent })) : []
                             } />
                     }
                     onViewDetails={() => navigation.navigate('ExpandExpenses', { year, month })} />
-                <View>
-                    <Text style={{ fontSize: 36, textAlign: 'center' }}>Expenses by Months</Text>
-                </View>
-                <View style={{ alignItems: 'center', marginBottom: 70 }}>
-                    <MonthlyExpenseGraph
-                        data={monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth : []}
-                        monthSelector={month}
-                        yearSelector={year} />
-                    <Button text='View More' onPress={() => navigation.navigate('ExpandExpenses', { year, month })}></Button>
-                </View>
+                <Card
+                    title='Budgets by Month'
+                    graph={
+                        <BudgetsByMonth
+                            month={month as MonthType}
+                            data={
+                                monthTotalsData?.monthsTotals.__typename == "MonthsTotals" ? monthTotalsData.monthsTotals.byMonth.map(x => {
+                                    return {
+                                        month: x.month,
+                                        budget: x.amountBudgeted,
+                                        spent: {
+                                            planned: x.amountSpentPlanned,
+                                            unplanned: x.amountSpentUnplanned,
+                                        },
+                                    }
+                                }) : []
+                            } />
+                    }
+                    onViewDetails={() => navigation.navigate('ExpandBudget', { year, month })} />
                 <View>
                     <Text style={{ fontSize: 36, textAlign: 'center' }}>Budget and Expenses by Month</Text>
                 </View>

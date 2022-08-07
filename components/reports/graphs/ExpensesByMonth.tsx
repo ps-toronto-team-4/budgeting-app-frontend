@@ -33,6 +33,7 @@ export function ExpensesByMonth(props: ExpensesByMonthProps) {
         }
         return highest;
     }, [props.data]);
+    // Add data for months that have 0 amount
     const data: ExpensesByMonthDatum[] = useMemo(() => {
         return MONTHS_ORDER.map(month => {
             return {
@@ -87,7 +88,8 @@ export function ExpensesByMonth(props: ExpensesByMonthProps) {
                         data={slicedData}
                         x={(datum: object) => (datum as ExpensesByMonthDatum).month.slice(0, 3)}
                         y={(datum: object) => (datum as ExpensesByMonthDatum).amount}
-                        labels={({ datum }: { datum: ExpensesByMonthDatum }) => datum.amount.toFixed(2)}
+                        labels={({ datum }: { datum: ExpensesByMonthDatum }) => datum.amount > 0 ? datum.amount.toFixed(2) : null}
+                        style={{ data: { fill: '#aa3377' } }}
                         barRatio={0.7} />
                     <VictoryBar
                         data={padData}
