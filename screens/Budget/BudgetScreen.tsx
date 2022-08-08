@@ -53,7 +53,7 @@ export default function BudgetScreen({ navigation, route }: RootTabScreenProps<'
         });
 
         return listener;
-    });
+    }, []);
 
     const [getBudgets, { data: budgetData, refetch: budgetRefetch }] = useLazyQuery<GetBudgetsQuery, GetBudgetsQueryVariables>(GetBudgetsDocument);
     const [getMonthlyBreakdown, { data: monthData, refetch: monthRefetch }] = useLazyQuery<GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables>(GetMonthBreakdownDocument);
