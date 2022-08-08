@@ -94,7 +94,7 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                         {
                             target: "data",
                             eventHandlers: {
-                                onPress: () => {
+                                onPressIn: () => {
                                     return (
                                         [
                                             {
