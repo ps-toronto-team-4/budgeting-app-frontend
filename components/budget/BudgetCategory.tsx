@@ -73,7 +73,7 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
                         </View>
                         <View style={staticStyles.amntDisplayContainer}>
                             <View style={staticStyles.amntTitleContainer}>
-                                <Text style={staticStyles.amntTitle}>Expenses</Text>
+                                <Text style={staticStyles.amntTitle}>Spent</Text>
                             </View>
                             <Text style={staticStyles.amntText}>
                                 ${actual}
