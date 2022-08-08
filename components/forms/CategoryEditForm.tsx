@@ -69,6 +69,11 @@ export function CategoryEditForm({ initVals, onSubmit }: CategoryEditFormProps) 
                     onChange={setName}
                     errorMessage={nameError} />
                 <ColorField label="Color" />
+                <InputField
+                    label="Details"
+                    placeholder="optional"
+                    defaultValue={details}
+                    onChange={setDetails} />
             </View>
         </Form>
     );

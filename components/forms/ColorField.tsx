@@ -10,6 +10,8 @@ export interface ColorItemProps {
 }
 
 export function ColorItem(props: ColorItemProps) {
+
+
     return (
         <TouchableHighlight style={styles.colorItemContainer} underlayColor="rgba(0,0,0,0.2)" onPress={() => { }}>
             <ColorCircle color={props.color} size={24} />
@@ -31,8 +33,8 @@ export function ColorField({ label, defaultColor }: ColorFieldProps) {
                 <Text style={styles.label}>{label}</Text>
                 <View style={styles.colorsContainer}>
                     {
-                        colorsList.map((color, i) =>
-                            <ColorItem color={color} key={i} selected={color === defaultColor} />
+                        colorsList.map((color) =>
+                            <ColorItem color={color} key={color} selected={color === defaultColor} />
                         )
                     }
                 </View>
