@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
     title: {
         fontWeight: 'bold',
         fontSize: 22,
+        maxWidth: 350,
     },
     graphContainer: {
         alignItems: 'center'

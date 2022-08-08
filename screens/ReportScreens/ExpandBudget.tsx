@@ -139,7 +139,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
         <ScrollView>
             <Card
-                title='Budgets by Month'
+                title={`Budgets for ${month.slice(0, 3)} ${year}`}
                 graph={
                     <BudgetsByMonth
                         month={month as MonthType}

@@ -83,7 +83,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     return <View style={staticStyles.screen}>
         <ScrollView>
             <Card
-                title={`Expenses for ${route.params.year}`}
+                title={`Expenses for ${route.params.month.slice(0, 3)} ${route.params.year}`}
                 graph={
                     <ExpensesByMonth
                         month={route.params.month as MonthType}
