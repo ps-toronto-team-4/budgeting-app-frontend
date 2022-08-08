@@ -1,4 +1,4 @@
-name: Generate Demo QR
+name: Generate QR 2
 on:
   workflow_dispatch:
 
