@@ -123,7 +123,6 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                                     {
                                         target: 'data',
                                         callback: () => {
-                                            setCategory(undefined);
                                             Keyboard.dismiss();
                                         }
                                     }
@@ -170,7 +169,6 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                                         {
                                             target: 'parent',
                                             callback: () => {
-                                                setCategory(undefined);
                                                 Keyboard.dismiss();
                                             }
                                         }
