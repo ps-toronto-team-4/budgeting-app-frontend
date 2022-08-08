@@ -65,7 +65,7 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
                     <View style={staticStyles.body}>
                         <View style={staticStyles.amntDisplayContainer}>
                             <View style={staticStyles.amntTitleContainer}>
-                                <Text style={staticStyles.amntTitle}>Planned</Text>
+                                <Text style={staticStyles.amntTitle}>Budgeted</Text>
                             </View>
                             <Text style={staticStyles.amntText}>
                                 ${planned}
@@ -73,7 +73,7 @@ export function BudgetCategory({ category, color, planned, actual, onPressDots, 
                         </View>
                         <View style={staticStyles.amntDisplayContainer}>
                             <View style={staticStyles.amntTitleContainer}>
-                                <Text style={staticStyles.amntTitle}>Actual</Text>
+                                <Text style={staticStyles.amntTitle}>Expenses</Text>
                             </View>
                             <Text style={staticStyles.amntText}>
                                 ${actual}
