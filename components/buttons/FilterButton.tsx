@@ -9,7 +9,7 @@ export function FilterButton(props: FilterButtonProps) {
     return (
         <TouchableHighlight style={styles.container} onPress={props.onPress}
             underlayColor="rgba(0,0,0,0.1)">
-            <Feather name="filter" size={24} />
+            <Feather name="filter" size={24} color="black" />
         </TouchableHighlight>
     );
 }
