@@ -171,7 +171,8 @@ export function DropdownField(props: DropdownFieldProps) {
                             ref={inputRef}
                             onBlur={() => setFocused(false)}
                             value={value}
-                            onChangeText={setValue} />
+                            onChangeText={setValue}
+                            pointerEvents="none" />
                         <TouchableHighlight
                             style={styles.arrowIconContainer}
                             underlayColor="rgba(0,0,0,0.1)"
