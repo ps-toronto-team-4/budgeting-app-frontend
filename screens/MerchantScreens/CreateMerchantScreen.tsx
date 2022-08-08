@@ -27,19 +27,6 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [category, setCategory] = React.useState<{ id: number, name: string } | undefined>();
     const [check, setCheck] = React.useState(false);
     const [disabledButton, setDisabledButton] = React.useState(false);
-    const [categoryOpen, setCategoryOpen] = React.useState(false);
-
-    const preFillCategory = () => {
-        AsyncStorage.getItem('New Category')
-            .then((val) => {
-                if (val) {
-                    setCategory(JSON.parse(val));
-                }
-            })
-            .catch((err) => {
-                console.log("Couldn't retrieve new category: " + err)
-            })
-    }
 
     const [createMerchant, { loading: merchantLoading, data: merchantData }] = useMutation<CreateMerchantMutation>(CreateMerchantDocument, {
         variables: { passwordHash: passwordHash, name: merchantName, description: details, defaultCategoryId: category?.id },
@@ -60,9 +47,20 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
     const [getMerchants, { data: manyMerchantsData }] = useLazyQuery<GetMerchantsQuery, GetMerchantsQueryVariables>(GetMerchantsDocument);
 
     useRefresh(() => {
-        preFillCategory();
         refetch({ passwordHash });
     });
+    
+    useRefresh(() => {
+        AsyncStorage.getItem('New Category')
+        .then((val) => {
+            if (val) {
+                setCategory(JSON.parse(val));
+            }
+        })
+        .catch((err) => {
+            console.log("Couldn't retrieve new category: " + err)
+        });
+    }), [categoryData];
 
     const merchantTaken = () => {
         if (manyMerchantsData?.merchants.__typename === "MerchantsSuccess" && merchantName) {
@@ -121,7 +119,7 @@ export default function CreateMerchant({ navigation }: RootStackScreenProps<'Cre
                         categoryData?.categories.__typename == "CategoriesSuccess" ?
                             categoryData.categories.categories.map(x => { return { id: x.id.toString(), value: x.name, color: '#' + x.colourHex } }) : []
                     }
-                    defaultValue={category?.name}
+                    cachedValue={category?.name}
                     onChange={handleCategorySelect}
                     onCreateNew={handleCreateCategory}
                     labelForCreateNew="category" />

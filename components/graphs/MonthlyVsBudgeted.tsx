@@ -49,20 +49,11 @@ const RenderGraph = ({ data }: GraphParameters) => {
     return (
         <>
             <VictoryChart>
-                <VictoryAxis
-                    style={{
-                        grid: { stroke: "none" },
-                    }}
-                />
-                <VictoryGroup offset={20}
-                >
-                    <VictoryStack colorScale={['#aa3377', '#e0b4cd']}
+                <VictoryAxis />
+                <VictoryGroup offset={20}>
+                    <VictoryStack
                         labels={filteredData.map(ele => '$' + ele.amountSpent.toFixed(2))}
-                        labelComponent={<VictoryLabel y={undefY} dx={-20} />}
-                    >
-
-
-
+                        labelComponent={<VictoryLabel y={undefY} dx={-20} />}>
                         <VictoryBar
                             categories={{ x: filteredData.map(ele => ele.shortMonth) }}
                             name="bar-1"
@@ -72,19 +63,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                                     x: ele.shortMonth,
                                     y: ele.amountSpentPlanned
                                 }
-                            })}
-                            events={[
-                                {
-                                    target: "data",
-                                    eventHandlers: {
-                                        onClick: onPressClickHandler,
-                                        onPressIn: onPressClickHandler,
-
-                                    }
-                                }
-                            ]}
-
-                        />
+                            })} />
                         <VictoryBar
                             categories={{ x: filteredData.map(ele => ele.shortMonth) }}
                             name="bar-2"
@@ -94,26 +73,11 @@ const RenderGraph = ({ data }: GraphParameters) => {
                                     x: ele.shortMonth,
                                     y: ele.amountSpentUnplanned,
                                 }
-                            })}
-                            events={[
-                                {
-                                    target: "data",
-                                    eventHandlers: {
-                                        onClick: onPressClickHandler,
-                                        onPressIn: onPressClickHandler,
-
-                                    }
-                                }
-                            ]}
-
-                        />
+                            })} />
                     </VictoryStack>
-                    <VictoryStack colorScale={['#008866', '#008866']}
+                    <VictoryStack
                         labels={filteredData.map(ele => '$' + ele.amountBudgeted.toFixed(2))}
-                        labelComponent={<VictoryLabel y={undefY} dx={20} />}
-                    >
-
-
+                        labelComponent={<VictoryLabel y={undefY} dx={20} />}>
                         <VictoryBar
                             categories={{ x: filteredData.map(ele => ele.shortMonth) }}
                             barWidth={20}
@@ -122,19 +86,7 @@ const RenderGraph = ({ data }: GraphParameters) => {
                                     x: ele.shortMonth,
                                     y: ele.amountBudgeted
                                 }
-                            })}
-                            events={[
-                                {
-                                    target: "data",
-                                    eventHandlers: {
-                                        onClick: onPressClickHandler,
-                                        onPressIn: onPressClickHandler,
-
-                                    }
-                                }
-                            ]}
-
-                        />
+                            })} />
                         <VictoryBar
                             categories={{ x: filteredData.map(ele => ele.shortMonth) }}
                             barWidth={20}
@@ -143,23 +95,12 @@ const RenderGraph = ({ data }: GraphParameters) => {
                                     x: ele.shortMonth,
                                     y: ele.zero
                                 }
-                            })}
-                            events={[
-                                {
-                                    target: "data",
-                                    eventHandlers: {
-                                        onClick: onPressClickHandler,
-                                        onPressIn: onPressClickHandler,
-
-                                    }
-                                }
-                            ]}
-                        // labels={({ datum }) => datum.y.toFixed(2)}
-                        />
+                            })} />
                     </VictoryStack>
                 </VictoryGroup>
-
             </VictoryChart>
+
+
             <VictoryLegend x={50} y={0}
                 centerTitle={true}
                 orientation="horizontal"

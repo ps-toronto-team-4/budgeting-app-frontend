@@ -7,6 +7,7 @@ import { useLazyQuery } from '@apollo/client';
 import { Budget, GetBudgetsDocument, GetBudgetsQuery, GetMonthBreakdownDocument, GetMonthBreakdownQuery, GetMonthBreakdownQueryVariables, MonthType } from "../../components/generated";
 import MonthlyVsBudgetedCategory from '../../components/graphs/monthlyVsBudgetedCategory';
 import { AntDesign } from "@expo/vector-icons";
+import { Card } from "../../components/reports/Card";
 
 export default function ExpandExpense({ navigation, route }: RootStackScreenProps<'ExpandExpenses'>) {
 
@@ -53,16 +54,27 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
     return <View style={staticStyles.screen}>
         <ScrollView>
-            <View>
-                <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20, marginHorizontal: 20, fontSize: 26 }}>
-                    Budgeted and Planned Comparison By Category for {month.charAt(0) + month.substring(1, month.length).toLowerCase()} {year}
-                </Text>
-            </View>
-            <MonthlyVsBudgetedCategory
-                displayAmount={3}
-                jumpAmount={1}
-                data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []}
-                budgetReferenceData={currentBudget} />
+            <Card
+                title={`Budgets by Category for ${month.slice(0, 3)} ${year}`}
+                graph={
+                    <MonthlyVsBudgetedCategory
+                        displayAmount={3}
+                        jumpAmount={1}
+                        data={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ?
+                            monthlyBreakdownData.monthBreakdown.byCategory.filter(ele => {
+                                const foundBudget = budgetsData?.budgets.__typename == 'BudgetsSuccess' ?
+                                    budgetsData.budgets.budgets.find(bud => {
+                                        return bud.month == month && bud.year == year
+                                    }) as Budget : undefined
+                                const foundPair = foundBudget?.budgetCategories?.find(cat => cat.category.name == ele.category?.name)
+                                // console.log("pari", foundPair, ele)
+                                return !(ele.amountSpent == 0 && (foundPair === undefined || foundPair.amount == 0))// && (foundPair === undefined || foundPair.amount == 0)
+                            }) : []}
+                        budgetReferenceData={budgetsData?.budgets.__typename === 'BudgetsSuccess' ?
+                            budgetsData.budgets.budgets.find(ele => {
+                                return ele.month == month && ele.year == year
+                            }) as Budget : undefined} />
+                } />
             <View>
                 <View style={{ flex: 1, marginTop: 55, marginBottom: 5, marginLeft: 60, marginRight: 60 }}>
                     <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50 }}>
