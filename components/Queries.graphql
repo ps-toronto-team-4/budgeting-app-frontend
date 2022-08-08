@@ -608,3 +608,22 @@ query homePageData($passwordHash: String!, $month: MonthType!, $year: Int!) {
         }
     }
 }
+
+query budgetDetailsByDate($passwordHash: String!, $month: MonthType!, $year: Int! ) {
+    budgetDetailsByDate(passwordHash: $passwordHash, month: $month, year: $year) {
+        __typename
+        ...on BudgetDetails {
+            byCategory {
+                amountBudgeted
+                amountActual
+                category {
+                    name
+                }
+            }
+        }
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
+}

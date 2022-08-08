@@ -10,6 +10,8 @@ import { VictoryLegend, VictoryPie } from "victory-native";
 import { EventCallbackInterface, StringOrNumberOrList } from "victory-core";
 import { DropdownField } from "../../components/forms/DropdownField";
 import ByCategory from "../../components/graphs/ByCategory";
+import { Form } from "../../components/forms/Form";
+import { Card } from "../../components/reports/Card";
 
 type ByCategoryProps = {
     categoryData: MonthBreakdownCategory[];
@@ -84,6 +86,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     }
 
     const handleCategoryChange = (newCategory: { id: number, name: string } | undefined) => {
+        if (!newCategory) return;
         setSelectedCategory(newCategory);
         if (newCategory) {
             retrieveAmountSpent(newCategory.name);
@@ -96,50 +99,56 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
 
     return (
-        <View style={[staticStyles.screen]}>
-            <ScrollView keyboardShouldPersistTaps="always">
-                <View>
-                    <Text style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginVertical: 20, marginHorizontal: 40, fontSize: 26 }}>
-                        Monthly Expenses By Category for {month.charAt(0) + month.substring(1, month.length).toLowerCase()} {year}
-                    </Text>
-                </View>
-
-                <View>
-                    <ByCategory categoryData={monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown" ? monthlyBreakdownData.monthBreakdown.byCategory : []} month={month} year={year} onChangeCategory={handleCategoryChange}></ByCategory>
-                </View>
-
-                <View style={staticStyles.insightsContainer}>
-                    {
-                        selectedCategory !== undefined &&
-                        <>
-
-                            <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50, marginHorizontal: 80 }}>
-                                <View style={{ justifyContent: "center" }}>
-                                    <Text style={{ justifyContent: 'center', textAlign: 'center' }}>
-                                        <Text style={{ fontWeight: 'bold', fontSize: 26 }}>${categoryExpense}</Text>
-                                        <Text style={{ fontSize: 26 }}> spent on </Text>
-                                        <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{selectedCategory?.name}</Text>
-                                    </Text>
-                                </View>
+        <ScrollView keyboardShouldPersistTaps="always" style={staticStyles.screen}>
+            <Card
+                title='Expenses by Category'
+                graph={
+                    <ByCategory
+                        categoryData={
+                            monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown"
+                                ? monthlyBreakdownData.monthBreakdown.byCategory.slice().sort((a, b) => {
+                                    if (!a.category || !b.category) {
+                                        return 0;
+                                    } else if (a.category.name > b.category.name) {
+                                        return 1;
+                                    } else if (a.category.name < b.category.name) {
+                                        return -1;
+                                    } else {
+                                        return 0;
+                                    }
+                                })
+                                : []
+                        }
+                        month={month}
+                        year={year}
+                        onChangeCategory={handleCategoryChange} />
+                } />
+            <View style={staticStyles.insightsContainer}>
+                {
+                    selectedCategory !== undefined &&
+                    <>
+                        <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50, marginHorizontal: 80 }}>
+                            <View style={{ justifyContent: "center" }}>
+                                <Text style={{ justifyContent: 'center', textAlign: 'center' }}>
+                                    <Text style={{ fontWeight: 'bold', fontSize: 26 }}>${categoryExpense}</Text>
+                                    <Text style={{ fontSize: 26 }}> spent on </Text>
+                                    <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{selectedCategory?.name}</Text>
+                                </Text>
                             </View>
+                        </View>
 
-                            <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50, marginHorizontal: 100 }}>
-                                <View style={{ justifyContent: "center" }}>
-                                    <Text style={{ justifyContent: 'center', textAlign: 'center' }}>
-                                        <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{percent}</Text>
-                                        <Text style={{ fontSize: 26 }}> of your {month.charAt(0) + month.substring(1, month.length).toLowerCase()} expenses</Text>
-                                    </Text>
-                                </View>
+                        <View style={{ justifyContent: "center", alignContent: 'center', paddingTop: 50, marginHorizontal: 100 }}>
+                            <View style={{ justifyContent: "center" }}>
+                                <Text style={{ justifyContent: 'center', textAlign: 'center' }}>
+                                    <Text style={{ fontWeight: 'bold', fontSize: 26 }}>{percent}</Text>
+                                    <Text style={{ fontSize: 26 }}> of your {month.charAt(0) + month.substring(1, month.length).toLowerCase()} expenses</Text>
+                                </Text>
                             </View>
-                        </>
-
-                    }
-                </View>
-
-
-            </ScrollView>
-
-        </View >
+                        </View>
+                    </>
+                }
+            </View>
+        </ScrollView>
     );
 
 }
@@ -148,11 +157,9 @@ const staticStyles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'white',
-
     },
     graphContainer: {
         alignItems: 'center',
-
     },
     insightsContainer: {
         alignItems: 'center',
