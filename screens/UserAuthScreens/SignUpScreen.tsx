@@ -86,8 +86,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<'SignU
     const setData = async () => {
         if (data?.signUp.__typename === "CreateUserSuccess") {
             try {
-                await AsyncStorage.setItem('passwordHash', data.signUp.passwordHash);
-                navigation.replace('Root');
+                await AsyncStorage.setItem('passwordHash', data.signUp.passwordHash, () => navigation.navigate('Root'));
             } catch (error) {
                 console.log(error);
                 Alert.alert("Something went wrong");
