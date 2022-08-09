@@ -4,7 +4,7 @@
     "slug": "budgeting-app-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/pigeon.png",
+    "icon": "./assets/images/pigeon-small.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/pigeon.png",
@@ -22,13 +22,13 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/pigeon.png",
+        "foregroundImage": "./assets/images/pigeon-small.png",
         "backgroundColor": "#FFFFFF"
       },
       "permissions": []
     },
     "web": {
-      "favicon": "./assets/images/pigeon.png"
+      "favicon": "./assets/images/pigeon-small.png"
     },
     "scheme": "ps"
   }
