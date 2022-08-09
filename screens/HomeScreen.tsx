@@ -98,8 +98,11 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         let yearAvg = 0;
         if (avgData?.monthsTotals.__typename === 'MonthsTotals' && avgData.monthsTotals.averageSpent) {
             const applicableMonthData = avgData.monthsTotals.byMonth.filter(x => x.year === year).map(x => x.amountSpent);
-            console.log(applicableMonthData.length);
-            yearAvg = applicableMonthData.reduce((a, b) => a + b, 0) / applicableMonthData.length;
+            if (applicableMonthData.length === 0) {
+                yearAvg = 0;
+            } else {
+                yearAvg = applicableMonthData.reduce((a, b) => a + b, 0) / applicableMonthData.length;
+            }
         }
         return yearAvg;
     }, [avgData]);
