@@ -607,6 +607,18 @@ query homePageData($passwordHash: String!, $month: MonthType!, $year: Int!) {
             errorMessage
         }
     }
+
+    monthBreakdown(passwordHash: $passwordHash, month: $month, year: $year) {
+        __typename
+        ...on MonthBreakdown {
+            totalSpent
+        }
+
+        ...on FailurePayload {
+            exceptionName
+            errorMessage
+        }
+    }
 }
 
 query budgetDetailsByDate($passwordHash: String!, $month: MonthType!, $year: Int! ) {
