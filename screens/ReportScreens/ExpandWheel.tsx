@@ -56,7 +56,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
 
     const retrieveAmountSpent = (categoryName: string) => {
         if (monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
-            let categoryIndex = monthlyBreakdownData.monthBreakdown.byCategory.findIndex(e => e.category?.name === categoryName);
+            let categoryIndex = monthlyBreakdownData.monthBreakdown.byCategory.findIndex(e => (categoryName === 'Uncategorized' && !e.category) || e.category?.name === categoryName);
             let currentCategorySpent = monthlyBreakdownData.monthBreakdown.byCategory[categoryIndex].amountSpent;
 
             if (currentCategorySpent > 0) {
@@ -73,7 +73,7 @@ export default function ExpandExpense({ navigation, route }: RootStackScreenProp
     const percentOfTotal = (categoryName: string) => {
         if (monthlyBreakdownData?.monthBreakdown.__typename === "MonthBreakdown") {
             let totalSpent = monthlyBreakdownData.monthBreakdown.totalSpent;
-            let categoryIndex = monthlyBreakdownData.monthBreakdown.byCategory.findIndex(e => e.category?.name === categoryName);
+            let categoryIndex = monthlyBreakdownData.monthBreakdown.byCategory.findIndex(e => (categoryName === 'Uncategorized' && !e.category) || e.category?.name === categoryName);
             let currentCategorySpent = monthlyBreakdownData.monthBreakdown.byCategory[categoryIndex].amountSpent;
             let delta = (currentCategorySpent) / (totalSpent);
 
