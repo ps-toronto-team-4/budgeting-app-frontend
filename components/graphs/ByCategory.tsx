@@ -42,6 +42,10 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
         return categoryData.slice().filter(x => !!x.category && x.amountSpent > 0);
     }, [categoryData]);
 
+    const hasUncategorizedExpenses = useMemo(() => {
+        return categoryData.find(datum => datum.category === null && datum.amountSpent !== 0);
+    }, [categoryData]);
+
     function handleCategorySelect(categoryId: string | undefined) {
         if (categoryId === '-1') setCategory({ id: -1, name: 'Uncategorized' })
         if (categoriesData?.categories.__typename == "CategoriesSuccess") {
@@ -184,9 +188,13 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                     label="Category"
                     placeholder="choose a category"
                     data={
-                        [...filteredCategoryData.map(x => {
-                            return { id: x.category?.id.toString() || '-2', value: x.category?.name || '' }
-                        }), { id: '-1', value: 'Uncategorized' }]
+                        hasUncategorizedExpenses ?
+                            [...filteredCategoryData.map(x => {
+                                return { id: x.category?.id.toString() || '-2', value: x.category?.name || '' }
+                            }), { id: '-1', value: 'Uncategorized' }]
+                            : [...filteredCategoryData.map(x => {
+                                return { id: x.category?.id.toString() || '-2', value: x.category?.name || '' }
+                            })]
                     }
                     onChange={handleCategorySelect}
                     cachedValue={category?.name}
