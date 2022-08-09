@@ -25,7 +25,8 @@
         "foregroundImage": "./assets/images/pigeon-small.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": []
+      "permissions": [],
+      "package": "com.jeremie.budgetingappfrontend"
     },
     "web": {
       "favicon": "./assets/images/pigeon-small.png"
