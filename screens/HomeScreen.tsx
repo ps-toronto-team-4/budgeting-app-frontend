@@ -85,13 +85,13 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
     const homeQueryData = useMemo(() => {
         let overBudgetCategories: string[] = [];
         let monthTotal = 0;
-        if (homePageData?.budgetDetailsByDate.__typename === 'BudgetDetails' ) {
+        if (homePageData?.budgetDetailsByDate.__typename === 'BudgetDetails') {
             monthTotal = homePageData.budgetDetailsByDate.totalActual;
             overBudgetCategories = homePageData.budgetDetailsByDate.byCategory.filter(budgetCategory => {
                 return (budgetCategory.amountActual > budgetCategory.amountBudgeted);
             }).map((item) => item.category.name);
         }
-        return {monthTotal, overBudgetCategories};
+        return { monthTotal, overBudgetCategories };
     }, [homePageData]);
 
     const averageData = useMemo(() => {
@@ -129,7 +129,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                 <View style={[style.alert, ALERT_COLOR.over]}>
                     <Feather name='info' size={24} color={ALERT_COLOR.over.borderColor} style={{ margin: 10 }} />
                     <Text style={style.alertText}>You are over budget in these categories for the month of {monthName}:
-                        {homeQueryData.overBudgetCategories.map((x, i) => <Text style={{fontWeight: 'bold'}} key={i}>{' ' + x + (i < homeQueryData.overBudgetCategories.length - 1 ? ',' : '')}</Text>)}</Text>
+                        {homeQueryData.overBudgetCategories.map((x, i) => <Text style={{ fontWeight: 'bold' }} key={i}>{' ' + x + (i < homeQueryData.overBudgetCategories.length - 1 ? ',' : '')}</Text>)}</Text>
                 </View>
             ) : (
                 <View style={[style.alert, ALERT_COLOR.under]}>
@@ -144,7 +144,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                         <Text style={style.dateText}>{MONTHS_ORDER[month]}</Text>
                     </View>
                     <View style={style.summaryDataContainer}>
-                        <Text style={style.summaryData}>${homeQueryData.monthTotal.toFixed(2)}</Text>
+                        <Text style={style.summaryData}>${homePageData?.monthBreakdown.__typename === 'MonthBreakdown' ? homePageData.monthBreakdown.totalSpent.toFixed(2) : '0.00'}</Text>
                         <Text style={style.summaryText}>Your total spendings this month so far</Text>
                     </View>
                 </View>
@@ -164,8 +164,8 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
                         <Text style={style.subtitle}>Upcoming Expenses:</Text>
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', padding: 15 }}>
                             <View style={{ backgroundColor: 'rgb(22, 89, 193)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 9, paddingVertical: 3, borderRadius: 90, marginRight: 15 }}>
-                                <Text style={{ fontSize: 16, color: 'white', textAlign: 'center', textAlignVertical: 'center'}}>
-                                {upcoming.length}
+                                <Text style={{ fontSize: 16, color: 'white', textAlign: 'center', textAlignVertical: 'center' }}>
+                                    {upcoming.length}
                                 </Text>
                             </View>
                             <AntDesign
