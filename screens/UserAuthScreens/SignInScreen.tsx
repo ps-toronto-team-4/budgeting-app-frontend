@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Button from "../../components/buttons/Button";
 import TextInput from "../../components/forms/TextInput";
@@ -15,28 +15,15 @@ import { Form } from "../../components/forms/Form";
 export default function SignInScreen({ navigation }: RootStackScreenProps<'SignIn'>) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [usernamePayload, setUsernamePayload] = useState('');
-    const [passwordPayload, setPasswordPayload] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
 
     useAuth({ redirect: 'ifAuthorized' });
 
-    const setData = async () => {
-        try {
-            await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == 'SignInSuccess' ? data.signIn.passwordHash : '', () => navigation.navigate('Root'));
-        } catch (error) {
-            if (data?.signIn.__typename == 'FailurePayload') {
-                alert(data.signIn.errorMessage);
-            } else {
-                alert('An error occured while writing to local storage.');
-            }
-        }
-    };
     const [triggerLogin, { loading, error, data }] = useLazyQuery<LoginQuery, LoginQueryVariables>(LoginDocument, {
-        variables: { username: usernamePayload, password: passwordPayload },
         onCompleted: (data) => {
             if (data?.signIn.__typename === 'SignInSuccess') {
-                setData();
+                AsyncStorage.setItem('passwordHash', data.signIn.__typename === 'SignInSuccess' ? data.signIn.passwordHash : '').then(() => {
+                    navigation.navigate('Root');
+                });
             }
         },
         onError: (data) => {
@@ -45,9 +32,9 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
     });
 
     const handleLogin = () => {
-        setUsernamePayload(username);
-        setPasswordPayload(password);
-        triggerLogin();
+        if (username && password) {
+            triggerLogin({ variables: { username, password } });
+        }
     }
 
     return (
