@@ -160,7 +160,7 @@ export default function ByCategory({ categoryData, month, year, onChangeCategory
                         }
                         itemsPerRow={2}
                         gutter={20}
-                        height={32 * (categoryData.filter((data) => data.amountSpent != 0).length / 2)}
+                        height={40 * (categoryData.filter((data) => data.amountSpent != 0).length / 2)}
                         events={[
                             {
                                 target: 'parent',
