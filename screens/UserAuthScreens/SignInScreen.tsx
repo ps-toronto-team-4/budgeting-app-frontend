@@ -23,8 +23,7 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<'SignI
 
     const setData = async () => {
         try {
-            await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == 'SignInSuccess' ? data.signIn.passwordHash : '');
-            navigation.navigate('Root');
+            await AsyncStorage.setItem('passwordHash', data?.signIn.__typename == 'SignInSuccess' ? data.signIn.passwordHash : '', () => navigation.navigate('Root'));
         } catch (error) {
             if (data?.signIn.__typename == 'FailurePayload') {
                 alert(data.signIn.errorMessage);
