@@ -58,6 +58,10 @@ export interface DropdownFieldProps {
      * given.
      */
     cachedValue?: string;
+    /**
+     * If true, will not try to calculate dropdown height based on keyboard, and will render the entire dropdown.
+     */
+    disableScroll?: boolean;
 }
 
 /**
@@ -81,6 +85,8 @@ export function DropdownField(props: DropdownFieldProps) {
     const [scrollViewScreenY, setScrollViewScreenY] = useState(0);
     const maxScrollViewHeight = keyboardScreenY - scrollViewScreenY - (Platform.OS === 'android' ? 25 : 0);
     const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => console.log('scroll view height: ' + maxScrollViewHeight), [maxScrollViewHeight]);
 
     useEffect(() => {
         Keyboard.addListener('keyboardDidShow', (e) => {
@@ -136,6 +142,15 @@ export function DropdownField(props: DropdownFieldProps) {
         });
     };
 
+    const handlePressArrow = () => {
+        if (!focused) {
+            scrollViewStartRef.current?.measureInWindow((x, y) => {
+                setScrollViewScreenY(y);
+            });
+        }
+        setFocused(oldFocused => !oldFocused);
+    };
+
     function handlePressCreateNew() {
         props.onCreateNew && props.onCreateNew(value);
         setCachedValue(value);
@@ -156,11 +171,12 @@ export function DropdownField(props: DropdownFieldProps) {
                             ref={inputRef}
                             onBlur={() => setFocused(false)}
                             value={value}
-                            onChangeText={setValue} />
+                            onChangeText={setValue}
+                            pointerEvents="none" />
                         <TouchableHighlight
                             style={styles.arrowIconContainer}
                             underlayColor="rgba(0,0,0,0.1)"
-                            onPress={() => { setFocused(oldFocused => !oldFocused) }}>
+                            onPress={handlePressArrow}>
                             <AntDesign
                                 name={focused ? 'up' : 'down'}
                                 size={20}
@@ -177,7 +193,7 @@ export function DropdownField(props: DropdownFieldProps) {
             <View>
                 {
                     focused &&
-                    <ScrollView style={[styles.scrollView, { maxHeight: maxScrollViewHeight }]} keyboardShouldPersistTaps="always">
+                    <ScrollView style={[styles.scrollView, { maxHeight: props.disableScroll ? 1000 : maxScrollViewHeight }]} keyboardShouldPersistTaps="always" nestedScrollEnabled={true}>
                         {
                             filteredData.map(datum =>
                                 <DropdownItem item={datum} onPress={handleItemPress} key={datum.id} />

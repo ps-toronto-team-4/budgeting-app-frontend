@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "budgeting-app-frontend",
+    "name": "Pigeon",
     "slug": "budgeting-app-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/pigeon-small.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/pigeon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -22,13 +22,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/pigeon-small.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": []
+      "permissions": [],
+      "package": "com.jeremie.budgetingappfrontend"
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/pigeon-small.png"
     },
     "scheme": "ps"
   }

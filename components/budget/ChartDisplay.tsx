@@ -17,10 +17,10 @@ export function ChartDisplay({ planned, actualBudgeted, actualUnbudgeted, height
                 <VictoryAxis crossAxis />
                 <VictoryStack colorScale={['#aa3377', '#e0b4cd']}>
                     <VictoryBar
-                        categories={{ x: ['Planned', 'Actual'] }}
+                        categories={{ x: ['Total Budgeted', 'Total Spent'] }}
                         data={[
-                            { x: 'Planned', y: planned, label: '$' + planned.toFixed(2), fill: '#4477aa' },
-                            { x: 'Actual', y: actualBudgeted, fill: '#aa3377' },
+                            { x: 'Total Budgeted', y: planned, label: '$' + planned.toFixed(2), fill: '#4477aa' },
+                            { x: 'Total Spent', y: actualBudgeted, fill: '#aa3377' },
                         ]}
                         style={{
                             data:
@@ -33,10 +33,10 @@ export function ChartDisplay({ planned, actualBudgeted, actualUnbudgeted, height
                         width={200}
                         barWidth={50} />
                     <VictoryBar
-                        categories={{ x: ['Planned', 'Actual'] }}
+                        categories={{ x: ['Total Budgeted', 'Total Spent'] }}
                         data={[
-                            { x: 'Planned', y: 0 },
-                            { x: 'Actual', y: actualUnbudgeted, label: `$${(actualBudgeted + actualUnbudgeted).toFixed(2)}` }
+                            { x: 'Total Budgeted', y: 0 },
+                            { x: 'Total Spent', y: actualUnbudgeted, label: `$${(actualBudgeted + actualUnbudgeted).toFixed(2)}` }
                         ]}
                         width={200}
                         barWidth={50} />

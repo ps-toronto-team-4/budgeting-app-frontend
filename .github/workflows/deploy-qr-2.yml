@@ -1,10 +1,10 @@
-name: Generate QR
+name: Generate QR 2
 on:
   workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ps42
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -13,4 +13,4 @@ jobs:
           node-version: 16.15.1
       - run: npm install -g expo-cli
       - run: npm install
-      - run: expo start --tunnel --port 6000 > index.txt
+      - run: expo start --tunnel --port 7000 > index.txt

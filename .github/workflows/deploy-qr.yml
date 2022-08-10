@@ -1,11 +1,10 @@
-name: tests
-on: 
-  push:
-  pull_request:
-    types: [opened]
+name: Generate QR
+on:
+  workflow_dispatch:
+
 jobs:
-  run_tests:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: ps41
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -14,5 +13,4 @@ jobs:
           node-version: 16.15.1
       - run: npm install -g expo-cli
       - run: npm install
-      - run: npm test
-      - run: expo build:web
+      - run: expo start --tunnel --port 6000 > index.txt
